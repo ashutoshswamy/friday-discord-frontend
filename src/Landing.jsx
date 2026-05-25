@@ -212,9 +212,9 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           {/* Left: Content */}
           <div className="lp-hero-content">
             <h1 className="lp-hero-title">
-              Make Your<br />
-              <span className="lp-hero-title-accent">Server</span><br />
-              Extraordinary
+              Your Server.<br />
+              <span className="lp-hero-title-accent">Friday's</span><br />
+              Got It.
             </h1>
 
             <p className="lp-hero-desc">

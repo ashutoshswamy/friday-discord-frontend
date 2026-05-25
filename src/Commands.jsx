@@ -68,7 +68,7 @@ const COMMANDS = [
     usage: '/timeout [user] [duration] [reason]',
     options: [
       { name: 'user', type: 'User', required: true, desc: 'Member to timeout' },
-      { name: 'duration', type: 'Integer', required: true, desc: 'Duration in minutes' },
+      { name: 'duration', type: 'Choice', required: true, desc: '60 Seconds · 5 Minutes · 10 Minutes · 1 Hour · 1 Day' },
       { name: 'reason', type: 'String', required: false, desc: 'Reason for timeout' },
     ],
     admin: false,
@@ -142,7 +142,7 @@ const COMMANDS = [
     usage: '/purge [amount] [filter?]',
     options: [
       { name: 'amount', type: 'Integer', required: true, desc: 'Number of messages to delete (1–100)' },
-      { name: 'filter', type: 'String', required: false, desc: 'Filter: bots, links, images, text' },
+      { name: 'filter', type: 'Choice', required: false, desc: 'bots · links · attachments · embeds' },
     ],
     admin: true,
     dashboard: false,
