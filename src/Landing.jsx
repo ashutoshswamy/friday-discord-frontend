@@ -190,6 +190,10 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#how">How it works</a>
             <RouterLink to="/commands">Commands</RouterLink>
             <RouterLink to="/updates">Updates</RouterLink>
+            <RouterLink to="/status" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00e676', display: 'inline-block', boxShadow: '0 0 6px #00e676' }} />
+              Status
+            </RouterLink>
           </nav>
 
           <div className="lp-nav-ctas">
@@ -217,6 +221,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
             <RouterLink to="/commands" onClick={() => setMobileMenuOpen(false)}>Commands</RouterLink>
             <RouterLink to="/updates" onClick={() => setMobileMenuOpen(false)}>Updates</RouterLink>
+            <RouterLink to="/status" onClick={() => setMobileMenuOpen(false)}>Status</RouterLink>
             <a
               href={inviteUrl}
               target="_blank"
