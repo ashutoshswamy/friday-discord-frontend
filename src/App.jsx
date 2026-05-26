@@ -8,7 +8,7 @@ import {
   Calendar, CheckCircle2, Sparkles,
   Fish, Package, Target, Flame, Heart, PawPrint, Swords, UtensilsCrossed, Pickaxe, Dog, Cat, Rabbit, Pizza as PizzaIcon,
   Wrench, Activity, Hash, Headphones, FolderOpen, Cpu, TrendingUp,
-  Home, BookOpen, Menu, Landmark
+  Home, BookOpen, Menu, Landmark, Briefcase
 } from 'lucide-react';
 import Landing from './Landing';
 import Commands from './Commands';
@@ -124,6 +124,11 @@ function App() {
   const [ticketsList, setTicketsList]       = useState([]);
   const [ticketsLoaded, setTicketsLoaded]   = useState(false);
 
+  const [jobsList, setJobsList]             = useState([]);
+  const [jobsLoaded, setJobsLoaded]         = useState(false);
+  const [jobsAssignModal, setJobsAssignModal] = useState(null); // { userId, username, avatar }
+  const [jobsAssignKey, setJobsAssignKey]   = useState('');
+
   const [purgeChannelId, setPurgeChannelId] = useState('');
   const [purgeAmount, setPurgeAmount]       = useState('10');
   const [purgeFilter, setPurgeFilter]       = useState('');
@@ -180,6 +185,7 @@ function App() {
     if (activeTab === 'tickets' && !ticketsLoaded) fetchTickets();
     if (activeTab === 'logs' && !modstatsLoaded) fetchModstats();
     if (activeTab === 'stocks' && !stockCatalogLoaded) fetchStockCatalog();
+    if (activeTab === 'jobs' && !jobsLoaded) fetchJobs();
   }, [activeTab, activeGuildId]);
 
   // ── Auto-refresh: refresh telemetry + active economy panel every 30s
@@ -986,6 +992,45 @@ function App() {
     finally { setMarketLoaded(true); }
   };
 
+  const fetchJobs = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/jobs`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setJobsList(await res.json());
+    } catch { /* silent */ }
+    finally { setJobsLoaded(true); }
+  };
+
+  const adminSetJob = async (userId, jobKey) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/jobs/${userId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobKey }),
+      });
+      if (res.ok) {
+        setJobsList(prev => {
+          const existing = prev.find(j => j.userId === userId);
+          if (existing) return prev.map(j => j.userId === userId ? { ...j, jobKey } : j);
+          return [...prev, { userId, jobKey, jobAppliedAt: Date.now() }];
+        });
+        showNotification('success', 'Job assigned.');
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const adminClearJob = async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/jobs/${userId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setJobsList(prev => prev.filter(j => j.userId !== userId));
+        showNotification('success', 'Job cleared.');
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
   const fetchTickets = async () => {
     try {
       const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/tickets`, { headers: { Authorization: `Bearer ${token}` } });
@@ -1276,6 +1321,7 @@ function App() {
                       { id: 'alerts',      Icon: Bell,             label: 'Alerts' },
                       { group: 'Economy' },
                       { id: 'stocks',      Icon: TrendingUp,       label: 'Stocks' },
+                      { id: 'jobs',        Icon: Briefcase,        label: 'Jobs' },
                       { id: 'inventory',   Icon: Package,          label: 'Inventory' },
                       { id: 'pets',        Icon: Sparkles,         label: 'Pets' },
                       { id: 'market',      Icon: Zap,              label: 'Market' },
@@ -1319,7 +1365,7 @@ function App() {
                     <div className="header-title-container">
                       <div className="header-tab-accent" />
                       <h1>
-                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Embed Builder' }[activeTab] || activeTab}
+                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', jobs: 'Job Ecosystem', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Embed Builder' }[activeTab] || activeTab}
                       </h1>
                     </div>
                     <div className="header-actions">
@@ -3377,6 +3423,191 @@ function App() {
                                   </div>
                                 )}
                               </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* ── JOBS ── */}
+                        {activeTab === 'jobs' && (() => {
+                          const JOBS_DEF = {
+                            cashier:   { name: 'Cashier',           emoji: '🛒', tier: 1, levelRequired: 1,  minPay: 60,  maxPay: 120, xpBonus: 0,  description: 'Scan items and manage the checkout lane.' },
+                            performer: { name: 'Street Performer',  emoji: '🎸', tier: 1, levelRequired: 1,  minPay: 30,  maxPay: 180, xpBonus: 0,  description: 'Entertain passersby for tips — volatile income.' },
+                            delivery:  { name: 'Delivery Driver',   emoji: '🚗', tier: 1, levelRequired: 1,  minPay: 70,  maxPay: 130, xpBonus: 5,  description: 'Deliver packages across the city.' },
+                            chef:      { name: 'Chef',              emoji: '👨‍🍳', tier: 2, levelRequired: 5,  minPay: 120, maxPay: 210, xpBonus: 10, description: 'Cook gourmet dishes in a busy kitchen.' },
+                            mechanic:  { name: 'Mechanic',          emoji: '🔧', tier: 2, levelRequired: 5,  minPay: 130, maxPay: 220, xpBonus: 0,  description: 'Repair vehicles and heavy machinery.' },
+                            guard:     { name: 'Security Guard',    emoji: '💂', tier: 2, levelRequired: 5,  minPay: 110, maxPay: 190, xpBonus: 0,  description: 'Patrol premises and maintain order.' },
+                            engineer:  { name: 'Software Engineer', emoji: '💻', tier: 3, levelRequired: 10, minPay: 200, maxPay: 360, xpBonus: 20, description: 'Build and ship software products.' },
+                            doctor:    { name: 'Doctor',            emoji: '🩺', tier: 3, levelRequired: 10, minPay: 220, maxPay: 390, xpBonus: 15, description: 'Treat patients and perform procedures.' },
+                            lawyer:    { name: 'Lawyer',            emoji: '⚖️', tier: 3, levelRequired: 10, minPay: 210, maxPay: 370, xpBonus: 10, description: 'Argue cases and draft contracts.' },
+                            ceo:       { name: 'CEO',               emoji: '🏢', tier: 4, levelRequired: 20, minPay: 360, maxPay: 620, xpBonus: 25, description: 'Lead a corporation and make high-stakes decisions.' },
+                            banker:    { name: 'Investment Banker', emoji: '💰', tier: 4, levelRequired: 20, minPay: 300, maxPay: 660, xpBonus: 15, description: 'Manage portfolios and execute financial deals.' },
+                            gamedev:   { name: 'Game Developer',    emoji: '🎮', tier: 4, levelRequired: 20, minPay: 280, maxPay: 600, xpBonus: 30, description: 'Design and ship immersive games.' },
+                          };
+                          const TIER_COLORS = { 1: '#9CA3AF', 2: '#60A5FA', 3: '#A78BFA', 4: '#FBBF24' };
+                          const TIER_LABELS = { 1: 'Starter', 2: 'Skilled', 3: 'Professional', 4: 'Elite' };
+
+                          const employedMap = {};
+                          jobsList.forEach(j => { employedMap[j.userId] = j.jobKey; });
+
+                          const jobCounts = {};
+                          jobsList.forEach(j => { jobCounts[j.jobKey] = (jobCounts[j.jobKey] || 0) + 1; });
+                          const topJob = Object.entries(jobCounts).sort((a, b) => b[1] - a[1])[0];
+
+                          return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+                              {/* Stats row */}
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                                {[
+                                  { label: 'Employed Members', value: jobsList.length },
+                                  { label: 'Unemployed Members', value: Math.max(0, members.length - jobsList.length) },
+                                  { label: 'Most Popular Job', value: topJob ? `${JOBS_DEF[topJob[0]]?.emoji} ${JOBS_DEF[topJob[0]]?.name}` : '—' },
+                                ].map(s => (
+                                  <div key={s.label} className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: '0.5px' }}>{s.label}</div>
+                                    <div style={{ fontSize: '22px', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>{s.value}</div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Job catalogue */}
+                              <div className="glass-panel" style={{ padding: '24px' }}>
+                                <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <Briefcase size={15} style={{ color: 'var(--primary)' }} />
+                                  Job Catalogue
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+                                  {[1, 2, 3, 4].map(tier => (
+                                    <div key={tier} style={{ display: 'contents' }}>
+                                      {Object.entries(JOBS_DEF).filter(([, j]) => j.tier === tier).map(([key, job]) => {
+                                        const count = jobCounts[key] || 0;
+                                        return (
+                                          <div key={key} style={{ padding: '14px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-card)', border: `1px solid ${TIER_COLORS[tier]}22`, position: 'relative', overflow: 'hidden' }}>
+                                            <div style={{ position: 'absolute', top: 0, left: 0, width: '3px', height: '100%', background: TIER_COLORS[tier] }} />
+                                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                              <span style={{ fontSize: '24px', lineHeight: 1 }}>{job.emoji}</span>
+                                              <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                                                  <span style={{ fontWeight: 700, fontSize: '14px' }}>{job.name}</span>
+                                                  <span style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '999px', background: `${TIER_COLORS[tier]}22`, color: TIER_COLORS[tier], fontFamily: 'var(--font-display)', fontWeight: 700 }}>{TIER_LABELS[tier]}</span>
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>{job.description}</div>
+                                                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                                  <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>🪙 {job.minPay}–{job.maxPay}/shift</span>
+                                                  {job.xpBonus > 0 && <span style={{ fontSize: '11px', color: '#8B5CF6', fontWeight: 600 }}>+{job.xpBonus} XP/shift</span>}
+                                                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lv {job.levelRequired}+</span>
+                                                  {count > 0 && <span style={{ fontSize: '11px', color: TIER_COLORS[tier], fontWeight: 600 }}>{count} employed</span>}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Employed members */}
+                              <div className="glass-panel" style={{ padding: '24px' }}>
+                                <div className="chart-title" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <Users size={15} style={{ color: 'var(--primary)' }} />
+                                  Member Employment
+                                  <button className="btn btn-secondary" style={{ marginLeft: 'auto', fontSize: '12px', padding: '4px 10px' }} onClick={() => { setJobsLoaded(false); fetchJobs(); }}>
+                                    <RefreshCw size={12} /> Refresh
+                                  </button>
+                                </div>
+                                {!jobsLoaded ? (
+                                  <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}><RefreshCw className="animate-spin" size={20} color="var(--primary)" /></div>
+                                ) : (
+                                  <div className="table-container">
+                                    <table className="dashboard-table">
+                                      <thead><tr><th>Member</th><th>Job</th><th>Tier</th><th>Pay Range</th><th>XP Bonus</th><th>Actions</th></tr></thead>
+                                      <tbody>
+                                        {members.map(m => {
+                                          const jobKey = employedMap[m.id];
+                                          const job    = jobKey ? JOBS_DEF[jobKey] : null;
+                                          return (
+                                            <tr key={m.id}>
+                                              <td>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                  <img className="user-avatar-sm" src={m.avatar} alt={m.username} style={{ width: '28px', height: '28px', borderRadius: '6px' }} onError={e => { e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }} />
+                                                  <span style={{ fontWeight: 600 }}>{m.username}</span>
+                                                </div>
+                                              </td>
+                                              <td>
+                                                {job ? (
+                                                  <span>{job.emoji} {job.name}</span>
+                                                ) : (
+                                                  <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Unemployed</span>
+                                                )}
+                                              </td>
+                                              <td>
+                                                {job ? (
+                                                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[job.tier]}22`, color: TIER_COLORS[job.tier], fontWeight: 700 }}>{TIER_LABELS[job.tier]}</span>
+                                                ) : '—'}
+                                              </td>
+                                              <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#10B981' }}>
+                                                {job ? `🪙 ${job.minPay}–${job.maxPay}` : '🪙 50–150'}
+                                              </td>
+                                              <td style={{ fontSize: '12px', color: '#8B5CF6' }}>
+                                                {job && job.xpBonus > 0 ? `+${job.xpBonus} XP` : '—'}
+                                              </td>
+                                              <td>
+                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                  <button className="btn btn-secondary" style={{ fontSize: '11px', padding: '3px 10px' }} onClick={() => { setJobsAssignModal(m); setJobsAssignKey(jobKey || ''); }}>
+                                                    Assign
+                                                  </button>
+                                                  {job && (
+                                                    <button className="btn btn-danger" style={{ fontSize: '11px', padding: '3px 10px' }} onClick={() => adminClearJob(m.id)}>
+                                                      Fire
+                                                    </button>
+                                                  )}
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          );
+                                        })}
+                                        {members.length === 0 && (
+                                          <tr><td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No members found.</td></tr>
+                                        )}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Assign job modal */}
+                              {jobsAssignModal && (
+                                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                                  <div className="glass-panel" style={{ padding: '28px', minWidth: '360px', maxWidth: '440px', position: 'relative' }}>
+                                    <button style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => setJobsAssignModal(null)}><X size={18} /></button>
+                                    <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '4px' }}>Assign Job</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+                                      Assigning job for <strong>{jobsAssignModal.username}</strong>. Bypasses level requirements.
+                                    </div>
+                                    <div className="form-group">
+                                      <label>Job</label>
+                                      <select className="form-select" value={jobsAssignKey} onChange={e => setJobsAssignKey(e.target.value)}>
+                                        <option value="">— Select a job —</option>
+                                        {[1, 2, 3, 4].map(tier => (
+                                          <optgroup key={tier} label={`Tier ${tier} — ${TIER_LABELS[tier]}`}>
+                                            {Object.entries(JOBS_DEF).filter(([, j]) => j.tier === tier).map(([key, job]) => (
+                                              <option key={key} value={key}>{job.emoji} {job.name}</option>
+                                            ))}
+                                          </optgroup>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                      <button className="btn btn-primary" style={{ flex: 1 }} disabled={!jobsAssignKey} onClick={async () => { await adminSetJob(jobsAssignModal.id, jobsAssignKey); setJobsAssignModal(null); }}>
+                                        <Briefcase size={14} /> Assign
+                                      </button>
+                                      <button className="btn btn-secondary" onClick={() => setJobsAssignModal(null)}>Cancel</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           );
                         })()}
