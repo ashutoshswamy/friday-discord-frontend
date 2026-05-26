@@ -1494,27 +1494,32 @@ function App() {
                             </div>
 
                             {/* Server Activity — mirrors /serveractivity command */}
-                            <div className="glass-panel" style={{ padding: '24px' }}>
-                              <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Activity size={15} color="var(--primary)" /> Server Activity
+                            <div className="sa-panel">
+                              <div className="sa-header">
+                                <div className="sa-header-left">
+                                  <div className="sa-header-icon"><Activity size={14} /></div>
+                                  <span className="sa-header-title">Server Activity</span>
+                                </div>
+                                <div className="sa-header-pulse"><span className="sa-pulse-dot" /><span className="sa-pulse-label">Live</span></div>
                               </div>
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '14px' }}>
+                              <div className="sa-grid">
                                 {[
-                                  { icon: <Users size={17} color="var(--primary)" />, label: 'Members', val: telemetry.guild.memberCount?.toLocaleString() ?? '—' },
-                                  { icon: <Hash size={17} color="#38bdf8" />, label: 'Text Channels', val: (telemetry.guild.textChannelCount ?? telemetry.guild.channels?.length ?? 0).toString() },
-                                  { icon: <Headphones size={17} color="#a78bfa" />, label: 'Voice Channels', val: (telemetry.guild.voiceChannelCount ?? 0).toString() },
-                                  { icon: <FolderOpen size={17} color="#fb923c" />, label: 'Categories', val: (telemetry.guild.categoryCount ?? 0).toString() },
-                                  { icon: <Shield size={17} color="#f59e0b" />, label: 'Roles', val: (telemetry.guild.roleCount ?? telemetry.guild.roles?.length ?? 0).toString() },
-                                  { icon: <Zap size={17} color="#f472b6" />, label: 'Boost Tier', val: `Tier ${telemetry.guild.boostTier ?? 0}` },
-                                  { icon: <TrendingUp size={17} color="#34d399" />, label: 'Boosts', val: (telemetry.guild.boostCount ?? 0).toString() },
-                                  { icon: <Cpu size={17} color="var(--text-muted)" />, label: 'Server Created', val: telemetry.guild.createdAt ? new Date(telemetry.guild.createdAt).toLocaleDateString() : '—' },
-                                ].map(({ icon, label, val }) => (
-                                  <div key={label} style={{ padding: '14px 12px', background: 'rgba(0,0,0,0.18)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <div style={{ flexShrink: 0 }}>{icon}</div>
-                                    <div style={{ minWidth: 0 }}>
-                                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '3px' }}>{label}</div>
-                                      <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '16px', lineHeight: 1 }}>{val}</div>
+                                  { Icon: Users,      color: '#3b9dff', label: 'Members',        val: telemetry.guild.memberCount?.toLocaleString() ?? '—',                                                              span: true  },
+                                  { Icon: Hash,       color: '#38bdf8', label: 'Text Channels',   val: (telemetry.guild.textChannelCount ?? telemetry.guild.channels?.length ?? 0).toString() },
+                                  { Icon: Headphones, color: '#a78bfa', label: 'Voice Channels',  val: (telemetry.guild.voiceChannelCount ?? 0).toString() },
+                                  { Icon: FolderOpen, color: '#fb923c', label: 'Categories',      val: (telemetry.guild.categoryCount ?? 0).toString() },
+                                  { Icon: Shield,     color: '#f59e0b', label: 'Roles',           val: (telemetry.guild.roleCount ?? telemetry.guild.roles?.length ?? 0).toString() },
+                                  { Icon: Zap,        color: '#f472b6', label: 'Boost Tier',      val: `Tier ${telemetry.guild.boostTier ?? 0}` },
+                                  { Icon: TrendingUp, color: '#34d399', label: 'Boosts',          val: (telemetry.guild.boostCount ?? 0).toString() },
+                                  { Icon: Cpu,        color: '#64748b', label: 'Server Created',  val: telemetry.guild.createdAt ? new Date(telemetry.guild.createdAt).toLocaleDateString() : '—', span: true },
+                                ].map(({ Icon, color, label, val, span }) => (
+                                  <div key={label} className={`sa-card${span ? ' sa-card--span' : ''}`} style={{ '--sa-color': color }}>
+                                    <div className="sa-card-top">
+                                      <div className="sa-card-icon"><Icon size={15} /></div>
+                                      <span className="sa-card-label">{label}</span>
                                     </div>
+                                    <div className="sa-card-value">{val}</div>
+                                    <div className="sa-card-glow" />
                                   </div>
                                 ))}
                               </div>

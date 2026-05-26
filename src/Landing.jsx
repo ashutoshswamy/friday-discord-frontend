@@ -152,10 +152,74 @@ const STEPS = [
   },
 ];
 
+const PREVIEW_ITEMS = [
+  {
+    id: 'automod', label: 'AutoMod', Icon: Shield, color: '#3b9dff', eyebrow: 'AUTOMOD',
+    title: 'Full AutoMod Control',
+    desc: 'Toggle spam, caps, link, and invite filters with a single click. Build custom blocklists with plain words or regex patterns. Whitelist trusted channels and roles so they never get caught in the net.',
+    bullets: ['Spam, caps, link & invite filters', 'Custom word & regex blocklist', 'Channel & role whitelisting', 'Auto-escalation punishment rules'],
+  },
+  {
+    id: 'leveling', label: 'Leveling', Icon: Zap, color: '#8b5cf6', eyebrow: 'LEVELING',
+    title: 'Track Your Community',
+    desc: 'Real-time XP and economy leaderboards show exactly who\'s most active. Set multipliers for XP events, assign milestone role rewards, and watch engagement climb.',
+    bullets: ['XP & economy leaderboards', 'Configurable XP multipliers', 'Level-up role rewards', 'Voice activity tracking'],
+  },
+  {
+    id: 'economy', label: 'Economy', Icon: Coins, color: '#00c853', eyebrow: 'ECONOMY',
+    title: 'A Full Virtual Economy',
+    desc: 'Build a thriving server economy with a custom shop, tiered job system, hunting and fishing minigames, player-to-player trading, and a real-time stock market with 5× leveraged positions.',
+    bullets: ['Custom server shop with role rewards', '24 careers across 4 pay tiers', 'Hunt, fish, dig & player market', 'Real-time stocks with leveraged trading'],
+  },
+  {
+    id: 'giveaways', label: 'Giveaways', Icon: Gift, color: '#ff4569', eyebrow: 'GIVEAWAYS',
+    title: 'Run Giveaways Effortlessly',
+    desc: 'Launch timed giveaways with button-based entry in seconds. End them early, draw multiple winners at once, or reroll from the existing entry pool — all without touching a command.',
+    bullets: ['Button-based entry system', 'Multiple winners & early end', 'One-click winner reroll', 'RSVP event cards with attendance'],
+  },
+  {
+    id: 'tickets', label: 'Tickets', Icon: LifeBuoy, color: '#ff9100', eyebrow: 'TICKETS',
+    title: 'Effortless Support System',
+    desc: 'Deploy a persistent helpdesk panel in any channel. Members open private ticket threads, add collaborators, and receive a full HTML transcript when the ticket closes.',
+    bullets: ['One-click ticket creation panel', 'Private per-member threads', 'Add or remove collaborators', 'Full HTML transcript on close'],
+  },
+  {
+    id: 'onboarding', label: 'Onboarding', Icon: UserPlus, color: '#38bdf8', eyebrow: 'ONBOARDING',
+    title: 'Smart Member Onboarding',
+    desc: 'Greet every new member with a personalised welcome message using dynamic placeholders. Auto-assign roles on join and deploy button-based reaction role menus so members self-organise from day one.',
+    bullets: ['Custom welcome messages with placeholders', 'Auto-assign roles on member join', 'Button-based reaction role menus', 'Up to 5 self-assignable roles per panel'],
+  },
+  {
+    id: 'alerts', label: 'Alerts', Icon: Bell, color: '#f59e0b', eyebrow: 'ALERTS',
+    title: 'Never Miss a Drop',
+    desc: 'Subscribe to YouTube channels and Twitch streamers. Friday pings your chosen Discord channel the moment a new video uploads or a streamer goes live — no delays, no polling.',
+    bullets: ['YouTube upload notifications', 'Twitch live stream alerts', 'Route alerts to any channel', 'Manage all subscriptions from dashboard'],
+  },
+  {
+    id: 'customcmds', label: 'Custom Commands', Icon: Terminal, color: '#10b981', eyebrow: 'CUSTOM COMMANDS',
+    title: 'Your Server, Your Commands',
+    desc: 'Build a library of server-specific trigger commands. Create plain-text responses for quick info or rich embed cards for fully styled announcements — no coding needed.',
+    bullets: ['Plain-text trigger commands', 'Rich embed responses via modal builder', 'Unlimited custom commands per server', 'Add, edit & remove from the dashboard'],
+  },
+  {
+    id: 'auditing', label: 'Auditing', Icon: FileText, color: '#f43f5e', eyebrow: 'AUDITING',
+    title: 'Full Server Audit Trail',
+    desc: 'Keep a complete record of everything that happens in your server. Track deleted and edited messages, voice join/leave activity, and per-moderator action counts — all accessible from the dashboard.',
+    bullets: ['Deleted & edited message logs', 'Voice channel join/leave history', 'Per-moderator action stats', 'Live telemetry charts on dashboard'],
+  },
+  {
+    id: 'voice', label: 'Voice', Icon: Mic, color: '#a78bfa', eyebrow: 'VOICE',
+    title: 'Dynamic Voice Channels',
+    desc: 'Members create personal temporary voice channels on demand. Lock, unlock, or claim ownership — channels disappear automatically when everyone leaves. Track voice time on a live weekly leaderboard.',
+    bullets: ['Auto-created temp voice channels', 'Lock, unlock & claim commands', 'Weekly voice time leaderboard', 'Auto-cleanup when channel empties'],
+  },
+];
+
 export default function Landing({ onLogin, clientId, isLoggedIn }) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activePreview, setActivePreview] = useState('automod');
   const handleDashboard = isLoggedIn ? () => navigate('/dashboard') : onLogin;
 
   useEffect(() => {
@@ -172,6 +236,155 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
   const ORBIT_RADIUS = 155;
   const ORBIT_CENTER = 190;
   const ICON_HALF = 22;
+
+  const renderCard = (id) => {
+    switch (id) {
+      case 'automod': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — AutoMod</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{borderBottom:'1px solid rgba(59,157,255,0.09)',paddingBottom:'10px',marginBottom:'0'}}>AutoMod Filters</div>
+              {[{label:'Spam Regulation',desc:'Deletes messages sent in rapid succession.',on:true},{label:'Mass Caps Filtering',desc:'Filters messages with excessive capital letters.',on:true},{label:'Link Blockers',desc:'Blocks URLs posted by non-whitelisted members.',on:true},{label:'Discord Invite Filter',desc:'Blocks Discord invite links posted by members.',on:true}].map(({label,desc,on})=>(
+                <div key={label} className="lp-am-toggle-row"><div className="lp-am-toggle-info"><div className="lp-am-toggle-h4">{label}</div><div className="lp-am-toggle-p">{desc}</div></div><div className="lp-am-switch"><div className={`lp-am-slider ${on?'lp-am-slider--on':''}`}><div className="lp-am-knob"/></div></div></div>
+              ))}
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Blocked Words &amp; Patterns</div>
+              <div className="lp-am-bw-input-row"><div className="lp-am-bw-input">Word or regex pattern...</div><button className="lp-am-bw-add-btn">+ Add</button></div>
+              <div className="lp-am-bw-chips">{['badword','scam*','/free.nitro/i','offensive'].map(w=>(<div key={w} className="lp-am-bw-chip"><span>{w}</span><X size={11}/></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'leveling': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Leaderboard</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-lb-ticker">{[{label:'Total XP',value:'284,500',color:'#8b5cf6'},{label:'Coins Circ.',value:'4.2M',color:'#00c853'},{label:'Peak Level',value:'Lv. 42',color:'#f59e0b'},{label:'Active Members',value:'312',color:'#3b9dff'}].map(({label,value,color})=>(<div key={label} className="lp-lb-ticker-cell"><div className="lp-lb-ticker-label">{label}</div><div className="lp-lb-ticker-value" style={{color}}>{value}</div></div>))}</div>
+            <div className="lp-lb-board-header"><Zap size={13} color="#8b5cf6"/><span className="lp-lb-board-title">XP RANKINGS</span><span className="lp-lb-board-count"><UserPlus size={10}/> 312</span></div>
+            <div className="lp-lb-podium">{[{name:'nova_knight',level:42,xp:9400,pct:88,pc:{glow:'#f59e0b',ring:'linear-gradient(135deg,#f59e0b,#fcd34d)',label:'GOLD',num:'1'},order:0},{name:'crystal_void',level:38,xp:7800,pct:72,pc:{glow:'#94a3b8',ring:'linear-gradient(135deg,#94a3b8,#cbd5e1)',label:'SILVER',num:'2'},order:-1},{name:'blazex99',level:35,xp:6600,pct:61,pc:{glow:'#b45309',ring:'linear-gradient(135deg,#b45309,#d97706)',label:'BRONZE',num:'3'},order:1}].map(({name,level,xp,pct,pc,order})=>(<div key={name} className="lp-lb-podium-card" style={{border:`1px solid ${pc.glow}30`,boxShadow:`0 0 20px ${pc.glow}14`,order}}><div className="lp-lb-podium-watermark" style={{color:`${pc.glow}10`}}>{pc.num}</div><div className="lp-lb-podium-badge" style={{color:pc.glow,background:`${pc.glow}18`,border:`1px solid ${pc.glow}40`}}>{pc.label}</div><div className="lp-lb-podium-avatar-wrap" style={{padding:'2px',background:pc.ring}}><div className="lp-lb-podium-avatar">{name[0].toUpperCase()}</div></div><div className="lp-lb-podium-name">{name}</div><div className="lp-lb-podium-level" style={{color:'#8b5cf6'}}>LVL {level}</div><div className="lp-lb-podium-xp">{xp.toLocaleString()} XP</div><div className="lp-lb-podium-bar"><div className="lp-lb-podium-bar-fill" style={{width:`${pct}%`}}/></div></div>))}</div>
+            <div className="lp-lb-rows-label">Ranked 4–6</div>
+            {[{rank:4,name:'lunaris',level:31,xp:5100,pct:47},{rank:5,name:'axion_drift',level:28,xp:4200,pct:38},{rank:6,name:'dusk_angel',level:24,xp:3500,pct:29}].map(({rank,name,level,xp,pct})=>(<div key={rank} className="lp-lb-rank-row"><span className="lp-lb-rank-num">#{rank}</span><div className="lp-lb-rank-avatar">{name[0].toUpperCase()}</div><div className="lp-lb-rank-info"><div className="lp-lb-rank-name">{name}</div><div className="lp-lb-rank-bar-track"><div className="lp-lb-rank-bar-fill" style={{width:`${pct}%`}}/></div></div><div className="lp-lb-rank-stat"><div className="lp-lb-rank-level">LVL {level}</div><div className="lp-lb-rank-xp">{xp.toLocaleString()} xp</div></div></div>))}
+          </div>
+        </div>
+      );
+      case 'economy': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Economy</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-shop-stats-row">{[{label:'Coins in Circulation',value:'4.2M',color:'#00c853'},{label:'Shop Items',value:'12',color:'#f59e0b'},{label:'Transactions Today',value:'847',color:'#3b9dff'}].map(({label,value,color})=>(<div key={label} className="lp-shop-stat-cell"><div className="lp-shop-stat-value" style={{color}}>{value}</div><div className="lp-shop-stat-label">{label}</div></div>))}</div>
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Server Shop<button className="lp-shop-add-btn"><Coins size={11}/> Add Item</button></div>
+              <div className="lp-shop-items">{[{name:'VIP Role',price:5000,icon:'👑',desc:'Exclusive VIP member role'},{name:'Custom Colour',price:2500,icon:'🎨',desc:'Pick your own role colour'},{name:'XP Booster',price:1000,icon:'⚡',desc:'+50 XP on use · consumable'},{name:'Coin Multiplier',price:3000,icon:'💰',desc:'2× /work pay for 24h'}].map(({name,price,icon,desc})=>(<div key={name} className="lp-shop-item-row"><div className="lp-shop-item-icon">{icon}</div><div className="lp-shop-item-info"><div className="lp-shop-item-name">{name}</div><div className="lp-shop-item-desc">{desc}</div></div><div className="lp-shop-item-price"><Coins size={10} color="#f59e0b"/> {price.toLocaleString()}</div></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'giveaways': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Giveaways</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Active Giveaways<span className="lp-gw-refresh-btn"><Star size={11}/></span></div>
+              {[{prize:'Discord Nitro Classic',winners:1,ends:'Dec 25, 2025, 8:00 PM'},{prize:'$50 Steam Gift Card',winners:2,ends:'Dec 28, 2025, 5:00 PM'}].map(({prize,winners,ends})=>(<div key={prize} className="lp-gw-item"><div className="lp-gw-item-top"><div><div className="lp-gw-item-prize"><Gift size={13} color="#ff9100" style={{flexShrink:0}}/> {prize}</div><div className="lp-gw-item-meta">{winners} winner{winners!==1?'s':''} · ends {ends}</div></div></div><div className="lp-gw-item-btns"><button className="lp-gw-btn lp-gw-btn-end">End Now</button><button className="lp-gw-btn">Reroll</button></div></div>))}
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title"><Gift size={13} style={{display:'inline',marginRight:'7px',color:'#ff9100'}}/>Launch Giveaway</div>
+              <div className="lp-gw-form"><div className="lp-gw-form-group"><label className="lp-gw-label">Prize</label><div className="lp-gw-input-mock">e.g. Discord Nitro</div></div><div className="lp-gw-form-row"><div className="lp-gw-form-group"><label className="lp-gw-label">Duration</label><div className="lp-gw-select-mock">30 Minutes ▾</div></div><div className="lp-gw-form-group"><label className="lp-gw-label">Winners</label><div className="lp-gw-select-mock">1 ▾</div></div></div><div className="lp-gw-form-group"><label className="lp-gw-label">Channel</label><div className="lp-gw-select-mock"># giveaways ▾</div></div><button className="lp-gw-launch-btn"><Gift size={13}/> Launch Giveaway</button></div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'tickets': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Tickets</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel"><div className="lp-tkt-stats-row">{[{label:'Open',value:'4',color:'#3b9dff'},{label:'Resolved',value:'31',color:'#00c853'},{label:'Avg. Close',value:'18m',color:'#f59e0b'}].map(({label,value,color})=>(<div key={label} className="lp-tkt-stat-cell"><div className="lp-tkt-stat-value" style={{color}}>{value}</div><div className="lp-tkt-stat-label">{label}</div></div>))}</div></div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Open Tickets</div>
+              <div className="lp-tkt-list">{[{id:'ticket-0041',user:'nova_knight',topic:'Appeal ban from last week',time:'2m ago'},{id:'ticket-0040',user:'crystal_void',topic:'Cannot access VIP channels',time:'14m ago'},{id:'ticket-0039',user:'blazex99',topic:'Missing coins after trade',time:'1h ago'},{id:'ticket-0038',user:'lunaris',topic:'Wrong role assigned on join',time:'2h ago'}].map(({id,user,topic,time})=>(<div key={id} className="lp-tkt-row"><div className="lp-tkt-row-left"><div className="lp-tkt-avatar">{user[0].toUpperCase()}</div><div className="lp-tkt-info"><div className="lp-tkt-topic">{topic}</div><div className="lp-tkt-meta">{user} · {time}</div></div></div><div className="lp-tkt-id-col"><span className="lp-tkt-id">{id}</span><span className="lp-tkt-status">open</span></div></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'onboarding': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Onboarding</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Welcome Message</div>
+              <div className="lp-ob-welcome-preview">Welcome to <strong>Nexus Gaming</strong>, <span style={{color:'#38bdf8'}}>@nova_knight</span>! 🎉 You're member <strong>#312</strong>. Head to <span style={{color:'#38bdf8'}}>#get-roles</span> to get started.</div>
+              <div className="lp-ob-placeholders">{['{user}','{username}','{server}','{memberCount}'].map(p=>(<span key={p} className="lp-ob-placeholder">{p}</span>))}</div>
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Reaction Roles<span style={{fontSize:'9px',color:'#38bdf8',background:'rgba(56,189,248,0.1)',border:'1px solid rgba(56,189,248,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>5 ROLES</span></div>
+              <div className="lp-ob-roles">{[{emoji:'🎮',label:'Gamer',color:'#8b5cf6'},{emoji:'🎨',label:'Artist',color:'#ec4899'},{emoji:'💻',label:'Dev',color:'#3b9dff'},{emoji:'🎵',label:'Music',color:'#10b981'},{emoji:'📢',label:'Announcements',color:'#f59e0b'}].map(({emoji,label,color})=>(<div key={label} className="lp-ob-role-chip" style={{borderColor:color+'33',color}}><span>{emoji}</span><span>{label}</span></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'alerts': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Alerts</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><span style={{color:'#ff0000',fontSize:'13px'}}>▶</span> YouTube Alerts</div>
+              <div className="lp-alerts-list">{[{name:'Linus Tech Tips',channel:'#tech-alerts',status:'live'},{name:'Fireship',channel:'#dev-alerts',status:'live'},{name:'MKBHD',channel:'#tech-alerts',status:'idle'}].map(({name,channel,status})=>(<div key={name} className="lp-alert-row"><div className="lp-alert-dot" style={{background:status==='live'?'#00c853':'#555'}}/><div className="lp-alert-info"><div className="lp-alert-name">{name}</div><div className="lp-alert-channel">{channel}</div></div><span className="lp-alert-badge" style={{color:status==='live'?'#00c853':'#555',borderColor:status==='live'?'rgba(0,200,83,0.25)':'rgba(85,85,85,0.25)',background:status==='live'?'rgba(0,200,83,0.08)':'rgba(85,85,85,0.08)'}}>{status==='live'?'NEW VIDEO':'WATCHING'}</span></div>))}</div>
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><span style={{color:'#9147ff',fontSize:'13px'}}>◆</span> Twitch Alerts</div>
+              <div className="lp-alerts-list">{[{name:'shroud',channel:'#gaming-alerts',status:'live'},{name:'pokimane',channel:'#gaming-alerts',status:'idle'},{name:'HasanAbi',channel:'#stream-alerts',status:'live'}].map(({name,channel,status})=>(<div key={name} className="lp-alert-row"><div className="lp-alert-dot" style={{background:status==='live'?'#9147ff':'#555'}}/><div className="lp-alert-info"><div className="lp-alert-name">{name}</div><div className="lp-alert-channel">{channel}</div></div><span className="lp-alert-badge" style={{color:status==='live'?'#9147ff':'#555',borderColor:status==='live'?'rgba(145,71,255,0.25)':'rgba(85,85,85,0.25)',background:status==='live'?'rgba(145,71,255,0.08)':'rgba(85,85,85,0.08)'}}>{status==='live'?'LIVE NOW':'OFFLINE'}</span></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'customcmds': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Custom Commands</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Custom Commands<span style={{fontSize:'9px',color:'#10b981',background:'rgba(16,185,129,0.1)',border:'1px solid rgba(16,185,129,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>6 ACTIVE</span></div>
+              <div className="lp-cc-list">{[{trigger:'!rules',type:'text',preview:'Please follow our server rules...'},{trigger:'!socials',type:'embed',preview:'Embed · Social Links Card'},{trigger:'!staff',type:'embed',preview:'Embed · Staff Team Card'},{trigger:'!faq',type:'text',preview:'Frequently asked questions...'},{trigger:'!discord',type:'text',preview:'Join our community at discord.gg/...'},{trigger:'!apply',type:'embed',preview:'Embed · Staff Application Form'}].map(({trigger,type,preview})=>(<div key={trigger} className="lp-cc-row"><code className="lp-cc-trigger">{trigger}</code><span className="lp-cc-type" style={{color:type==='embed'?'#8b5cf6':'#10b981',borderColor:type==='embed'?'rgba(139,92,246,0.25)':'rgba(16,185,129,0.25)',background:type==='embed'?'rgba(139,92,246,0.08)':'rgba(16,185,129,0.08)'}}>{type}</span><span className="lp-cc-preview">{preview}</span></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'auditing': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Audit Logs</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Recent Message Events</div>
+              <div className="lp-audit-list">{[{type:'deleted',user:'blazex99',content:'free nitro @ discord.gg/scam',time:'1m ago',color:'#f43f5e'},{type:'edited',user:'lunaris',content:'hey guys → hey everyone!',time:'4m ago',color:'#f59e0b'},{type:'deleted',user:'axion_drift',content:'FOLLOW ME ON TWITCH !!!!!!',time:'9m ago',color:'#f43f5e'},{type:'edited',user:'dusk_angel',content:'tomrrow → tomorrow at 8pm',time:'12m ago',color:'#f59e0b'}].map(({type,user,content,time,color})=>(<div key={user+time} className="lp-audit-row"><span className="lp-audit-badge" style={{color,borderColor:color+'33',background:color+'10'}}>{type}</span><div className="lp-audit-info"><span className="lp-audit-user">{user}</span><span className="lp-audit-content">{content}</span></div><span className="lp-audit-time">{time}</span></div>))}</div>
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Mod Stats — This Week</div>
+              <div className="lp-modstats-row">{[{label:'Warns',value:14,color:'#f59e0b'},{label:'Timeouts',value:6,color:'#3b9dff'},{label:'Kicks',value:2,color:'#ff9100'},{label:'Bans',value:1,color:'#f43f5e'}].map(({label,value,color})=>(<div key={label} className="lp-modstat-cell"><div className="lp-modstat-value" style={{color}}>{value}</div><div className="lp-modstat-label">{label}</div></div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      case 'voice': return (
+        <div className="lp-dash-card">
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday — Voice Activity</span></div>
+          <div className="lp-dash-body">
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Voice Leaderboard<span style={{fontSize:'9px',color:'#a78bfa',background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>THIS WEEK</span></div>
+              <div className="lp-vc-list">{[{rank:1,name:'nova_knight',mins:840,bar:100},{rank:2,name:'crystal_void',mins:612,bar:73},{rank:3,name:'blazex99',mins:490,bar:58},{rank:4,name:'lunaris',mins:310,bar:37},{rank:5,name:'axion_drift',mins:205,bar:24}].map(({rank,name,mins,bar})=>(<div key={name} className="lp-vc-row"><span className="lp-vc-rank">#{rank}</span><div className="lp-vc-avatar">{name[0].toUpperCase()}</div><div className="lp-vc-info"><div className="lp-vc-name">{name}</div><div className="lp-vc-bar-track"><div className="lp-vc-bar-fill" style={{width:`${bar}%`}}/></div></div><span className="lp-vc-mins">{mins}m</span></div>))}</div>
+            </div>
+            <div className="lp-dash-chart-panel">
+              <div className="lp-dash-chart-title">Active Temp Channels</div>
+              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members} members</span>{locked&&<span className="lp-vc-lock">🔒</span>}</div>))}</div>
+            </div>
+          </div>
+        </div>
+      );
+      default: return null;
+    }
+  };
 
   return (
     <div className="lp-root">
@@ -450,161 +663,69 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             ))}
           </div>
 
-          {/* ── Dashboard Preview Grid ── */}
-          <div className="lp-how-cards-grid">
+        </div>
+      </section>
 
-            {/* AutoMod */}
-            <div className="lp-dash-card">
-              <div className="lp-dash-titlebar">
-                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
-                <span className="lp-dash-titlebar-label">Friday Dashboard — AutoMod</span>
-              </div>
-              <div className="lp-dash-body">
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '0' }}>AutoMod Filters</div>
-                  {[
-                    { label: 'Spam Regulation',      desc: 'Deletes messages sent in rapid succession.',          on: true },
-                    { label: 'Mass Caps Filtering',  desc: 'Filters messages with excessive capital letters.',     on: true },
-                    { label: 'Link Blockers',         desc: 'Blocks URLs posted by non-whitelisted members.',      on: true },
-                    { label: 'Discord Invite Filter', desc: 'Blocks Discord invite links posted by members.',      on: true },
-                  ].map(({ label, desc, on }) => (
-                    <div key={label} className="lp-am-toggle-row">
-                      <div className="lp-am-toggle-info">
-                        <div className="lp-am-toggle-h4">{label}</div>
-                        <div className="lp-am-toggle-p">{desc}</div>
-                      </div>
-                      <div className="lp-am-switch">
-                        <div className={`lp-am-slider ${on ? 'lp-am-slider--on' : ''}`}><div className="lp-am-knob" /></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title">Blocked Words &amp; Patterns</div>
-                  <div className="lp-am-bw-input-row">
-                    <div className="lp-am-bw-input">Word or regex pattern...</div>
-                    <button className="lp-am-bw-add-btn">+ Add</button>
+      {/* ── DASHBOARD PREVIEW ── */}
+      <section className="lp-preview" id="preview">
+        <div className="lp-container">
+          <div className="lp-how-header">
+            <div className="lp-section-eyebrow">
+              <span className="lp-section-eyebrow-line" />
+              <span className="lp-section-label">DASHBOARD PREVIEW</span>
+            </div>
+            <h2 className="lp-section-title">See Friday in Action</h2>
+            <p className="lp-section-desc">
+              A live look at the Friday dashboard — click any feature to see it in action.
+            </p>
+          </div>
+
+          <div className="lp-preview-split">
+            {/* Left — sticky feature list */}
+            <div className="lp-preview-list">
+              {PREVIEW_ITEMS.map(({ id, label, Icon, color }) => (
+                <button
+                  key={id}
+                  className={`lp-preview-list-btn ${activePreview === id ? 'active' : ''}`}
+                  onClick={() => setActivePreview(id)}
+                  style={activePreview === id ? { color, borderColor: color + '44', background: color + '0d' } : {}}
+                >
+                  <div className="lp-preview-list-icon" style={activePreview === id ? { background: color + '18', color } : {}}>
+                    <Icon size={15} />
                   </div>
-                  <div className="lp-am-bw-chips">
-                    {['badword', 'scam*', '/free.nitro/i', 'offensive'].map(w => (
-                      <div key={w} className="lp-am-bw-chip"><span>{w}</span><X size={11} /></div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                  <span>{label}</span>
+                  {activePreview === id && <ChevronRight size={13} className="lp-preview-list-arrow" />}
+                </button>
+              ))}
             </div>
 
-            {/* Leaderboard */}
-            <div className="lp-dash-card">
-              <div className="lp-dash-titlebar">
-                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
-                <span className="lp-dash-titlebar-label">Friday Dashboard — Leaderboard</span>
+            {/* Right — active preview */}
+            <div className="lp-preview-active">
+              <div className="lp-preview-active-card">
+                {renderCard(activePreview)}
               </div>
-              <div className="lp-dash-body">
-                <div className="lp-lb-ticker">
-                  {[
-                    { label: 'Total XP',       value: '284,500', color: '#8b5cf6' },
-                    { label: 'Coins Circ.',    value: '4.2M',    color: '#00c853' },
-                    { label: 'Peak Level',     value: 'Lv. 42',  color: '#f59e0b' },
-                    { label: 'Active Members', value: '312',     color: '#3b9dff' },
-                  ].map(({ label, value, color }) => (
-                    <div key={label} className="lp-lb-ticker-cell">
-                      <div className="lp-lb-ticker-label">{label}</div>
-                      <div className="lp-lb-ticker-value" style={{ color }}>{value}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="lp-lb-board-header">
-                  <Zap size={13} color="#8b5cf6" />
-                  <span className="lp-lb-board-title">XP RANKINGS</span>
-                  <span className="lp-lb-board-count"><UserPlus size={10}/> 312</span>
-                </div>
-                <div className="lp-lb-podium">
-                  {[
-                    { name: 'nova_knight',  level: 42, xp: 9400, pct: 88, pc: { glow: '#f59e0b', ring: 'linear-gradient(135deg,#f59e0b,#fcd34d)', label: 'GOLD',   num: '1' }, order: 0 },
-                    { name: 'crystal_void', level: 38, xp: 7800, pct: 72, pc: { glow: '#94a3b8', ring: 'linear-gradient(135deg,#94a3b8,#cbd5e1)', label: 'SILVER', num: '2' }, order: -1 },
-                    { name: 'blazex99',     level: 35, xp: 6600, pct: 61, pc: { glow: '#b45309', ring: 'linear-gradient(135deg,#b45309,#d97706)', label: 'BRONZE', num: '3' }, order: 1 },
-                  ].map(({ name, level, xp, pct, pc, order }) => (
-                    <div key={name} className="lp-lb-podium-card" style={{ border: `1px solid ${pc.glow}30`, boxShadow: `0 0 20px ${pc.glow}14`, order }}>
-                      <div className="lp-lb-podium-watermark" style={{ color: `${pc.glow}10` }}>{pc.num}</div>
-                      <div className="lp-lb-podium-badge" style={{ color: pc.glow, background: `${pc.glow}18`, border: `1px solid ${pc.glow}40` }}>{pc.label}</div>
-                      <div className="lp-lb-podium-avatar-wrap" style={{ padding: '2px', background: pc.ring }}>
-                        <div className="lp-lb-podium-avatar">{name[0].toUpperCase()}</div>
+              <div className="lp-preview-active-text">
+                {(() => {
+                  const p = PREVIEW_ITEMS.find(x => x.id === activePreview);
+                  if (!p) return null;
+                  return (
+                    <>
+                      <div className="lp-section-eyebrow" style={{ marginBottom: '16px' }}>
+                        <span className="lp-section-eyebrow-line" />
+                        <span className="lp-section-label" style={{ color: p.color }}>{p.eyebrow}</span>
                       </div>
-                      <div className="lp-lb-podium-name">{name}</div>
-                      <div className="lp-lb-podium-level" style={{ color: '#8b5cf6' }}>LVL {level}</div>
-                      <div className="lp-lb-podium-xp">{xp.toLocaleString()} XP</div>
-                      <div className="lp-lb-podium-bar"><div className="lp-lb-podium-bar-fill" style={{ width: `${pct}%` }} /></div>
-                    </div>
-                  ))}
-                </div>
-                <div className="lp-lb-rows-label">Ranked 4–6</div>
-                {[
-                  { rank: 4, name: 'lunaris',     level: 31, xp: 5100, pct: 47 },
-                  { rank: 5, name: 'axion_drift',  level: 28, xp: 4200, pct: 38 },
-                  { rank: 6, name: 'dusk_angel',   level: 24, xp: 3500, pct: 29 },
-                ].map(({ rank, name, level, xp, pct }) => (
-                  <div key={rank} className="lp-lb-rank-row">
-                    <span className="lp-lb-rank-num">#{rank}</span>
-                    <div className="lp-lb-rank-avatar">{name[0].toUpperCase()}</div>
-                    <div className="lp-lb-rank-info">
-                      <div className="lp-lb-rank-name">{name}</div>
-                      <div className="lp-lb-rank-bar-track"><div className="lp-lb-rank-bar-fill" style={{ width: `${pct}%` }} /></div>
-                    </div>
-                    <div className="lp-lb-rank-stat">
-                      <div className="lp-lb-rank-level">LVL {level}</div>
-                      <div className="lp-lb-rank-xp">{xp.toLocaleString()} xp</div>
-                    </div>
-                  </div>
-                ))}
+                      <h3 className="lp-preview-text-title">{p.title}</h3>
+                      <p className="lp-preview-text-desc">{p.desc}</p>
+                      <ul className="lp-preview-bullets">
+                        {p.bullets.map((b, i) => (
+                          <li key={i}><Check size={14} color={p.color} /><span>{b}</span></li>
+                        ))}
+                      </ul>
+                    </>
+                  );
+                })()}
               </div>
             </div>
-
-            {/* Giveaways */}
-            <div className="lp-dash-card">
-              <div className="lp-dash-titlebar">
-                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
-                <span className="lp-dash-titlebar-label">Friday Dashboard — Giveaways</span>
-              </div>
-              <div className="lp-dash-body">
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    Active Giveaways
-                    <span className="lp-gw-refresh-btn"><Star size={11}/></span>
-                  </div>
-                  {[
-                    { prize: 'Discord Nitro Classic', winners: 1, ends: 'Dec 25, 2025, 8:00 PM' },
-                    { prize: '$50 Steam Gift Card',   winners: 2, ends: 'Dec 28, 2025, 5:00 PM' },
-                  ].map(({ prize, winners, ends }) => (
-                    <div key={prize} className="lp-gw-item">
-                      <div className="lp-gw-item-top">
-                        <div>
-                          <div className="lp-gw-item-prize"><Gift size={13} color="#ff9100" style={{ flexShrink: 0 }}/> {prize}</div>
-                          <div className="lp-gw-item-meta">{winners} winner{winners !== 1 ? 's' : ''} · ends {ends}</div>
-                        </div>
-                      </div>
-                      <div className="lp-gw-item-btns">
-                        <button className="lp-gw-btn lp-gw-btn-end">End Now</button>
-                        <button className="lp-gw-btn">Reroll</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title"><Gift size={13} style={{ display: 'inline', marginRight: '7px', color: '#ff9100' }}/>Launch Giveaway</div>
-                  <div className="lp-gw-form">
-                    <div className="lp-gw-form-group"><label className="lp-gw-label">Prize</label><div className="lp-gw-input-mock">e.g. Discord Nitro</div></div>
-                    <div className="lp-gw-form-row">
-                      <div className="lp-gw-form-group"><label className="lp-gw-label">Duration</label><div className="lp-gw-select-mock">30 Minutes ▾</div></div>
-                      <div className="lp-gw-form-group"><label className="lp-gw-label">Winners</label><div className="lp-gw-select-mock">1 ▾</div></div>
-                    </div>
-                    <div className="lp-gw-form-group"><label className="lp-gw-label">Channel</label><div className="lp-gw-select-mock"># giveaways ▾</div></div>
-                    <button className="lp-gw-launch-btn"><Gift size={13}/> Launch Giveaway</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>
