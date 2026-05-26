@@ -1494,32 +1494,29 @@ function App() {
                             </div>
 
                             {/* Server Activity — mirrors /serveractivity command */}
-                            <div className="sa-panel">
-                              <div className="sa-header">
-                                <div className="sa-header-left">
-                                  <div className="sa-header-icon"><Activity size={14} /></div>
-                                  <span className="sa-header-title">Server Activity</span>
-                                </div>
-                                <div className="sa-header-pulse"><span className="sa-pulse-dot" /><span className="sa-pulse-label">Live</span></div>
+                            <div className="glass-panel" style={{ padding: '22px 24px' }}>
+                              <div className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Activity size={13} color="var(--primary)" /> Server Activity
                               </div>
-                              <div className="sa-grid">
+                              <div className="sa-stat-grid">
                                 {[
-                                  { Icon: Users,      color: '#3b9dff', label: 'Members',        val: telemetry.guild.memberCount?.toLocaleString() ?? '—',                                                              span: true  },
-                                  { Icon: Hash,       color: '#38bdf8', label: 'Text Channels',   val: (telemetry.guild.textChannelCount ?? telemetry.guild.channels?.length ?? 0).toString() },
-                                  { Icon: Headphones, color: '#a78bfa', label: 'Voice Channels',  val: (telemetry.guild.voiceChannelCount ?? 0).toString() },
-                                  { Icon: FolderOpen, color: '#fb923c', label: 'Categories',      val: (telemetry.guild.categoryCount ?? 0).toString() },
-                                  { Icon: Shield,     color: '#f59e0b', label: 'Roles',           val: (telemetry.guild.roleCount ?? telemetry.guild.roles?.length ?? 0).toString() },
-                                  { Icon: Zap,        color: '#f472b6', label: 'Boost Tier',      val: `Tier ${telemetry.guild.boostTier ?? 0}` },
-                                  { Icon: TrendingUp, color: '#34d399', label: 'Boosts',          val: (telemetry.guild.boostCount ?? 0).toString() },
-                                  { Icon: Cpu,        color: '#64748b', label: 'Server Created',  val: telemetry.guild.createdAt ? new Date(telemetry.guild.createdAt).toLocaleDateString() : '—', span: true },
-                                ].map(({ Icon, color, label, val, span }) => (
-                                  <div key={label} className={`sa-card${span ? ' sa-card--span' : ''}`} style={{ '--sa-color': color }}>
-                                    <div className="sa-card-top">
-                                      <div className="sa-card-icon"><Icon size={15} /></div>
-                                      <span className="sa-card-label">{label}</span>
+                                  { Icon: Users,      color: '#3b9dff', bg: 'rgba(59,157,255,0.1)',   shadow: 'rgba(59,157,255,0.12)',  label: 'Members',       val: telemetry.guild.memberCount?.toLocaleString() ?? '—' },
+                                  { Icon: Hash,       color: '#38bdf8', bg: 'rgba(56,189,248,0.1)',   shadow: 'rgba(56,189,248,0.12)',  label: 'Text Channels', val: (telemetry.guild.textChannelCount ?? telemetry.guild.channels?.length ?? 0).toString() },
+                                  { Icon: Headphones, color: '#a78bfa', bg: 'rgba(167,139,250,0.1)',  shadow: 'rgba(167,139,250,0.12)', label: 'Voice Channels',val: (telemetry.guild.voiceChannelCount ?? 0).toString() },
+                                  { Icon: FolderOpen, color: '#fb923c', bg: 'rgba(251,146,60,0.1)',   shadow: 'rgba(251,146,60,0.12)',  label: 'Categories',    val: (telemetry.guild.categoryCount ?? 0).toString() },
+                                  { Icon: Shield,     color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',   shadow: 'rgba(245,158,11,0.12)',  label: 'Roles',         val: (telemetry.guild.roleCount ?? telemetry.guild.roles?.length ?? 0).toString() },
+                                  { Icon: Zap,        color: '#f472b6', bg: 'rgba(244,114,182,0.1)',  shadow: 'rgba(244,114,182,0.12)', label: 'Boost Tier',    val: `Tier ${telemetry.guild.boostTier ?? 0}` },
+                                  { Icon: TrendingUp, color: '#34d399', bg: 'rgba(52,211,153,0.1)',   shadow: 'rgba(52,211,153,0.12)',  label: 'Boosts',        val: (telemetry.guild.boostCount ?? 0).toString() },
+                                  { Icon: Cpu,        color: '#546b87', bg: 'rgba(84,107,135,0.1)',   shadow: 'rgba(84,107,135,0.1)',   label: 'Server Created',val: telemetry.guild.createdAt ? new Date(telemetry.guild.createdAt).toLocaleDateString() : '—' },
+                                ].map(({ Icon, color, bg, shadow, label, val }) => (
+                                  <div key={label} className="glass-panel stat-card">
+                                    <div className="stat-icon-wrapper" style={{ background: bg, color, boxShadow: `0 0 18px ${shadow}` }}>
+                                      <Icon size={18} />
                                     </div>
-                                    <div className="sa-card-value">{val}</div>
-                                    <div className="sa-card-glow" />
+                                    <div className="stat-info">
+                                      <h3>{label}</h3>
+                                      <div className="stat-value">{val}</div>
+                                    </div>
                                   </div>
                                 ))}
                               </div>
