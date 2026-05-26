@@ -95,10 +95,14 @@ function App() {
   const [newCustomCmd, setNewCustomCmd]     = useState({ name: '', text: '' });
 
   // Giveaways state
-  const [giveawaysList, setGiveawaysList]   = useState([]);
-  const [giveawaysLoaded, setGiveawaysLoaded] = useState(false);
-  const [newGiveaway, setNewGiveaway]       = useState({ duration: '30m', winners: '1', prize: '', channelId: '' });
-  const [newEvent, setNewEvent]             = useState({ title: '', description: '', date: '', location: '', channelId: '' });
+  const [giveawaysList, setGiveawaysList]       = useState([]);
+  const [giveawaysLoaded, setGiveawaysLoaded]   = useState(false);
+  const [giveawayHistory, setGiveawayHistory]   = useState([]);
+  const [giveawayHistoryLoaded, setGiveawayHistoryLoaded] = useState(false);
+  const [eventHistory, setEventHistory]         = useState([]);
+  const [eventHistoryLoaded, setEventHistoryLoaded] = useState(false);
+  const [newGiveaway, setNewGiveaway]           = useState({ duration: '30m', winners: '1', prize: '', channelId: '' });
+  const [newEvent, setNewEvent]                 = useState({ title: '', description: '', date: '', location: '', channelId: '' });
   const [newReactionRole, setNewReactionRole] = useState({ title: '', description: '', channelId: '', roleIds: ['', '', '', '', ''] });
 
   // Alerts state
@@ -176,6 +180,8 @@ function App() {
     if (!activeGuildId || !token) return;
     if (activeTab === 'customcmds' && !customCmdsLoaded) fetchCustomCmds();
     if (activeTab === 'giveaways' && !giveawaysLoaded) { fetchGiveaways(); }
+    if (activeTab === 'giveaways' && !giveawayHistoryLoaded) { fetchGiveawayHistory(); }
+    if (activeTab === 'giveaways' && !eventHistoryLoaded) { fetchEventHistory(); }
     if (activeTab === 'alerts' && !alertsLoaded) fetchAlerts();
     if (activeTab === 'milestones' && !rankCardLoaded) fetchRankCard();
     if (activeTab === 'leaderboard' && !lbCardLoaded) fetchLbCard();
@@ -317,6 +323,9 @@ function App() {
     setTelemetry(null);
     setMembers([]);
     setShowGuildDropdown(false);
+    setGiveawaysLoaded(false);
+    setGiveawayHistoryLoaded(false);
+    setEventHistoryLoaded(false);
   };
 
   // ── Notifications
@@ -786,6 +795,22 @@ function App() {
       if (res.ok) setGiveawaysList(await res.json());
     } catch { /* silent */ }
     finally { setGiveawaysLoaded(true); }
+  };
+
+  const fetchGiveawayHistory = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/giveaways/history`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setGiveawayHistory(await res.json());
+    } catch { /* silent */ }
+    finally { setGiveawayHistoryLoaded(true); }
+  };
+
+  const fetchEventHistory = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/events/history`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setEventHistory(await res.json());
+    } catch { /* silent */ }
+    finally { setEventHistoryLoaded(true); }
   };
 
   const createGiveaway = async (e) => {
@@ -2921,6 +2946,77 @@ function App() {
                                   <button className="btn btn-primary" type="submit" style={{ width: '100%', background: 'rgba(255,204,0,0.15)', borderColor: 'rgba(255,204,0,0.4)', color: '#FFCC00', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px' }}><Calendar size={14} /> Deploy Event Card</button>
                                 </form>
                               </div>
+                            </div>
+                          </div>
+
+                          {/* History row */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '24px' }}>
+                            {/* Giveaway History */}
+                            <div className="glass-panel" style={{ padding: '24px' }}>
+                              <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span><Gift size={13} style={{ display: 'inline', marginRight: '7px', color: '#ff9100' }} />Past Giveaways</span>
+                                <button className="btn btn-secondary" style={{ fontSize: '12px', padding: '4px 10px' }} onClick={() => { setGiveawayHistoryLoaded(false); fetchGiveawayHistory(); }}><RefreshCw size={12} /></button>
+                              </div>
+                              {!giveawayHistoryLoaded ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={22} color="#3b9dff" /></div>
+                              ) : giveawayHistory.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '32px 24px', color: 'var(--text-muted)' }}>
+                                  <Gift size={32} style={{ marginBottom: '12px', opacity: 0.25 }} />
+                                  <p style={{ fontSize: '13px' }}>No past giveaways yet.</p>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '360px', overflowY: 'auto' }}>
+                                  {giveawayHistory.map(g => {
+                                    const statusColor = g.status === 'ended' ? '#4ade80' : g.status === 'cancelled' ? '#f87171' : '#3b9dff';
+                                    return (
+                                      <div key={g.id} style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius-md)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                                          <span style={{ fontWeight: 600, fontSize: '13px' }}>{g.prize}</span>
+                                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '99px', background: statusColor + '18', color: statusColor, border: `1px solid ${statusColor}30`, textTransform: 'capitalize' }}>{g.status}</span>
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                                          <span>🏅 {g.winnersCount} winner{g.winnersCount !== 1 ? 's' : ''}</span>
+                                          <span>👥 {g.entrantsCount} entries</span>
+                                          {g.winnerIds?.length > 0 && <span>🏆 {g.winnerIds.map(id => `<@${id}>`).join(', ')}</span>}
+                                        </div>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', opacity: 0.6 }}>{new Date(g.createdAt).toLocaleDateString()}{g.endedAt ? ` → ${new Date(g.endedAt).toLocaleDateString()}` : ''}</div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Event History */}
+                            <div className="glass-panel" style={{ padding: '24px' }}>
+                              <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span><Calendar size={13} style={{ display: 'inline', marginRight: '7px', color: '#FFCC00' }} />Past Events</span>
+                                <button className="btn btn-secondary" style={{ fontSize: '12px', padding: '4px 10px' }} onClick={() => { setEventHistoryLoaded(false); fetchEventHistory(); }}><RefreshCw size={12} /></button>
+                              </div>
+                              {!eventHistoryLoaded ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={22} color="#3b9dff" /></div>
+                              ) : eventHistory.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '32px 24px', color: 'var(--text-muted)' }}>
+                                  <Calendar size={32} style={{ marginBottom: '12px', opacity: 0.25 }} />
+                                  <p style={{ fontSize: '13px' }}>No past events yet.</p>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '360px', overflowY: 'auto' }}>
+                                  {eventHistory.map(ev => (
+                                    <div key={ev.id} style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 'var(--radius-md)' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px' }}>
+                                        <span style={{ fontWeight: 600, fontSize: '13px' }}>{ev.title}</span>
+                                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(255,204,0,0.12)', color: '#FFCC00', border: '1px solid rgba(255,204,0,0.25)' }}>👥 {ev.rsvpCount} RSVPs</span>
+                                      </div>
+                                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                                        <span>⏰ {ev.date}</span>
+                                        <span>📍 {ev.location}</span>
+                                      </div>
+                                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', opacity: 0.6 }}>{new Date(ev.createdAt).toLocaleDateString()}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
