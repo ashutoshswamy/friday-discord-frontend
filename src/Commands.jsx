@@ -1136,15 +1136,27 @@ const COMMANDS = [
     dashboard: false,
   },
   {
-    name: 'poll',
+    name: 'poll create',
     category: 'utility',
-    desc: 'Creates a standardized poll with up to 4 reaction voting options.',
-    usage: '/poll [question] [options]',
+    desc: 'Posts a reaction poll in the current channel with up to 10 options and optional custom emojis.',
+    usage: '/poll create [question] [options] [emojis?]',
     options: [
-      { name: 'question', type: 'String', required: true, desc: 'The poll question or topic' },
-      { name: 'options', type: 'String', required: true, desc: 'Comma-separated options (max 4)' },
+      { name: 'question', type: 'String', required: true, desc: 'The poll question' },
+      { name: 'options', type: 'String', required: true, desc: 'Comma-separated options (2–10)' },
+      { name: 'emojis', type: 'String', required: false, desc: 'Comma-separated emojis matching each option (e.g. ✅,❌,🤔)' },
     ],
     admin: false,
+    dashboard: true,
+  },
+  {
+    name: 'poll close',
+    category: 'utility',
+    desc: 'Closes an active poll by message ID, posts final results with vote counts, and removes reactions.',
+    usage: '/poll close [id]',
+    options: [
+      { name: 'id', type: 'String', required: true, desc: 'The message ID of the poll to close' },
+    ],
+    admin: true,
     dashboard: false,
   },
   {

@@ -139,7 +139,9 @@ function App() {
   const [purgeFilter, setPurgeFilter]       = useState('');
 
   const [embedForm, setEmbedForm] = useState({ channelId: '', title: '', description: '', color: '#00FFCC', image: '', thumbnail: '' });
-  const [pollForm, setPollForm] = useState({ channelId: '', question: '', options: ['', ''] });
+  const [pollForm, setPollForm] = useState({ channelId: '', question: '', options: ['', ''], emojis: ['', ''] });
+  const [pollsList, setPollsList] = useState([]);
+  const [pollsLoaded, setPollsLoaded] = useState(false);
 
   const [modstatsList, setModstatsList]     = useState([]);
   const [modstatsLoaded, setModstatsLoaded] = useState(false);
@@ -181,6 +183,7 @@ function App() {
     if (!activeGuildId || !token) return;
     if (activeTab === 'customcmds' && !customCmdsLoaded) fetchCustomCmds();
     if (activeTab === 'giveaways' && !giveawaysLoaded) { fetchGiveaways(); }
+    if (activeTab === 'polls' && !pollsLoaded) { fetchPolls(); }
     if (activeTab === 'giveaways' && !giveawayHistoryLoaded) { fetchGiveawayHistory(); }
     if (activeTab === 'giveaways' && !eventHistoryLoaded) { fetchEventHistory(); }
     if (activeTab === 'alerts' && !alertsLoaded) fetchAlerts();
@@ -327,6 +330,7 @@ function App() {
     setGiveawaysLoaded(false);
     setGiveawayHistoryLoaded(false);
     setEventHistoryLoaded(false);
+    setPollsLoaded(false);
   };
 
   // ── Notifications
@@ -1179,19 +1183,47 @@ function App() {
     } catch (err) { showNotification('error', err.message); }
   };
 
+  const fetchPolls = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/polls`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setPollsList(await res.json());
+    } catch { /* silent */ }
+    finally { setPollsLoaded(true); }
+  };
+
   const sendPoll = async (e) => {
     e.preventDefault();
-    const filledOptions = pollForm.options.filter(o => o.trim() !== '');
+    const filledIndices = pollForm.options.map((o, i) => o.trim() !== '' ? i : -1).filter(i => i >= 0);
+    const filledOptions = filledIndices.map(i => pollForm.options[i]);
+    const filledEmojis = filledIndices.map(i => pollForm.emojis[i] || '');
+    const hasCustomEmojis = filledEmojis.some(e => e.trim() !== '');
     if (!pollForm.channelId || !pollForm.question || filledOptions.length < 2) return;
     try {
+      const body = { channelId: pollForm.channelId, question: pollForm.question, options: filledOptions };
+      if (hasCustomEmojis) body.emojis = filledEmojis;
       const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/poll`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ channelId: pollForm.channelId, question: pollForm.question, options: filledOptions }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         showNotification('success', 'Poll posted successfully!');
-        setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''] });
+        setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''], emojis: ['', ''] });
+        setPollsLoaded(false);
+        fetchPolls();
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const closePoll = async (messageId) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/polls/${messageId}/close`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        showNotification('success', 'Poll closed and results posted!');
+        setPollsLoaded(false);
+        fetchPolls();
       } else throw new Error((await res.json()).error);
     } catch (err) { showNotification('error', err.message); }
   };
@@ -1399,6 +1431,7 @@ function App() {
                       { id: 'pets',        Icon: Sparkles,         label: 'Pets' },
                       { id: 'market',      Icon: Zap,              label: 'Market' },
                       { group: 'Utilities' },
+                      { id: 'polls',       Icon: BarChart2,        label: 'Polls' },
                       { id: 'utilities',   Icon: Wrench,           label: 'Embed Builder' },
                     ].map((item) => item.group ? (
                       <div key={item.group} className="sidebar-nav-group">{item.group}</div>
@@ -1438,7 +1471,7 @@ function App() {
                     <div className="header-title-container">
                       <div className="header-tab-accent" />
                       <h1>
-                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', jobs: 'Job Ecosystem', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Utilities' }[activeTab] || activeTab}
+                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', jobs: 'Job Ecosystem', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Utilities', polls: 'Polls' }[activeTab] || activeTab}
                       </h1>
                     </div>
                     <div className="header-actions">
@@ -4038,6 +4071,125 @@ function App() {
                         })()}
 
                         {/* ── UTILITIES / EMBED BUILDER ── */}
+                        {/* ── POLLS ── */}
+                        {activeTab === 'polls' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '24px', alignItems: 'start' }}>
+                            {/* Create poll */}
+                            <div className="glass-panel" style={{ padding: '24px' }}>
+                              <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <BarChart2 size={14} color="var(--primary)" /> Create Poll
+                              </div>
+                              <form onSubmit={sendPoll} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                  <label>Target Channel</label>
+                                  <select className="form-select" value={pollForm.channelId} onChange={e => setPollForm(p => ({ ...p, channelId: e.target.value }))} required>
+                                    <option value="">— Select Channel —</option>
+                                    {telemetry.guild.channels.map(c => <option key={c.id} value={c.id}># {c.name}</option>)}
+                                  </select>
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                  <label>Question</label>
+                                  <input className="form-input" type="text" placeholder="e.g. What's your favourite language?" value={pollForm.question} onChange={e => setPollForm(p => ({ ...p, question: e.target.value }))} required maxLength={256} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Options (2–10)</label>
+                                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Emoji optional — defaults to 1️⃣2️⃣...</span>
+                                  </div>
+                                  {pollForm.options.map((opt, i) => (
+                                    <div key={i} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                      <input
+                                        className="form-input"
+                                        type="text"
+                                        placeholder="😀"
+                                        value={pollForm.emojis[i] || ''}
+                                        onChange={e => setPollForm(p => { const emojis = [...p.emojis]; emojis[i] = e.target.value; return { ...p, emojis }; })}
+                                        style={{ width: '52px', flexShrink: 0, textAlign: 'center', fontSize: '18px', padding: '6px 4px' }}
+                                        maxLength={8}
+                                      />
+                                      <input
+                                        className="form-input"
+                                        type="text"
+                                        placeholder={`Option ${i + 1}`}
+                                        value={opt}
+                                        onChange={e => setPollForm(p => { const opts = [...p.options]; opts[i] = e.target.value; return { ...p, options: opts }; })}
+                                        style={{ flex: 1 }}
+                                        maxLength={100}
+                                      />
+                                      {pollForm.options.length > 2 && (
+                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 8px', flexShrink: 0 }} onClick={() => setPollForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i), emojis: p.emojis.filter((_, idx) => idx !== i) }))}>
+                                          <X size={12} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {pollForm.options.length < 10 && (
+                                    <button type="button" className="btn btn-secondary" style={{ fontSize: '12px' }} onClick={() => setPollForm(p => ({ ...p, options: [...p.options, ''], emojis: [...p.emojis, ''] }))}>
+                                      + Add Option
+                                    </button>
+                                  )}
+                                </div>
+                                <button className="btn btn-primary" type="submit" disabled={!pollForm.channelId || !pollForm.question || pollForm.options.filter(o => o.trim()).length < 2}>
+                                  <BarChart2 size={14} /> Post Poll
+                                </button>
+                              </form>
+                            </div>
+
+                            {/* Poll history */}
+                            <div className="glass-panel" style={{ padding: '24px' }}>
+                              <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Poll History</span>
+                                <button className="btn btn-secondary" style={{ fontSize: '12px', padding: '4px 10px' }} onClick={() => { setPollsLoaded(false); fetchPolls(); }}><RefreshCw size={12} /></button>
+                              </div>
+                              {!pollsLoaded ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={22} color="#3b9dff" /></div>
+                              ) : pollsList.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--text-muted)' }}>
+                                  <BarChart2 size={36} style={{ marginBottom: '12px', opacity: 0.25 }} />
+                                  <p style={{ fontSize: '13px' }}>No polls yet. Create one using the form.</p>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '560px', overflowY: 'auto' }}>
+                                  {pollsList.map(poll => {
+                                    const isActive = poll.status === 'active';
+                                    return (
+                                      <div key={poll.id} style={{ padding: '14px 16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${isActive ? 'rgba(0,255,204,0.15)' : 'rgba(255,255,255,0.07)'}`, borderRadius: 'var(--radius-md)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+                                          <span style={{ fontWeight: 600, fontSize: '13.5px', lineHeight: 1.4 }}>{poll.question}</span>
+                                          <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '99px', whiteSpace: 'nowrap', flexShrink: 0,
+                                            background: isActive ? 'rgba(0,255,204,0.1)' : 'rgba(113,113,122,0.15)',
+                                            color: isActive ? 'var(--primary)' : '#71717a',
+                                            border: `1px solid ${isActive ? 'rgba(0,255,204,0.25)' : 'rgba(113,113,122,0.3)'}` }}>
+                                            {isActive ? '🟢 Active' : '🔒 Closed'}
+                                          </span>
+                                        </div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                                          {poll.options.map((opt, i) => {
+                                            const emoji = poll.emojis?.[i] || ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i];
+                                            return (
+                                            <span key={i} style={{ fontSize: '12px', padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', color: 'var(--text-secondary)' }}>
+                                              {emoji} {opt}
+                                            </span>
+                                            );
+                                          })}
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(poll.createdAt).toLocaleDateString()}{poll.closedAt ? ` → closed ${new Date(poll.closedAt).toLocaleDateString()}` : ''}</span>
+                                          {isActive && (
+                                            <button className="btn btn-secondary" style={{ fontSize: '12px', padding: '4px 12px', borderColor: 'rgba(248,113,113,0.3)', color: '#f87171' }} onClick={() => closePoll(poll.id)}>
+                                              Close Poll
+                                            </button>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {activeTab === 'utilities' && (
                           <>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
@@ -4116,59 +4268,6 @@ function App() {
                             </div>
                           </div>
 
-                          {/* Poll Creator */}
-                          <div className="glass-panel" style={{ padding: '24px', marginTop: '24px' }}>
-                            <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <BarChart2 size={15} color="var(--primary)" /> Poll Creator
-                            </div>
-                            <form onSubmit={sendPoll} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
-                              {/* Left: question + channel */}
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                  <label>Target Channel</label>
-                                  <select className="form-select" value={pollForm.channelId} onChange={e => setPollForm(p => ({ ...p, channelId: e.target.value }))} required>
-                                    <option value="">— Select Channel —</option>
-                                    {telemetry.guild.channels.map(c => <option key={c.id} value={c.id}># {c.name}</option>)}
-                                  </select>
-                                </div>
-                                <div className="form-group" style={{ marginBottom: 0 }}>
-                                  <label>Question</label>
-                                  <input className="form-input" type="text" placeholder="e.g. What's your favourite language?" value={pollForm.question} onChange={e => setPollForm(p => ({ ...p, question: e.target.value }))} required maxLength={256} />
-                                </div>
-                                <button className="btn btn-primary" type="submit" disabled={!pollForm.channelId || !pollForm.question || pollForm.options.filter(o => o.trim()).length < 2}>
-                                  <BarChart2 size={15} /> Post Poll
-                                </button>
-                              </div>
-                              {/* Right: options */}
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Options (2–10)</label>
-                                {pollForm.options.map((opt, i) => (
-                                  <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '16px', width: '20px', flexShrink: 0 }}>{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i]}</span>
-                                    <input
-                                      className="form-input"
-                                      type="text"
-                                      placeholder={`Option ${i + 1}`}
-                                      value={opt}
-                                      onChange={e => setPollForm(p => { const opts = [...p.options]; opts[i] = e.target.value; return { ...p, options: opts }; })}
-                                      style={{ flex: 1 }}
-                                      maxLength={100}
-                                    />
-                                    {pollForm.options.length > 2 && (
-                                      <button type="button" className="btn btn-secondary" style={{ padding: '6px 8px', flexShrink: 0 }} onClick={() => setPollForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i) }))}>
-                                        <X size={12} />
-                                      </button>
-                                    )}
-                                  </div>
-                                ))}
-                                {pollForm.options.length < 10 && (
-                                  <button type="button" className="btn btn-secondary" style={{ marginTop: '4px', fontSize: '12px' }} onClick={() => setPollForm(p => ({ ...p, options: [...p.options, ''] }))}>
-                                    + Add Option
-                                  </button>
-                                )}
-                              </div>
-                            </form>
-                          </div>
                           </>
                         )}
 
