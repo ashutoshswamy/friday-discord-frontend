@@ -1766,6 +1766,44 @@
   margin-bottom: 0;
 }
 
+.lp-am-optout-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.lp-am-optout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-am-optout-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(59, 157, 255, 0.08);
+  border-radius: 6px;
+}
+
+.lp-am-optout-channel {
+  flex: 1;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lp-text);
+}
+
+.lp-am-optout-x {
+  color: var(--lp-text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
 /* ── HOW IT WORKS — Feature Preview Strip ── */
 .lp-how-strip {
   display: grid;
