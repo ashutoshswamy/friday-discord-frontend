@@ -1694,41 +1694,54 @@ function App() {
                                         </button>
                                       </div>
 
-                                      {/* Live preview — leaderboard card row sample */}
+                                      {/* Live preview — leaderboard card */}
                                       <div>
                                         <div style={{ fontSize: '10px', fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '1.5px', marginBottom: '10px', textTransform: 'uppercase' }}>Preview</div>
-                                        <div style={{ width: '360px', borderRadius: '10px', background: pt.bg, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-                                          {/* Left accent bar */}
-                                          <div style={{ display: 'flex', position: 'relative' }}>
-                                            <div style={{ width: '5px', flexShrink: 0, background: `linear-gradient(180deg,${pa1},${pa2})` }} />
-                                            <div style={{ flex: 1, padding: '12px 14px 4px' }}>
-                                              {/* Header */}
-                                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', paddingBottom: '8px', borderBottom: `1px solid ${pa1}20` }}>
-                                                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: `linear-gradient(135deg,${pa1},${pa2})`, flexShrink: 0 }} />
-                                                <div>
-                                                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFD700', fontFamily: 'var(--font-display)' }}>XP Leaderboard</div>
-                                                  <div style={{ fontSize: '10px', color: '#9CA3AF' }}>Server Name · Top 10</div>
-                                                </div>
+                                        <div style={{ width: '460px', borderRadius: '12px', background: pt.bg, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, position: 'relative' }}>
+                                          {/* Ambient top-right glow */}
+                                          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '140px', height: '140px', borderRadius: '50%', background: `radial-gradient(circle, ${pa1}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
+                                          {/* Header */}
+                                          <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: `linear-gradient(135deg,${pa1},${pa2})`, flexShrink: 0 }} />
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                              <div style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '999px', background: '#FFD70018', border: '1px solid #FFD70044', marginBottom: '3px' }}>
+                                                <span style={{ fontSize: '8px', fontWeight: 700, color: '#FFD700', letterSpacing: '0.5px', fontFamily: 'var(--font-display)' }}>XP  LEADERBOARD</span>
                                               </div>
-                                              {/* Sample rows */}
-                                              {[
-                                                { rank: 1, name: 'TopUser', stat: 'Level 42', sub: '98,400 XP', color: '#FFD700' },
-                                                { rank: 2, name: 'Player2', stat: 'Level 38', sub: '84,100 XP', color: '#C0C0C0' },
-                                                { rank: 3, name: 'Member3', stat: 'Level 31', sub: '61,200 XP', color: '#CD7F32' },
-                                              ].map(row => (
-                                                <div key={row.rank} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', borderBottom: `1px solid rgba(255,255,255,0.03)` }}>
-                                                  <div style={{ width: '22px', fontSize: '10px', fontWeight: 800, color: row.color, textAlign: 'center', flexShrink: 0 }}>#{row.rank}</div>
-                                                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: `${row.color}33`, flexShrink: 0 }} />
-                                                  <div style={{ flex: 1, fontSize: '11px', fontWeight: 600, color: '#E5E7EB' }}>{row.name}</div>
-                                                  <div style={{ textAlign: 'right' }}>
-                                                    <div style={{ fontSize: '11px', fontWeight: 700, color: row.rank === 1 ? row.color : pa1 }}>{row.stat}</div>
-                                                    <div style={{ fontSize: '9px', color: '#6B7280' }}>{row.sub}</div>
-                                                  </div>
-                                                </div>
-                                              ))}
-                                              <div style={{ padding: '6px 0 2px', fontSize: '9px', color: '#374151', textAlign: 'center' }}>Fictional simulation · Rankings update in real-time</div>
+                                              <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Server Name</div>
+                                            </div>
+                                            <div style={{ padding: '4px 10px', borderRadius: '999px', background: `linear-gradient(90deg,${pa1}22,${pa2}22)`, border: `1.5px solid ${pa1}88`, flexShrink: 0 }}>
+                                              <span style={{ fontSize: '9px', fontWeight: 700, color: pa1, fontFamily: 'var(--font-display)' }}>TOP  3</span>
                                             </div>
                                           </div>
+                                          {/* Divider */}
+                                          <div style={{ height: '1px', background: `linear-gradient(90deg, transparent, ${pa1}44, ${pa2}44, transparent)`, marginBottom: '2px' }} />
+                                          {/* Sample rows */}
+                                          {[
+                                            { rank: 1, name: 'TopUser', lvl: 42, xp: '98,400', color: '#FFD700', bot: '#B8860B', pct: 0.82 },
+                                            { rank: 2, name: 'Player2', lvl: 38, xp: '84,100', color: '#E8E8E8', bot: '#A0A0A0', pct: 0.65 },
+                                            { rank: 3, name: 'Member3', lvl: 31, xp: '61,200', color: '#F0A060', bot: '#8B4513', pct: 0.47 },
+                                          ].map((row, i) => (
+                                            <div key={row.rank} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 16px', background: `${row.color}0a` }}>
+                                              <div style={{ width: '28px', height: '18px', borderRadius: '4px', background: `linear-gradient(180deg,${row.color}30,${row.bot}30)`, border: `1px solid ${row.color}88`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <span style={{ fontSize: '9px', fontWeight: 800, color: row.color, fontFamily: 'var(--font-display)' }}>#{row.rank}</span>
+                                              </div>
+                                              <div style={{ width: '24px', height: '24px', borderRadius: '4px', background: `linear-gradient(135deg,${row.color}44,${row.bot}44)`, border: `1px solid ${row.color}55`, flexShrink: 0 }} />
+                                              <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '3px' }}>{row.name}</div>
+                                                <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', width: '110px' }}>
+                                                  <div style={{ width: `${row.pct * 100}%`, height: '100%', background: `linear-gradient(90deg,${row.color},${row.bot})` }} />
+                                                </div>
+                                              </div>
+                                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                                <div style={{ fontSize: '11px', fontWeight: 700, color: row.color, fontFamily: 'var(--font-display)' }}>Lvl {row.lvl}</div>
+                                                <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)' }}>{row.xp} XP</div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                          {/* Footer */}
+                                          <div style={{ padding: '6px 0', background: 'rgba(255,255,255,0.025)', textAlign: 'center', fontSize: '9px', color: 'rgba(255,255,255,0.18)', fontFamily: 'var(--font-display)' }}>Server Name  ·  Rankings update in real-time</div>
+                                          {/* Bottom accent line */}
+                                          <div style={{ height: '2px', background: `linear-gradient(90deg, transparent 0%, ${pa1}bb 30%, ${pa2}bb 70%, transparent 100%)` }} />
                                         </div>
                                       </div>
                                     </div>
@@ -2175,37 +2188,42 @@ function App() {
                                     {/* Live preview */}
                                     <div>
                                       <div style={{ fontSize: '10px', fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '1.5px', marginBottom: '10px', textTransform: 'uppercase' }}>Preview</div>
-                                      <div style={{
-                                        width: '380px',
-                                        height: '120px',
-                                        borderRadius: '10px',
-                                        background: previewTheme.bg,
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        border: '1px solid rgba(255,255,255,0.06)',
-                                        flexShrink: 0,
-                                      }}>
-                                        {/* Left accent bar */}
-                                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: `linear-gradient(180deg,${pa1},${pa2})` }} />
-                                        {/* Avatar ring mock */}
-                                        <div style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', width: '60px', height: '60px', borderRadius: '50%', background: `linear-gradient(135deg,${pa1},${pa2})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                          <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: previewTheme.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: 'rgba(255,255,255,0.4)' }}>U</div>
+                                      <div style={{ width: '475px', height: '150px', borderRadius: '14px', background: previewTheme.bg, position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+                                        {/* Ambient glows */}
+                                        <div style={{ position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)', width: '120px', height: '120px', borderRadius: '50%', background: `radial-gradient(circle, ${pa1}22 0%, transparent 70%)`, pointerEvents: 'none' }} />
+                                        <div style={{ position: 'absolute', right: '-30px', top: '-30px', width: '140px', height: '140px', borderRadius: '50%', background: `radial-gradient(circle, ${pa2}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
+                                        {/* Watermark rank */}
+                                        <div style={{ position: 'absolute', right: '8px', bottom: '-6px', fontSize: '80px', fontWeight: 900, color: `${pa1}09`, lineHeight: 1, pointerEvents: 'none', userSelect: 'none', fontFamily: 'var(--font-display)' }}>#3</div>
+                                        {/* Square avatar with gradient border */}
+                                        <div style={{ position: 'absolute', left: '20px', top: '20px', width: '110px', height: '110px', borderRadius: '10px', background: `linear-gradient(135deg,${pa1},${pa2})`, padding: '2px' }}>
+                                          <div style={{ width: '100%', height: '100%', borderRadius: '8px', background: '#1a1b2e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>U</div>
                                         </div>
-                                        {/* Text area */}
-                                        <div style={{ position: 'absolute', left: '92px', top: '22px', right: '16px' }}>
-                                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                            <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>Username</div>
-                                            <div style={{ display: 'flex', gap: '10px' }}>
-                                              <span style={{ fontSize: '10px', fontWeight: 700, color: previewTheme.levelColor, fontFamily: 'var(--font-display)' }}>LEVEL 12</span>
-                                              <span style={{ fontSize: '10px', fontWeight: 700, color: pa1, fontFamily: 'var(--font-display)' }}>RANK #3</span>
+                                        {/* Content area */}
+                                        <div style={{ position: 'absolute', left: '148px', top: '19px', right: '18px' }}>
+                                          {/* Username */}
+                                          <div style={{ fontSize: '23px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '5px', paddingRight: '58px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Username</div>
+                                          {/* Level pill */}
+                                          <div style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '999px', border: `1px solid ${previewTheme.levelColor}55`, background: `${previewTheme.levelColor}18`, marginBottom: '10px' }}>
+                                            <span style={{ fontSize: '9px', fontWeight: 700, color: previewTheme.levelColor, fontFamily: 'var(--font-display)', letterSpacing: '0.5px' }}>LEVEL  12</span>
+                                          </div>
+                                          {/* Progress bar */}
+                                          <div style={{ position: 'relative', height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.06)', overflow: 'visible', marginBottom: '8px' }}>
+                                            <div style={{ width: '62%', height: '100%', background: `linear-gradient(90deg,${pa1},${pa2})`, borderRadius: '5px', position: 'relative', overflow: 'hidden' }}>
+                                              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '2px', background: `${pa2}ee`, boxShadow: `0 0 8px 2px ${pa2}88` }} />
                                             </div>
                                           </div>
-                                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>1,240 / 2,000 XP</div>
-                                          {/* Progress bar */}
-                                          <div style={{ height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                            <div style={{ width: '62%', height: '100%', background: `linear-gradient(90deg,${pa1},${pa2})`, borderRadius: '5px' }} />
+                                          {/* XP row */}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)' }}>1,240  /  2,000 XP</span>
+                                            <span style={{ fontSize: '9px', fontWeight: 700, color: pa2 }}>62%</span>
                                           </div>
                                         </div>
+                                        {/* Rank pill — top right */}
+                                        <div style={{ position: 'absolute', top: '18px', right: '18px', padding: '4px 12px', borderRadius: '999px', background: `linear-gradient(90deg,${pa1}28,${pa2}28)`, border: `1px solid ${pa1}88` }}>
+                                          <span style={{ fontSize: '9px', fontWeight: 700, color: pa1, fontFamily: 'var(--font-display)' }}># 3</span>
+                                        </div>
+                                        {/* Bottom accent line */}
+                                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent 0%, ${pa1}bb 30%, ${pa2}bb 70%, transparent 100%)` }} />
                                       </div>
                                     </div>
                                   </div>
