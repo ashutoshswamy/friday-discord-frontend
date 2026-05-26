@@ -423,12 +423,12 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
 
           {/* ── Header ── */}
           <div className="lp-how-header">
-            <div className="lp-section-eyebrow" style={{ justifyContent: 'center' }}>
+            <div className="lp-section-eyebrow">
               <span className="lp-section-eyebrow-line" />
               <span className="lp-section-label">HOW IT WORKS</span>
             </div>
-            <h2 className="lp-section-title" style={{ textAlign: 'center' }}>Up and Running in Minutes</h2>
-            <p className="lp-section-desc" style={{ textAlign: 'center', margin: '0 auto' }}>
+            <h2 className="lp-section-title">Up and Running in Minutes</h2>
+            <p className="lp-section-desc">
               No complicated setup. No technical knowledge required. Just invite, configure, and watch Friday work.
             </p>
           </div>
@@ -488,27 +488,6 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
                   <div className="lp-am-bw-chips">
                     {['badword', 'scam*', '/free.nitro/i', 'offensive'].map(w => (
                       <div key={w} className="lp-am-bw-chip"><span>{w}</span><X size={11} /></div>
-                    ))}
-                  </div>
-                </div>
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '10px' }}>Channel Opt-Outs per Filter</div>
-                  <div className="lp-am-optout-form">
-                    <div className="lp-am-rule-field" style={{ flex: 2 }}><label className="lp-gw-label">Filter</label><div className="lp-gw-select-mock">Link Blockers ▾</div></div>
-                    <div className="lp-am-rule-field" style={{ flex: 3 }}><label className="lp-gw-label">Channel</label><div className="lp-gw-select-mock"># links ▾</div></div>
-                    <button className="lp-gw-launch-btn" style={{ flex: '0 0 auto', padding: '0 12px', height: '30px', marginTop: '16px' }}>+ Opt Out</button>
-                  </div>
-                  <div className="lp-am-optout-list">
-                    {[
-                      { filter: 'Link Blockers',         filterCls: 'lp-badge-info',   channel: '# links' },
-                      { filter: 'Discord Invite Filter', filterCls: 'lp-badge-warn',   channel: '# partnerships' },
-                      { filter: 'Spam Regulation',       filterCls: 'lp-badge-danger', channel: '# bot-commands' },
-                    ].map(({ filter, filterCls, channel }) => (
-                      <div key={`${filter}-${channel}`} className="lp-am-optout-row">
-                        <span className={`lp-dash-badge ${filterCls}`}>{filter}</span>
-                        <span className="lp-am-optout-channel">{channel}</span>
-                        <X size={11} className="lp-am-optout-x" />
-                      </div>
                     ))}
                   </div>
                 </div>
