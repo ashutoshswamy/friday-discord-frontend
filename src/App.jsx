@@ -110,6 +110,8 @@ function App() {
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
   const [petsList, setPetsList]             = useState([]);
   const [petsLoaded, setPetsLoaded]         = useState(false);
+  const [petEditModal, setPetEditModal]     = useState(null); // pet object being edited
+  const [petEditForm, setPetEditForm]       = useState({ hunger: 0, energy: 0, affection: 0, level: 1 });
   const [marketList, setMarketList]         = useState([]);
   const [marketLoaded, setMarketLoaded]     = useState(false);
   const [inventorySearch, setInventorySearch] = useState('');
@@ -887,6 +889,53 @@ function App() {
       if (res.ok) setPetsList(await res.json());
     } catch { /* silent */ }
     finally { setPetsLoaded(true); }
+  };
+
+  const adminDeletePet = async (petId) => {
+    if (!window.confirm('Permanently delete this pet? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/pets/${petId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) { setPetsList(p => p.filter(pet => pet.id !== petId)); showNotification('success', 'Pet deleted.'); }
+      else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const adminFeedPet = async (petId) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/pets/${petId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ hunger: 100, energy: 100, affection: 100 }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setPetsList(p => p.map(pet => pet.id === petId ? { ...pet, ...updated } : pet));
+        showNotification('success', 'Pet fully restored.');
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const adminUpdatePet = async (e) => {
+    e.preventDefault();
+    if (!petEditModal) return;
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/pets/${petEditModal.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          hunger: Number(petEditForm.hunger),
+          energy: Number(petEditForm.energy),
+          affection: Number(petEditForm.affection),
+          level: Number(petEditForm.level),
+        }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setPetsList(p => p.map(pet => pet.id === petEditModal.id ? { ...pet, ...updated } : pet));
+        setPetEditModal(null);
+        showNotification('success', 'Pet updated.');
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
   };
 
   const fetchMarket = async () => {
@@ -2978,6 +3027,17 @@ function App() {
                                           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Swords size={11} /> ATK: <strong style={{ color: '#f87171' }}>{pet.attack}</strong></span>
                                           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Shield size={11} /> DEF: <strong style={{ color: '#60a5fa' }}>{pet.defense}</strong></span>
                                         </div>
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '14px', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+                                          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '11px', padding: '6px 8px' }} onClick={() => adminFeedPet(pet.id)} title="Restore all stats to 100">
+                                            <UtensilsCrossed size={11} /> Restore
+                                          </button>
+                                          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '11px', padding: '6px 8px' }} onClick={() => { setPetEditModal(pet); setPetEditForm({ hunger: pet.hunger, energy: pet.energy, affection: pet.affection, level: pet.level }); }} title="Edit pet stats">
+                                            <Swords size={11} /> Edit
+                                          </button>
+                                          <button className="btn" style={{ flex: 1, fontSize: '11px', padding: '6px 8px', background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }} onClick={() => adminDeletePet(pet.id)} title="Delete pet">
+                                            <Trash2 size={11} /> Delete
+                                          </button>
+                                        </div>
                                       </div>
                                     );
                                   })}
@@ -3375,6 +3435,48 @@ function App() {
                 </div>
 
                 {/* MEMBER MODAL */}
+                {petEditModal && (
+                  <div className="modal-overlay" onClick={() => setPetEditModal(null)}>
+                    <div className="modal-content glass-panel glow-panel-primary" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                      <div className="modal-header" style={{ paddingBottom: '16px', borderBottom: '1px solid var(--border)', marginBottom: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <PawPrint size={18} color="#a78bfa" />
+                          <div>
+                            <h2 style={{ margin: 0, fontSize: '16px' }}>Edit Pet — {petEditModal.petName}</h2>
+                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>{petEditModal.petType} · LVL {petEditModal.level}</p>
+                          </div>
+                        </div>
+                        <button className="modal-close" onClick={() => setPetEditModal(null)}><X size={20} /></button>
+                      </div>
+                      <form onSubmit={adminUpdatePet} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        {[
+                          { label: 'Level', key: 'level', min: 1, max: 100 },
+                          { label: 'Hunger', key: 'hunger', min: 0, max: 100 },
+                          { label: 'Energy', key: 'energy', min: 0, max: 100 },
+                          { label: 'Affection', key: 'affection', min: 0, max: 100 },
+                        ].map(({ label, key, min, max }) => (
+                          <div key={key}>
+                            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <span>{label}</span><span style={{ color: 'var(--text-muted)' }}>{min}–{max}</span>
+                            </label>
+                            <input
+                              type="number" min={min} max={max}
+                              value={petEditForm[key]}
+                              onChange={e => setPetEditForm(f => ({ ...f, [key]: e.target.value }))}
+                              className="form-input"
+                              style={{ width: '100%' }}
+                            />
+                          </div>
+                        ))}
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                          <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setPetEditModal(null)}>Cancel</button>
+                          <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
                 {showMemberModal && selectedMember && (() => {
                   const memberWarnings = telemetry?.warnings.filter(w => w.userId === selectedMember.id) || [];
                   const joinedDate = selectedMember.joinedAt ? new Date(selectedMember.joinedAt).toLocaleDateString() : '—';
