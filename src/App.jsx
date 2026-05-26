@@ -1142,25 +1142,25 @@ function App() {
 
                   {/* Server switcher */}
                   <div className="guild-selector-container">
-                    <div className={`guild-dropdown-btn${showGuildDropdown ? ' open' : ''}`} onClick={() => setShowGuildDropdown(!showGuildDropdown)}>
+                    <div className="guild-dropdown-btn" onClick={() => setShowGuildDropdown(!showGuildDropdown)}>
                       <div className="guild-info-inline">
                         {activeGuildIcon
                           ? <img className="guild-icon-sm" src={activeGuildIcon} alt={activeGuildName} />
                           : <div className="guild-icon-sm">{activeGuildName.charAt(0)}</div>}
                         <span className="guild-name-sm">{activeGuildName}</span>
                       </div>
-                      <ChevronDown size={13} className="guild-dropdown-chevron" />
+                      <ChevronDown size={13} style={{ color: '#3a5570', flexShrink: 0 }} />
                     </div>
 
                     {showGuildDropdown && (
-                      <div className="guild-dropdown-panel">
+                      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: '12px', right: '12px', zIndex: 50, background: 'rgba(4,8,20,0.98)', border: '1px solid rgba(59,157,255,0.14)', borderRadius: '8px', overflow: 'hidden', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
                         {guilds.filter(g => g.active && g.id !== activeGuildId).map(g => (
-                          <div key={g.id} className="guild-dropdown-item" onClick={() => selectGuild(g.id)}>
+                          <div key={g.id} className="nav-item" onClick={() => selectGuild(g.id)} style={{ borderRadius: 0, padding: '9px 12px', borderBottom: '1px solid rgba(59,157,255,0.04)' }}>
                             {g.icon ? <img className="guild-icon-sm" src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`} alt={g.name} /> : <div className="guild-icon-sm">{g.name.charAt(0)}</div>}
                             <span className="guild-name-sm">{g.name}</span>
                           </div>
                         ))}
-                        <div className="guild-dropdown-all-servers" onClick={() => setActiveGuildId(null)}>
+                        <div className="nav-item" onClick={() => setActiveGuildId(null)} style={{ borderRadius: 0, padding: '9px 12px', color: 'var(--primary)', justifyContent: 'center', fontSize: '12px' }}>
                           <Server size={13} /> All Servers
                         </div>
                       </div>
