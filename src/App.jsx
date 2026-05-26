@@ -108,6 +108,7 @@ function App() {
   // Economy panel state — Inventory, Pets, Market
   const [inventoryList, setInventoryList]   = useState([]);
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
+  const [inventoryCategory, setInventoryCategory] = useState('all');
   const [petsList, setPetsList]             = useState([]);
   const [petsLoaded, setPetsLoaded]         = useState(false);
   const [petEditModal, setPetEditModal]     = useState(null); // pet object being edited
@@ -875,10 +876,15 @@ function App() {
     finally { setInventoryLoaded(true); }
   };
 
-  const removeInventoryItem = async (itemId) => {
+  const removeInventoryItem = async (userId, itemName) => {
+    if (!window.confirm(`Remove all "${itemName}" from this user's inventory?`)) return;
     try {
-      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/inventory/${itemId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) { setInventoryList(p => p.filter(i => i.id !== itemId)); showNotification('success', 'Item removed from inventory.'); }
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/inventory`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId, itemName }),
+      });
+      if (res.ok) { setInventoryList(p => p.filter(i => !(i.user_id === userId && i.item_name === itemName))); showNotification('success', 'Item removed.'); }
       else throw new Error((await res.json()).error);
     } catch (err) { showNotification('error', err.message); }
   };
@@ -1569,6 +1575,12 @@ function App() {
                                   forest:   { label: 'Forest',   bg: 'linear-gradient(135deg,#0a1a0f,#050d04)', accent1: '#00c853', accent2: '#69f0ae' },
                                   sunset:   { label: 'Sunset',   bg: 'linear-gradient(135deg,#1a0a08,#0d0304)', accent1: '#ff4569', accent2: '#ff9100' },
                                   aurora:   { label: 'Aurora',   bg: 'linear-gradient(135deg,#0a0813,#070510)', accent1: '#8b5cf6', accent2: '#ec4899' },
+                                  neon:     { label: 'Neon',     bg: 'linear-gradient(135deg,#050515,#020208)', accent1: '#39ff14', accent2: '#ff00ff' },
+                                  ocean:    { label: 'Ocean',    bg: 'linear-gradient(135deg,#011020,#010810)', accent1: '#00e5ff', accent2: '#0ea5e9' },
+                                  volcano:  { label: 'Volcano',  bg: 'linear-gradient(135deg,#1a0500,#0d0200)', accent1: '#ff6d00', accent2: '#ffab40' },
+                                  sakura:   { label: 'Sakura',   bg: 'linear-gradient(135deg,#1a0510,#0d0208)', accent1: '#f472b6', accent2: '#fda4af' },
+                                  gold:     { label: 'Gold',     bg: 'linear-gradient(135deg,#1a1200,#0d0900)', accent1: '#fbbf24', accent2: '#f59e0b' },
+                                  void:     { label: 'Void',     bg: 'linear-gradient(135deg,#050005,#020002)', accent1: '#7c3aed', accent2: '#c026d3' },
                                 };
                                 const pt = LB_THEMES[lbTheme] || LB_THEMES.cyber;
                                 const pa1 = lbAccent || pt.accent1;
@@ -2041,6 +2053,12 @@ function App() {
                                 forest:   { label: 'Forest',   bg: 'linear-gradient(135deg,#0a1a0f,#050d04)', accent1: '#00c853', accent2: '#69f0ae', levelColor: '#b9f6ca' },
                                 sunset:   { label: 'Sunset',   bg: 'linear-gradient(135deg,#1a0a08,#0d0304)', accent1: '#ff4569', accent2: '#ff9100', levelColor: '#ffd740' },
                                 aurora:   { label: 'Aurora',   bg: 'linear-gradient(135deg,#0a0813,#070510)', accent1: '#8b5cf6', accent2: '#ec4899', levelColor: '#a78bfa' },
+                                neon:     { label: 'Neon',     bg: 'linear-gradient(135deg,#050515,#020208)', accent1: '#39ff14', accent2: '#ff00ff', levelColor: '#39ff14' },
+                                ocean:    { label: 'Ocean',    bg: 'linear-gradient(135deg,#011020,#010810)', accent1: '#00e5ff', accent2: '#0ea5e9', levelColor: '#38bdf8' },
+                                volcano:  { label: 'Volcano',  bg: 'linear-gradient(135deg,#1a0500,#0d0200)', accent1: '#ff6d00', accent2: '#ffab40', levelColor: '#ffd740' },
+                                sakura:   { label: 'Sakura',   bg: 'linear-gradient(135deg,#1a0510,#0d0208)', accent1: '#f472b6', accent2: '#fda4af', levelColor: '#fbcfe8' },
+                                gold:     { label: 'Gold',     bg: 'linear-gradient(135deg,#1a1200,#0d0900)', accent1: '#fbbf24', accent2: '#f59e0b', levelColor: '#fde68a' },
+                                void:     { label: 'Void',     bg: 'linear-gradient(135deg,#050005,#020002)', accent1: '#7c3aed', accent2: '#c026d3', levelColor: '#ddd6fe' },
                               };
                               const previewTheme = RANK_THEMES_UI[rankCardTheme] || RANK_THEMES_UI.cyber;
                               const pa1 = rankCardAccent || previewTheme.accent1;
@@ -2364,6 +2382,12 @@ function App() {
                                 forest:   { label: 'Forest',   bg: 'linear-gradient(135deg,#0a1a0f,#050d04)', accent1: '#00c853', accent2: '#69f0ae' },
                                 sunset:   { label: 'Sunset',   bg: 'linear-gradient(135deg,#1a0a08,#0d0304)', accent1: '#ff4569', accent2: '#ff9100' },
                                 aurora:   { label: 'Aurora',   bg: 'linear-gradient(135deg,#0a0813,#070510)', accent1: '#8b5cf6', accent2: '#ec4899' },
+                                neon:     { label: 'Neon',     bg: 'linear-gradient(135deg,#050515,#020208)', accent1: '#39ff14', accent2: '#ff00ff' },
+                                ocean:    { label: 'Ocean',    bg: 'linear-gradient(135deg,#011020,#010810)', accent1: '#00e5ff', accent2: '#0ea5e9' },
+                                volcano:  { label: 'Volcano',  bg: 'linear-gradient(135deg,#1a0500,#0d0200)', accent1: '#ff6d00', accent2: '#ffab40' },
+                                sakura:   { label: 'Sakura',   bg: 'linear-gradient(135deg,#1a0510,#0d0208)', accent1: '#f472b6', accent2: '#fda4af' },
+                                gold:     { label: 'Gold',     bg: 'linear-gradient(135deg,#1a1200,#0d0900)', accent1: '#fbbf24', accent2: '#f59e0b' },
+                                void:     { label: 'Void',     bg: 'linear-gradient(135deg,#050005,#020002)', accent1: '#7c3aed', accent2: '#c026d3' },
                               };
                               const wt = WC_THEMES[welcomeCardTheme] || WC_THEMES.cyber;
                               const wa1 = welcomeCardAccent || wt.accent1;
@@ -2869,88 +2893,149 @@ function App() {
 
                         {/* ── INVENTORY PANEL ── */}
                         {activeTab === 'inventory' && (() => {
-                          const grouped = {};
-                          inventoryList.forEach(item => {
-                            if (!grouped[item.user_id]) grouped[item.user_id] = [];
-                            grouped[item.user_id].push(item);
+                          const INV_CATS = {
+                            all:   { label: 'All',   color: '#94a3b8' },
+                            tool:  { label: 'Tools', color: '#60a5fa', bg: 'rgba(96,165,250,0.12)',  border: 'rgba(96,165,250,0.25)' },
+                            fish:  { label: 'Fish',  color: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  border: 'rgba(34,211,238,0.25)' },
+                            hunt:  { label: 'Hunt',  color: '#86efac', bg: 'rgba(134,239,172,0.12)', border: 'rgba(134,239,172,0.25)' },
+                            dig:   { label: 'Dig',   color: '#fbbf24', bg: 'rgba(251,191,36,0.12)',  border: 'rgba(251,191,36,0.25)' },
+                            food:  { label: 'Food',  color: '#fb923c', bg: 'rgba(251,146,60,0.12)',  border: 'rgba(251,146,60,0.25)' },
+                            loot:  { label: 'Loot',  color: '#a78bfa', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.25)' },
+                            other: { label: 'Other', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.25)' },
+                          };
+                          const getItemIcon = (name, size = 18) => {
+                            const n = name.toLowerCase();
+                            if (n.includes('rifle')) return <Target size={size} />;
+                            if (n.includes('pole') || n.includes('fish') || n.includes('bass') || n.includes('salmon') || n.includes('goldfish') || n.includes('whale') || n.includes('coral') || n.includes('seaweed') || n.includes('boot')) return <Fish size={size} />;
+                            if (n.includes('bear') || n.includes('deer') || n.includes('wolf') || n.includes('moose') || n.includes('elk')) return <PawPrint size={size} />;
+                            if (n.includes('worm') || n.includes('fossil') || n.includes('shovel') || n.includes('vase') || n.includes('chest')) return <Pickaxe size={size} />;
+                            if (n.includes('lootbox') || n.includes('crate')) return <Gift size={size} />;
+                            if (n.includes('pizza')) return <PizzaIcon size={size} />;
+                            return <Package size={size} />;
+                          };
+                          const uniqueHolders = new Set(inventoryList.map(i => i.user_id)).size;
+                          const uniqueItems = new Set(inventoryList.map(i => i.item_name)).size;
+                          const totalCount = inventoryList.reduce((s, i) => s + (i.count || 1), 0);
+                          const topItem = inventoryList.length ? [...inventoryList].sort((a, b) => (b.count || 1) - (a.count || 1))[0] : null;
+                          const filteredItems = inventoryList.filter(i => {
+                            const matchSearch = i.item_name.toLowerCase().includes(inventorySearch.toLowerCase()) || i.user_id.includes(inventorySearch);
+                            const matchCat = inventoryCategory === 'all' || (i.item_type || 'other') === inventoryCategory;
+                            return matchSearch && matchCat;
                           });
-                          const filteredItems = inventoryList.filter(i =>
-                            i.item_name.toLowerCase().includes(inventorySearch.toLowerCase()) ||
-                            i.user_id.includes(inventorySearch)
-                          );
                           return (
                             <div>
+                              {/* Stats row */}
                               <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
-                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '160px' }}>
+                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '140px' }}>
                                   <div className="stat-icon-wrapper stat-icon-primary"><ShoppingBag size={20} /></div>
-                                  <div className="stat-info"><h3>Total Items</h3><div className="stat-value">{inventoryList.length}</div></div>
+                                  <div className="stat-info"><h3>Total Items</h3><div className="stat-value">{totalCount}</div></div>
                                 </div>
-                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '160px' }}>
+                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '140px' }}>
                                   <div className="stat-icon-wrapper stat-icon-success"><Users size={20} /></div>
-                                  <div className="stat-info"><h3>Unique Holders</h3><div className="stat-value">{Object.keys(grouped).length}</div></div>
+                                  <div className="stat-info"><h3>Holders</h3><div className="stat-value">{uniqueHolders}</div></div>
                                 </div>
-                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '160px' }}>
+                                <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '140px' }}>
                                   <div className="stat-icon-wrapper stat-icon-warning"><Sparkles size={20} /></div>
-                                  <div className="stat-info"><h3>Unique Items</h3><div className="stat-value">{[...new Set(inventoryList.map(i => i.item_name))].length}</div></div>
+                                  <div className="stat-info"><h3>Unique Types</h3><div className="stat-value">{uniqueItems}</div></div>
                                 </div>
+                                {topItem && (
+                                  <div className="stat-card glass-panel" style={{ flex: '1', minWidth: '140px' }}>
+                                    <div className="stat-icon-wrapper" style={{ background: 'rgba(167,139,250,0.12)', color: '#a78bfa' }}><Gift size={20} /></div>
+                                    <div className="stat-info"><h3>Most Held</h3><div className="stat-value" style={{ fontSize: '13px', fontWeight: 700 }}>{topItem.item_name}</div></div>
+                                  </div>
+                                )}
                               </div>
+
                               <div className="glass-panel" style={{ padding: '24px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                  <div className="chart-title" style={{ marginBottom: 0 }}>All Inventory Items</div>
+                                {/* Toolbar */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                                  <div className="chart-title" style={{ marginBottom: 0 }}>Server Inventory</div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <input className="form-input" type="text" placeholder="Search item or user ID..." value={inventorySearch} onChange={e => setInventorySearch(e.target.value)} style={{ width: '220px' }} />
+                                    <input className="form-input" type="text" placeholder="Search item or user..." value={inventorySearch} onChange={e => setInventorySearch(e.target.value)} style={{ width: '200px' }} />
                                     <button className="btn btn-secondary" onClick={() => { setInventoryLoaded(false); fetchInventory(); }}><RefreshCw size={14} /></button>
                                   </div>
                                 </div>
+
+                                {/* Category filter tabs */}
+                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                                  {Object.entries(INV_CATS).map(([key, cat]) => {
+                                    const count = key === 'all' ? inventoryList.length : inventoryList.filter(i => (i.item_type || 'other') === key).length;
+                                    if (key !== 'all' && count === 0) return null;
+                                    return (
+                                      <button
+                                        key={key}
+                                        onClick={() => setInventoryCategory(key)}
+                                        style={{
+                                          padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                                          background: inventoryCategory === key ? cat.bg || 'rgba(59,157,255,0.15)' : 'rgba(255,255,255,0.04)',
+                                          border: `1px solid ${inventoryCategory === key ? cat.border || 'rgba(59,157,255,0.35)' : 'var(--border)'}`,
+                                          color: inventoryCategory === key ? cat.color : 'var(--text-muted)',
+                                        }}
+                                      >
+                                        {cat.label} <span style={{ opacity: 0.6, fontSize: '11px' }}>{count}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Content */}
                                 {!inventoryLoaded ? (
                                   <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={28} color="#3b9dff" /></div>
                                 ) : filteredItems.length === 0 ? (
-                                  <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>{inventorySearch ? 'No results match your search.' : 'No inventory items found. Items will appear here once players earn them.'}</p>
+                                  <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>{inventorySearch || inventoryCategory !== 'all' ? 'No results.' : 'No items yet. Players earn items via /fish, /hunt, /dig, or /buy.'}</p>
                                 ) : (
-                                  <div className="table-container">
-                                    <table className="dashboard-table">
-                                      <thead><tr><th>#</th><th>Item Name</th><th>Owner (User ID)</th><th>Acquired</th><th>Action</th></tr></thead>
-                                      <tbody>
-                                        {filteredItems.slice(0, 100).map((item, idx) => {
-                                          const owner = members.find(m => m.id === item.user_id);
-                                          return (
-                                            <tr key={item.id}>
-                                              <td style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>{idx + 1}</td>
-                                              <td>
-                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
-                                                  <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
-                                                    {item.item_name.includes('Fish') || item.item_name.includes('fish') || item.item_name.includes('Pole') ? <Fish size={16} /> :
-                                                     item.item_name.includes('Deer') || item.item_name.includes('Bear') || item.item_name.includes('Wolf') ? <PawPrint size={16} /> :
-                                                     item.item_name.includes('Worm') || item.item_name.includes('Fossil') ? <Pickaxe size={16} /> :
-                                                     item.item_name.includes('Lootbox') ? <Gift size={16} /> :
-                                                     item.item_name.includes('Rifle') ? <Target size={16} /> :
-                                                     item.item_name.includes('Shovel') ? <Pickaxe size={16} /> :
-                                                     item.item_name.includes('Pizza') ? <PizzaIcon size={16} /> :
-                                                     <Package size={16} />}
-                                                  </span>
-                                                  <span style={{ fontWeight: 600 }}>{item.item_name}</span>
-                                                </span>
-                                              </td>
-                                              <td>
-                                                {owner ? (
-                                                  <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                                                    <img src={owner.avatar} alt={owner.username} style={{ width: '22px', height: '22px', borderRadius: '50%' }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} />
-                                                    <span>{owner.username}</span>
-                                                  </span>
-                                                ) : <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>{item.user_id}</span>}
-                                              </td>
-                                              <td style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{item.acquired_at ? new Date(item.acquired_at).toLocaleString() : '—'}</td>
-                                              <td>
-                                                <button className="logout-btn" title="Remove item" onClick={() => removeInventoryItem(item.id)} style={{ color: 'var(--danger)' }}><Trash2 size={15} /></button>
-                                              </td>
-                                            </tr>
-                                          );
-                                        })}
-                                      </tbody>
-                                    </table>
-                                    {filteredItems.length > 100 && <p style={{ textAlign: 'center', padding: '12px', color: 'var(--text-muted)', fontSize: '12px' }}>Showing first 100 of {filteredItems.length} items. Use the search to narrow results.</p>}
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}>
+                                    {filteredItems.slice(0, 120).map(item => {
+                                      const owner = members.find(m => m.id === item.user_id);
+                                      const cat = INV_CATS[item.item_type || 'other'] || INV_CATS.other;
+                                      return (
+                                        <div key={`${item.user_id}-${item.item_name}`} style={{ padding: '14px 16px', borderRadius: '10px', border: `1px solid ${cat.border || 'var(--border)'}`, background: cat.bg || 'rgba(255,255,255,0.02)', position: 'relative', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                          {/* Count badge */}
+                                          {(item.count || 1) > 1 && (
+                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, borderRadius: '10px', padding: '1px 8px', fontSize: '11px', fontWeight: 700 }}>×{item.count}</div>
+                                          )}
+
+                                          {/* Icon + name */}
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: cat.bg, border: `1px solid ${cat.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat.color, flexShrink: 0 }}>
+                                              {getItemIcon(item.item_name)}
+                                            </div>
+                                            <div>
+                                              <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: 1.2 }}>{item.item_name}</div>
+                                              <div style={{ fontSize: '11px', marginTop: '3px', display: 'inline-flex', alignItems: 'center', padding: '1px 7px', borderRadius: '8px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, fontWeight: 600, textTransform: 'capitalize' }}>{cat.label}</div>
+                                            </div>
+                                          </div>
+
+                                          {/* Owner row */}
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', border: '1px solid var(--border)' }}>
+                                            {owner ? (
+                                              <>
+                                                <img src={owner.avatar} alt={owner.username} style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0 }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} />
+                                                <span style={{ fontSize: '12px', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owner.username}</span>
+                                              </>
+                                            ) : (
+                                              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.user_id}</span>
+                                            )}
+                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', flexShrink: 0 }}>
+                                              {item.acquired_at ? new Date(item.acquired_at).toLocaleDateString() : '—'}
+                                            </span>
+                                          </div>
+
+                                          {/* Delete */}
+                                          <button
+                                            onClick={() => removeInventoryItem(item.user_id, item.item_name)}
+                                            style={{ width: '100%', padding: '6px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.08)', color: '#f87171', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', transition: 'background 0.15s' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.18)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
+                                          >
+                                            <Trash2 size={12} /> Remove{(item.count || 1) > 1 ? ` all ${item.count}` : ''}
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 )}
+                                {filteredItems.length > 120 && <p style={{ textAlign: 'center', padding: '16px 0 0', color: 'var(--text-muted)', fontSize: '12px' }}>Showing 120 of {filteredItems.length}. Use search or category filters to narrow results.</p>}
                               </div>
                             </div>
                           );
