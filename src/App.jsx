@@ -109,6 +109,9 @@ function App() {
   const [inventoryList, setInventoryList]   = useState([]);
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
   const [inventoryCategory, setInventoryCategory] = useState('all');
+  const [inventorySelectedUser, setInventorySelectedUser] = useState(null);
+  const [inventoryGrantModal, setInventoryGrantModal] = useState(false);
+  const [inventoryGrantForm, setInventoryGrantForm] = useState({ itemName: '', count: '1' });
   const [petsList, setPetsList]             = useState([]);
   const [petsLoaded, setPetsLoaded]         = useState(false);
   const [petEditModal, setPetEditModal]     = useState(null); // pet object being edited
@@ -886,6 +889,36 @@ function App() {
       });
       if (res.ok) { setInventoryList(p => p.filter(i => !(i.user_id === userId && i.item_name === itemName))); showNotification('success', 'Item removed.'); }
       else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const grantInventoryItem = async (userId, itemName, count) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/economy/inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId, itemName, count: parseInt(count) || 1 }),
+      });
+      if (res.ok) {
+        const qty = parseInt(count) || 1;
+        setInventoryList(p => {
+          const key = `${userId}::${itemName}`;
+          const existing = p.find(i => i.user_id === userId && i.item_name === itemName);
+          if (existing) return p.map(i => i.user_id === userId && i.item_name === itemName ? { ...i, count: i.count + qty } : i);
+          const deriveType = n => {
+            n = n.toLowerCase();
+            if (['fishing pole','shovel','rifle'].some(k => n.includes(k.split(' ')[0]))) return 'tool';
+            if (['fish','bass','salmon','goldfish','whale','coral','seaweed','boot'].some(k => n.includes(k))) return 'fish';
+            if (['bear','deer','wolf','moose','elk'].some(k => n.includes(k))) return 'hunt';
+            if (['worm','fossil','vase','gold chest','gem'].some(k => n.includes(k))) return 'dig';
+            if (['pizza','bread','apple','food'].some(k => n.includes(k))) return 'food';
+            if (['lootbox','mystery','crate'].some(k => n.includes(k))) return 'loot';
+            return 'other';
+          };
+          return [...p, { id: Date.now(), user_id: userId, item_name: itemName, item_type: deriveType(itemName), count: qty, acquired_at: new Date().toISOString() }];
+        });
+        showNotification('success', `Granted ${qty}× ${itemName}.`);
+      } else throw new Error((await res.json()).error);
     } catch (err) { showNotification('error', err.message); }
   };
 
@@ -2917,11 +2950,29 @@ function App() {
                           const uniqueItems = new Set(inventoryList.map(i => i.item_name)).size;
                           const totalCount = inventoryList.reduce((s, i) => s + (i.count || 1), 0);
                           const topItem = inventoryList.length ? [...inventoryList].sort((a, b) => (b.count || 1) - (a.count || 1))[0] : null;
-                          const filteredItems = inventoryList.filter(i => {
-                            const matchSearch = i.item_name.toLowerCase().includes(inventorySearch.toLowerCase()) || i.user_id.includes(inventorySearch);
-                            const matchCat = inventoryCategory === 'all' || (i.item_type || 'other') === inventoryCategory;
-                            return matchSearch && matchCat;
+
+                          // Group items by user
+                          const userMap = {};
+                          for (const item of inventoryList) {
+                            if (!userMap[item.user_id]) userMap[item.user_id] = [];
+                            userMap[item.user_id].push(item);
+                          }
+                          const userEntries = Object.entries(userMap).sort((a, b) => {
+                            const aTotal = a[1].reduce((s, i) => s + (i.count || 1), 0);
+                            const bTotal = b[1].reduce((s, i) => s + (i.count || 1), 0);
+                            return bTotal - aTotal;
                           });
+
+                          // Selected user's items (with search + category filter)
+                          const selectedUserItems = inventorySelectedUser
+                            ? (userMap[inventorySelectedUser] || []).filter(i => {
+                                const matchSearch = i.item_name.toLowerCase().includes(inventorySearch.toLowerCase());
+                                const matchCat = inventoryCategory === 'all' || (i.item_type || 'other') === inventoryCategory;
+                                return matchSearch && matchCat;
+                              })
+                            : [];
+                          const selectedUserMember = inventorySelectedUser ? members.find(m => m.id === inventorySelectedUser) : null;
+
                           return (
                             <div>
                               {/* Stats row */}
@@ -2946,97 +2997,189 @@ function App() {
                                 )}
                               </div>
 
-                              <div className="glass-panel" style={{ padding: '24px' }}>
-                                {/* Toolbar */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-                                  <div className="chart-title" style={{ marginBottom: 0 }}>Server Inventory</div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <input className="form-input" type="text" placeholder="Search item or user..." value={inventorySearch} onChange={e => setInventorySearch(e.target.value)} style={{ width: '200px' }} />
-                                    <button className="btn btn-secondary" onClick={() => { setInventoryLoaded(false); fetchInventory(); }}><RefreshCw size={14} /></button>
-                                  </div>
-                                </div>
-
-                                {/* Category filter tabs */}
-                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                                  {Object.entries(INV_CATS).map(([key, cat]) => {
-                                    const count = key === 'all' ? inventoryList.length : inventoryList.filter(i => (i.item_type || 'other') === key).length;
-                                    if (key !== 'all' && count === 0) return null;
-                                    return (
+                              {/* ── USER DETAIL VIEW ── */}
+                              {inventorySelectedUser ? (
+                                <div className="glass-panel" style={{ padding: '24px' }}>
+                                  {/* Header */}
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                       <button
-                                        key={key}
-                                        onClick={() => setInventoryCategory(key)}
-                                        style={{
-                                          padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
-                                          background: inventoryCategory === key ? cat.bg || 'rgba(59,157,255,0.15)' : 'rgba(255,255,255,0.04)',
-                                          border: `1px solid ${inventoryCategory === key ? cat.border || 'rgba(59,157,255,0.35)' : 'var(--border)'}`,
-                                          color: inventoryCategory === key ? cat.color : 'var(--text-muted)',
-                                        }}
+                                        onClick={() => { setInventorySelectedUser(null); setInventorySearch(''); setInventoryCategory('all'); }}
+                                        style={{ padding: '6px 12px', borderRadius: '7px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
                                       >
-                                        {cat.label} <span style={{ opacity: 0.6, fontSize: '11px' }}>{count}</span>
+                                        ← Back
                                       </button>
-                                    );
-                                  })}
-                                </div>
-
-                                {/* Content */}
-                                {!inventoryLoaded ? (
-                                  <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={28} color="#3b9dff" /></div>
-                                ) : filteredItems.length === 0 ? (
-                                  <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>{inventorySearch || inventoryCategory !== 'all' ? 'No results.' : 'No items yet. Players earn items via /fish, /hunt, /dig, or /buy.'}</p>
-                                ) : (
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}>
-                                    {filteredItems.slice(0, 120).map(item => {
-                                      const owner = members.find(m => m.id === item.user_id);
-                                      const cat = INV_CATS[item.item_type || 'other'] || INV_CATS.other;
-                                      return (
-                                        <div key={`${item.user_id}-${item.item_name}`} style={{ padding: '14px 16px', borderRadius: '10px', border: `1px solid ${cat.border || 'var(--border)'}`, background: cat.bg || 'rgba(255,255,255,0.02)', position: 'relative', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                          {/* Count badge */}
-                                          {(item.count || 1) > 1 && (
-                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, borderRadius: '10px', padding: '1px 8px', fontSize: '11px', fontWeight: 700 }}>×{item.count}</div>
-                                          )}
-
-                                          {/* Icon + name */}
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: cat.bg, border: `1px solid ${cat.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat.color, flexShrink: 0 }}>
-                                              {getItemIcon(item.item_name)}
-                                            </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        {selectedUserMember ? (
+                                          <>
+                                            <img src={selectedUserMember.avatar} alt={selectedUserMember.username} style={{ width: '32px', height: '32px', borderRadius: '50%' }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} />
                                             <div>
-                                              <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: 1.2 }}>{item.item_name}</div>
-                                              <div style={{ fontSize: '11px', marginTop: '3px', display: 'inline-flex', alignItems: 'center', padding: '1px 7px', borderRadius: '8px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, fontWeight: 600, textTransform: 'capitalize' }}>{cat.label}</div>
+                                              <div style={{ fontWeight: 700, fontSize: '15px' }}>{selectedUserMember.username}</div>
+                                              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{inventorySelectedUser}</div>
                                             </div>
-                                          </div>
+                                          </>
+                                        ) : (
+                                          <div style={{ fontWeight: 700, fontSize: '15px', fontFamily: 'var(--font-mono)' }}>{inventorySelectedUser}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <input className="form-input" type="text" placeholder="Search items..." value={inventorySearch} onChange={e => setInventorySearch(e.target.value)} style={{ width: '160px' }} />
+                                      <button
+                                        onClick={() => { setInventoryGrantForm({ itemName: '', count: '1' }); setInventoryGrantModal(true); }}
+                                        style={{ padding: '7px 14px', borderRadius: '7px', border: '1px solid rgba(34,197,94,0.35)', background: 'rgba(34,197,94,0.1)', color: '#4ade80', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.2)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.1)'}
+                                      >
+                                        <Plus size={13} /> Grant Item
+                                      </button>
+                                    </div>
+                                  </div>
 
-                                          {/* Owner row */}
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', border: '1px solid var(--border)' }}>
-                                            {owner ? (
-                                              <>
-                                                <img src={owner.avatar} alt={owner.username} style={{ width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0 }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} />
-                                                <span style={{ fontSize: '12px', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owner.username}</span>
-                                              </>
-                                            ) : (
-                                              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.user_id}</span>
-                                            )}
-                                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', flexShrink: 0 }}>
-                                              {item.acquired_at ? new Date(item.acquired_at).toLocaleDateString() : '—'}
-                                            </span>
-                                          </div>
-
-                                          {/* Delete */}
-                                          <button
-                                            onClick={() => removeInventoryItem(item.user_id, item.item_name)}
-                                            style={{ width: '100%', padding: '6px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.08)', color: '#f87171', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', transition: 'background 0.15s' }}
-                                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.18)'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
-                                          >
-                                            <Trash2 size={12} /> Remove{(item.count || 1) > 1 ? ` all ${item.count}` : ''}
-                                          </button>
-                                        </div>
+                                  {/* Category tabs */}
+                                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                                    {Object.entries(INV_CATS).map(([key, cat]) => {
+                                      const cnt = key === 'all' ? (userMap[inventorySelectedUser] || []).length : (userMap[inventorySelectedUser] || []).filter(i => (i.item_type || 'other') === key).length;
+                                      if (key !== 'all' && cnt === 0) return null;
+                                      return (
+                                        <button key={key} onClick={() => setInventoryCategory(key)} style={{ padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s', background: inventoryCategory === key ? cat.bg || 'rgba(59,157,255,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${inventoryCategory === key ? cat.border || 'rgba(59,157,255,0.35)' : 'var(--border)'}`, color: inventoryCategory === key ? cat.color : 'var(--text-muted)' }}>
+                                          {cat.label} <span style={{ opacity: 0.6, fontSize: '11px' }}>{cnt}</span>
+                                        </button>
                                       );
                                     })}
                                   </div>
-                                )}
-                                {filteredItems.length > 120 && <p style={{ textAlign: 'center', padding: '16px 0 0', color: 'var(--text-muted)', fontSize: '12px' }}>Showing 120 of {filteredItems.length}. Use search or category filters to narrow results.</p>}
-                              </div>
+
+                                  {/* Items grid */}
+                                  {!inventoryLoaded ? (
+                                    <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={28} color="#3b9dff" /></div>
+                                  ) : selectedUserItems.length === 0 ? (
+                                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>No items match your filters.</p>
+                                  ) : (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                                      {selectedUserItems.map(item => {
+                                        const cat = INV_CATS[item.item_type || 'other'] || INV_CATS.other;
+                                        return (
+                                          <div key={`${item.user_id}-${item.item_name}`} style={{ padding: '14px 16px', borderRadius: '10px', border: `1px solid ${cat.border || 'var(--border)'}`, background: cat.bg || 'rgba(255,255,255,0.02)', display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative' }}>
+                                            {(item.count || 1) > 1 && (
+                                              <div style={{ position: 'absolute', top: '10px', right: '10px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, borderRadius: '10px', padding: '1px 8px', fontSize: '11px', fontWeight: 700 }}>×{item.count}</div>
+                                            )}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                              <div style={{ width: '38px', height: '38px', borderRadius: '9px', background: cat.bg, border: `1px solid ${cat.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat.color, flexShrink: 0 }}>{getItemIcon(item.item_name)}</div>
+                                              <div>
+                                                <div style={{ fontWeight: 700, fontSize: '13px', lineHeight: 1.2 }}>{item.item_name}</div>
+                                                <div style={{ fontSize: '11px', marginTop: '3px', display: 'inline-flex', alignItems: 'center', padding: '1px 7px', borderRadius: '8px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color, fontWeight: 600, textTransform: 'capitalize' }}>{cat.label}</div>
+                                              </div>
+                                            </div>
+                                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'right' }}>{item.acquired_at ? new Date(item.acquired_at).toLocaleDateString() : '—'}</div>
+                                            <button onClick={() => removeInventoryItem(item.user_id, item.item_name)} style={{ width: '100%', padding: '6px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.08)', color: '#f87171', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.18)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}>
+                                              <Trash2 size={12} /> Remove{(item.count || 1) > 1 ? ` all ${item.count}` : ''}
+                                            </button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+
+                                  {/* Grant item modal */}
+                                  {inventoryGrantModal && (
+                                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setInventoryGrantModal(false)}>
+                                      <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '14px', padding: '28px', width: '360px', maxWidth: '90vw' }} onClick={e => e.stopPropagation()}>
+                                        <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                          <Plus size={16} style={{ color: '#4ade80' }} /> Grant Item to {selectedUserMember?.username || inventorySelectedUser}
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                          <div>
+                                            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Item Name</label>
+                                            <input className="form-input" type="text" placeholder="e.g. Fishing Pole" value={inventoryGrantForm.itemName} onChange={e => setInventoryGrantForm(f => ({ ...f, itemName: e.target.value }))} style={{ width: '100%' }} autoFocus />
+                                          </div>
+                                          <div>
+                                            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Quantity</label>
+                                            <input className="form-input" type="number" min="1" max="100" value={inventoryGrantForm.count} onChange={e => setInventoryGrantForm(f => ({ ...f, count: e.target.value }))} style={{ width: '100%' }} />
+                                          </div>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                          <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setInventoryGrantModal(false)}>Cancel</button>
+                                          <button
+                                            className="btn btn-primary"
+                                            style={{ flex: 1 }}
+                                            disabled={!inventoryGrantForm.itemName.trim()}
+                                            onClick={async () => {
+                                              await grantInventoryItem(inventorySelectedUser, inventoryGrantForm.itemName.trim(), inventoryGrantForm.count);
+                                              setInventoryGrantModal(false);
+                                            }}
+                                          >Grant</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                /* ── USER LIST VIEW ── */
+                                <div className="glass-panel" style={{ padding: '24px' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                                    <div className="chart-title" style={{ marginBottom: 0 }}>Inventory by User</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <input className="form-input" type="text" placeholder="Search users..." value={inventorySearch} onChange={e => setInventorySearch(e.target.value)} style={{ width: '180px' }} />
+                                      <button className="btn btn-secondary" onClick={() => { setInventoryLoaded(false); fetchInventory(); }}><RefreshCw size={14} /></button>
+                                    </div>
+                                  </div>
+                                  {!inventoryLoaded ? (
+                                    <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}><RefreshCw className="animate-spin" size={28} color="#3b9dff" /></div>
+                                  ) : userEntries.length === 0 ? (
+                                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>No items yet. Players earn items via /fish, /hunt, /dig, or /buy.</p>
+                                  ) : (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}>
+                                      {userEntries
+                                        .filter(([uid]) => {
+                                          if (!inventorySearch) return true;
+                                          const m = members.find(m => m.id === uid);
+                                          return uid.includes(inventorySearch) || (m && m.username.toLowerCase().includes(inventorySearch.toLowerCase()));
+                                        })
+                                        .map(([uid, items]) => {
+                                          const m = members.find(m => m.id === uid);
+                                          const total = items.reduce((s, i) => s + (i.count || 1), 0);
+                                          const typeBreakdown = {};
+                                          for (const item of items) { const t = item.item_type || 'other'; typeBreakdown[t] = (typeBreakdown[t] || 0) + (item.count || 1); }
+                                          return (
+                                            <div
+                                              key={uid}
+                                              onClick={() => { setInventorySelectedUser(uid); setInventorySearch(''); setInventoryCategory('all'); }}
+                                              style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.15s', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                                              onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(59,157,255,0.4)'; e.currentTarget.style.background = 'rgba(59,157,255,0.05)'; }}
+                                              onMouseLeave={e => { e.currentTarget.style.border = '1px solid var(--border)'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
+                                            >
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                {m ? (
+                                                  <img src={m.avatar} alt={m.username} style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} />
+                                                ) : (
+                                                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(59,157,255,0.12)', border: '1px solid rgba(59,157,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Users size={16} color="#3b9dff" /></div>
+                                                )}
+                                                <div style={{ flex: 1, overflow: 'hidden' }}>
+                                                  <div style={{ fontWeight: 700, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m ? m.username : uid}</div>
+                                                  {m && <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{uid}</div>}
+                                                </div>
+                                                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                                  <div style={{ fontWeight: 700, fontSize: '16px', color: '#3b9dff' }}>{total}</div>
+                                                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>items</div>
+                                                </div>
+                                              </div>
+                                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                                {Object.entries(typeBreakdown).map(([type, cnt]) => {
+                                                  const cat = INV_CATS[type] || INV_CATS.other;
+                                                  return (
+                                                    <span key={type} style={{ fontSize: '10px', fontWeight: 600, padding: '2px 7px', borderRadius: '8px', background: cat.bg, border: `1px solid ${cat.border}`, color: cat.color }}>
+                                                      {cat.label} {cnt}
+                                                    </span>
+                                                  );
+                                                })}
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           );
                         })()}
