@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Landing from './Landing';
 import Commands from './Commands';
+import Updates from './Updates';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
@@ -1206,6 +1207,9 @@ function App() {
                       </button>
                       <button className="sf-icon-btn" onClick={() => navigate('/commands')} title="Commands">
                         <BookOpen size={13} /> Commands
+                      </button>
+                      <button className="sf-icon-btn" onClick={() => navigate('/updates')} title="Updates">
+                        <Activity size={13} /> Updates
                       </button>
                     </div>
                     <div className="sf-user">
@@ -3550,6 +3554,7 @@ function App() {
 
       {/* Commands reference */}
       <Route path="/commands" element={<Commands />} />
+      <Route path="/updates" element={<Updates />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

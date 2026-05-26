@@ -155,6 +155,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#ai">AI</a>
             <a href="#how">How it works</a>
             <RouterLink to="/commands">Commands</RouterLink>
+            <RouterLink to="/updates">Updates</RouterLink>
           </nav>
 
           <div className="lp-nav-ctas">
@@ -181,6 +182,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#ai" onClick={() => setMobileMenuOpen(false)}>AI</a>
             <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
             <RouterLink to="/commands" onClick={() => setMobileMenuOpen(false)}>Commands</RouterLink>
+            <RouterLink to="/updates" onClick={() => setMobileMenuOpen(false)}>Updates</RouterLink>
             <a
               href={inviteUrl}
               target="_blank"
