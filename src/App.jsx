@@ -1808,6 +1808,7 @@ function App() {
                                 { key: 'automodSpam', label: 'Spam Regulation', desc: 'Deletes messages sent in rapid succession.' },
                                 { key: 'automodCaps', label: 'Mass Caps Filtering', desc: 'Filters messages with excessive capital letters.' },
                                 { key: 'automodLinks', label: 'Link Blockers', desc: 'Blocks URLs posted by non-whitelisted members.' },
+                                { key: 'automodInvites', label: 'Discord Invite Filter', desc: 'Blocks Discord invite links (discord.gg / discord.com/invite) posted by members.' },
                               ].map(({ key, label, desc }) => (
                                 <div key={key} className="toggle-row">
                                   <div className="toggle-info"><h4>{label}</h4><p>{desc}</p></div>

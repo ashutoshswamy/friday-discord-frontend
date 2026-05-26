@@ -420,39 +420,127 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
       {/* ── HOW IT WORKS ── */}
       <section className="lp-how" id="how">
         <div className="lp-container">
-          <div className="lp-section-eyebrow">
-            <span className="lp-section-eyebrow-line" />
-            <span className="lp-section-label">HOW IT WORKS</span>
-          </div>
-          <h2 className="lp-section-title">Up and Running in Minutes</h2>
-          <p className="lp-section-desc">
-            No complicated setup. No technical knowledge required. Just invite, configure, and watch Friday work.
-          </p>
+          <div className="lp-how-layout">
+            {/* Left: steps */}
+            <div className="lp-how-left">
+              <div className="lp-section-eyebrow">
+                <span className="lp-section-eyebrow-line" />
+                <span className="lp-section-label">HOW IT WORKS</span>
+              </div>
+              <h2 className="lp-section-title">Up and Running in Minutes</h2>
+              <p className="lp-section-desc">
+                No complicated setup. No technical knowledge required. Just invite, configure, and watch Friday work.
+              </p>
 
-          <div className="lp-timeline">
-            {STEPS.map(({ Icon, number, title, desc }, i) => (
-              <div key={number} className="lp-tl-step">
-                <div className="lp-tl-left">
-                  <div className="lp-tl-num-wrap">
-                    <span className="lp-tl-num">{number}</span>
-                  </div>
-                  {i < STEPS.length - 1 && (
-                    <div className="lp-tl-connector">
-                      <div className="lp-tl-line" />
+              <div className="lp-timeline">
+                {STEPS.map(({ Icon, number, title, desc }, i) => (
+                  <div key={number} className="lp-tl-step">
+                    <div className="lp-tl-left">
+                      <div className="lp-tl-num-wrap">
+                        <span className="lp-tl-num">{number}</span>
+                      </div>
+                      {i < STEPS.length - 1 && (
+                        <div className="lp-tl-connector">
+                          <div className="lp-tl-line" />
+                        </div>
+                      )}
                     </div>
-                  )}
+                    <div className="lp-tl-content">
+                      <div className="lp-tl-icon-wrap">
+                        <Icon size={17} color="var(--lp-primary)" />
+                      </div>
+                      <div className="lp-tl-body">
+                        <h3 className="lp-tl-title">{title}</h3>
+                        <p className="lp-tl-desc">{desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: AutoMod dashboard visual */}
+            <div className="lp-how-right">
+              <div className="lp-automod-card">
+                {/* Window chrome */}
+                <div className="lp-automod-titlebar">
+                  <div className="lp-automod-dots">
+                    <span className="lp-dot lp-dot-r" />
+                    <span className="lp-dot lp-dot-y" />
+                    <span className="lp-dot lp-dot-g" />
+                  </div>
+                  <span className="lp-automod-titlebar-label">Friday Dashboard — AutoMod</span>
+                  <span className="lp-automod-active-badge">
+                    <span className="lp-automod-active-dot" />
+                    Active
+                  </span>
                 </div>
-                <div className="lp-tl-content">
-                  <div className="lp-tl-icon-wrap">
-                    <Icon size={17} color="var(--lp-primary)" />
+
+                {/* Server selector */}
+                <div className="lp-automod-server-row">
+                  <div className="lp-automod-server-icon">
+                    <Shield size={14} color="#3b9dff" />
                   </div>
-                  <div className="lp-tl-body">
-                    <h3 className="lp-tl-title">{title}</h3>
-                    <p className="lp-tl-desc">{desc}</p>
+                  <span className="lp-automod-server-name">My Awesome Server</span>
+                  <ChevronRight size={13} color="#546b87" />
+                  <span className="lp-automod-server-section">AutoMod</span>
+                </div>
+
+                {/* Filters panel */}
+                <div className="lp-automod-section">
+                  <div className="lp-automod-section-label">Filters</div>
+                  <div className="lp-automod-filters">
+                    {[
+                      { label: 'Spam Detection',    sub: '5 msg / 10s',     on: true,  color: '#3b9dff' },
+                      { label: 'Caps Lock Filter',  sub: '70% threshold',   on: true,  color: '#8b5cf6' },
+                      { label: 'Link Filter',       sub: 'Warn on trigger', on: true,  color: '#00c853' },
+                      { label: 'Discord Invites',   sub: 'Block & delete',  on: true,  color: '#f59e0b' },
+                    ].map(({ label, sub, on, color }) => (
+                      <div key={label} className="lp-automod-filter-row">
+                        <div className="lp-automod-filter-info">
+                          <span className="lp-automod-filter-name">{label}</span>
+                          <span className="lp-automod-filter-sub">{sub}</span>
+                        </div>
+                        <div className={`lp-automod-toggle ${on ? 'lp-automod-toggle--on' : ''}`} style={on ? { '--tog-color': color } : {}}>
+                          <div className="lp-automod-toggle-knob" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
+
+                {/* Divider */}
+                <div className="lp-automod-divider" />
+
+                {/* Recent actions */}
+                <div className="lp-automod-section">
+                  <div className="lp-automod-section-label">Recent Actions</div>
+                  <div className="lp-automod-log">
+                    {[
+                      { user: 'spammer_99',  action: 'Spam detected',  result: 'Warned',    color: '#ff4569', tag: 'WARN' },
+                      { user: 'ALLCAPSUSER', action: 'Caps violation',  result: 'Timed out', color: '#f59e0b', tag: 'MUTE' },
+                      { user: 'link_bot',    action: 'Link blocked',    result: 'Message deleted', color: '#3b9dff', tag: 'DEL' },
+                      { user: 'inv1te_spam', action: 'Invite blocked',  result: 'Warned',    color: '#ff4569', tag: 'WARN' },
+                    ].map(({ user, action, result, color, tag }) => (
+                      <div key={user} className="lp-automod-log-row">
+                        <span className="lp-automod-log-tag" style={{ color, borderColor: color + '40', background: color + '12' }}>{tag}</span>
+                        <div className="lp-automod-log-info">
+                          <span className="lp-automod-log-user">@{user}</span>
+                          <span className="lp-automod-log-action">{action} · {result}</span>
+                        </div>
+                        <span className="lp-automod-log-dot" style={{ background: color }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Save button row */}
+                <div className="lp-automod-footer">
+                  <span className="lp-automod-footer-hint">Changes auto-save</span>
+                  <button className="lp-automod-save-btn">Save Settings</button>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
