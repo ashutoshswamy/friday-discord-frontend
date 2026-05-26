@@ -3,9 +3,11 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Shield, Zap, Coins, Gift, LifeBuoy, UserPlus,
   ChevronRight, ArrowRight, Star, Check,
-  Menu, X, Link, Bell, Terminal, Mic, BrainCircuit
+  Menu, X, Link, Bell, Terminal, Mic, BrainCircuit,
+  Wrench, FileText, TrendingUp
 } from 'lucide-react';
 import './Landing.css';
+import Footer from './Footer';
 
 const makeInviteUrl = (clientId) =>
   `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`;
@@ -23,7 +25,7 @@ const FEATURES = [
   {
     Icon: Shield,
     title: 'AutoMod & Moderation',
-    desc: 'Full moderation suite — automated spam, caps, and link filtering with warn, timeout, kick, ban, lockdown, purge, and slowmode commands.',
+    desc: 'Full moderation suite — automated spam, caps, and link filtering with warn, timeout, kick, ban, lockdown, purge, slowmode, and escalation rules.',
     color: '#3b9dff',
     num: '01',
     pos: { gridColumn: '1 / 3', gridRow: '1 / 2' },
@@ -31,15 +33,15 @@ const FEATURES = [
   {
     Icon: Zap,
     title: 'XP Leveling & Voice',
-    desc: 'Members earn XP for chat and voice activity. Configure multipliers, role rewards at milestones, and view voice engagement leaderboards.',
+    desc: 'Members earn XP for chat and voice activity. Set multipliers, milestone role rewards, and track voice leaderboards.',
     color: '#8b5cf6',
     num: '02',
     pos: { gridColumn: '3 / 4', gridRow: '1 / 2' },
   },
   {
     Icon: Coins,
-    title: 'Economy & Mini-Games',
-    desc: 'Virtual economy with daily rewards, work, rob, and pay — plus six mini-games: blackjack, roulette, slots, and more.',
+    title: 'Economy, Stocks & Games',
+    desc: 'Virtual economy with daily, work, rob, hunt, fish, dig — plus a real-time stock market with long positions and 5× leveraged intraday trading. Blackjack, roulette, slots, and more.',
     color: '#00c853',
     num: '03',
     pos: { gridColumn: '1 / 2', gridRow: '2 / 3' },
@@ -58,7 +60,7 @@ const FEATURES = [
     desc: 'Launch timed giveaways with button entries, draw multiple winners, and reroll. Create RSVP event cards with live attendance tracking.',
     color: '#ff4569',
     num: '05',
-    pos: { gridColumn: '3 / 4', gridRow: '2 / 4' },
+    pos: { gridColumn: '3 / 4', gridRow: '2 / 3' },
   },
   {
     Icon: UserPlus,
@@ -66,7 +68,39 @@ const FEATURES = [
     desc: 'Welcome new members with custom messages, auto-assign roles on join, and deploy button-based reaction role menus — all dashboard-configurable.',
     color: '#38bdf8',
     num: '06',
-    pos: { gridColumn: '1 / 3', gridRow: '3 / 4' },
+    pos: { gridColumn: '1 / 2', gridRow: '3 / 4' },
+  },
+  {
+    Icon: Bell,
+    title: 'Alerts & Notifications',
+    desc: 'Subscribe to YouTube channel uploads and Twitch live streams. Friday pings your chosen channel the moment new content drops.',
+    color: '#f59e0b',
+    num: '07',
+    pos: { gridColumn: '2 / 3', gridRow: '3 / 4' },
+  },
+  {
+    Icon: Terminal,
+    title: 'Custom Commands',
+    desc: 'Create server-specific trigger commands with plain-text or rich embed responses. Build a custom command library unique to your community.',
+    color: '#10b981',
+    num: '08',
+    pos: { gridColumn: '3 / 4', gridRow: '3 / 4' },
+  },
+  {
+    Icon: FileText,
+    title: 'Auditing & Logs',
+    desc: 'Track deleted and edited messages, voice join/leave activity, and moderator action stats. Full audit trail accessible from the dashboard.',
+    color: '#f43f5e',
+    num: '09',
+    pos: { gridColumn: '1 / 2', gridRow: '4 / 5' },
+  },
+  {
+    Icon: Wrench,
+    title: 'Utility Tools',
+    desc: 'Avatar lookup, user/server/role/channel info, polls, reminders, Urban Dictionary, weather, and custom embed builder — all in one bot.',
+    color: '#94a3b8',
+    num: '10',
+    pos: { gridColumn: '2 / 4', gridRow: '4 / 5' },
   },
 ];
 
@@ -292,7 +326,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           </div>
           <h2 className="lp-section-title">Everything Your Server Needs</h2>
           <p className="lp-section-desc">
-            Six powerful systems — plus built-in AI — working in harmony to create a safer, more engaging community.
+            Ten powerful systems — plus built-in AI — working in harmony to create a safer, more engaging community.
           </p>
 
           <div className="lp-features-grid">
@@ -436,20 +470,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="lp-footer">
-        <div className="lp-container lp-footer-inner">
-          <div className="lp-nav-brand">
-            <img src="/logo.png" alt="Friday" className="lp-nav-logo" />
-            <span className="lp-nav-name" style={{ fontSize: '16px', letterSpacing: '1px' }}>FRIDAY</span>
-          </div>
-          <p className="lp-footer-copy">© 2025 Friday Bot. Built for Discord communities.</p>
-          <div className="lp-footer-links">
-            <a href={inviteUrl} target="_blank" rel="noreferrer">Invite</a>
-            <button onClick={handleDashboard}>Dashboard</button>
-          </div>
-        </div>
-      </footer>
+      <Footer onDashboard={handleDashboard} />
 
     </div>
   );

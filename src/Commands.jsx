@@ -377,13 +377,15 @@ const COMMANDS = [
   {
     name: 'shop add',
     category: 'economy',
-    desc: 'Admin: Add a new purchasable item to the server shop with optional role reward.',
-    usage: '/shop add [name] [cost] [description?] [role?]',
+    desc: 'Admin: Add a new purchasable item to the server shop with optional role reward or consumable effect.',
+    usage: '/shop add [name] [cost] [description?] [role?] [action_type?] [action_value?]',
     options: [
       { name: 'name', type: 'String', required: true, desc: 'Item name' },
       { name: 'cost', type: 'Integer', required: true, desc: 'Coin price' },
       { name: 'description', type: 'String', required: false, desc: 'Item description' },
       { name: 'role', type: 'Role', required: false, desc: 'Role to award on purchase' },
+      { name: 'action_type', type: 'Choice', required: false, desc: 'Consumable effect when used via /use — XP · COINS' },
+      { name: 'action_value', type: 'Integer', required: false, desc: 'Amount of XP or coins to grant when item is used' },
     ],
     admin: true,
     dashboard: true,

@@ -13,6 +13,8 @@ import {
 import Landing from './Landing';
 import Commands from './Commands';
 import Updates from './Updates';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
@@ -3555,6 +3557,8 @@ function App() {
       {/* Commands reference */}
       <Route path="/commands" element={<Commands />} />
       <Route path="/updates" element={<Updates />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
