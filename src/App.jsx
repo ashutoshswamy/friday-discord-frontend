@@ -1207,7 +1207,8 @@ function App() {
         body: JSON.stringify(body),
       });
       if (res.ok) {
-        showNotification('success', 'Poll posted successfully!');
+        const data = await res.json();
+        showNotification(data.warning ? 'error' : 'success', data.warning || 'Poll posted successfully!');
         setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''], emojis: ['', ''] });
         setPollsLoaded(false);
         fetchPolls();
