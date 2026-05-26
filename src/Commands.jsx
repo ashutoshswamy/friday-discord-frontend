@@ -714,6 +714,40 @@ const COMMANDS = [
     dashboard: false,
   },
 
+  {
+    name: 'coinflip',
+    category: 'economy',
+    desc: 'Flip a coin. Optionally guess heads or tails to see if you win.',
+    usage: '/coinflip [guess?]',
+    options: [
+      { name: 'guess', type: 'String', required: false, desc: 'Your guess: heads or tails' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'rps',
+    category: 'economy',
+    desc: 'Play Rock, Paper, Scissors against Friday.',
+    usage: '/rps [choice]',
+    options: [
+      { name: 'choice', type: 'String', required: true, desc: 'Your move: rock, paper, or scissors' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'scramble',
+    category: 'economy',
+    desc: 'Start a word scramble game in the channel. First to unscramble wins.',
+    usage: '/scramble [answer?]',
+    options: [
+      { name: 'answer', type: 'String', required: false, desc: 'Your answer to the current scramble' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+
   // ── LEVELING ──
   {
     name: 'rank',

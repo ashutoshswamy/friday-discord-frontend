@@ -8,7 +8,7 @@ import {
   Calendar, CheckCircle2, Sparkles,
   Fish, Package, Target, Flame, Heart, PawPrint, Swords, UtensilsCrossed, Pickaxe, Dog, Cat, Rabbit, Pizza as PizzaIcon,
   Wrench, Activity, Hash, Headphones, FolderOpen, Cpu, TrendingUp,
-  Home, BookOpen, Menu, Landmark, Briefcase
+  Home, BookOpen, Menu, Landmark, Briefcase, BarChart2
 } from 'lucide-react';
 import Landing from './Landing';
 import Commands from './Commands';
@@ -139,6 +139,7 @@ function App() {
   const [purgeFilter, setPurgeFilter]       = useState('');
 
   const [embedForm, setEmbedForm] = useState({ channelId: '', title: '', description: '', color: '#00FFCC', image: '', thumbnail: '' });
+  const [pollForm, setPollForm] = useState({ channelId: '', question: '', options: ['', ''] });
 
   const [modstatsList, setModstatsList]     = useState([]);
   const [modstatsLoaded, setModstatsLoaded] = useState(false);
@@ -1178,6 +1179,23 @@ function App() {
     } catch (err) { showNotification('error', err.message); }
   };
 
+  const sendPoll = async (e) => {
+    e.preventDefault();
+    const filledOptions = pollForm.options.filter(o => o.trim() !== '');
+    if (!pollForm.channelId || !pollForm.question || filledOptions.length < 2) return;
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/poll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ channelId: pollForm.channelId, question: pollForm.question, options: filledOptions }),
+      });
+      if (res.ok) {
+        showNotification('success', 'Poll posted successfully!');
+        setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''] });
+      } else throw new Error((await res.json()).error);
+    } catch (err) { showNotification('error', err.message); }
+  };
+
   const filteredMembers = members.filter(m =>
     m.username.toLowerCase().includes(memberSearch.toLowerCase()) ||
     (m.nickname && m.nickname.toLowerCase().includes(memberSearch.toLowerCase())) ||
@@ -1420,7 +1438,7 @@ function App() {
                     <div className="header-title-container">
                       <div className="header-tab-accent" />
                       <h1>
-                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', jobs: 'Job Ecosystem', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Embed Builder' }[activeTab] || activeTab}
+                        {{ overview: 'Overview', automod: 'AutoMod Rules', members: 'User Directory', logs: 'Audit Logs', shop: 'Server Shop', milestones: 'XP Milestones', onboarding: 'Onboarding', tickets: 'Tickets & Helpdesk', giveaways: 'Giveaways', customcmds: 'Custom Commands', alerts: 'Alerts', leaderboard: 'Leaderboard', stocks: 'Stocks & Portfolio', jobs: 'Job Ecosystem', inventory: 'Inventory', pets: 'Pets', market: 'Player Market', utilities: 'Utilities' }[activeTab] || activeTab}
                       </h1>
                     </div>
                     <div className="header-actions">
@@ -4021,6 +4039,7 @@ function App() {
 
                         {/* ── UTILITIES / EMBED BUILDER ── */}
                         {activeTab === 'utilities' && (
+                          <>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                             {/* Form */}
                             <div className="glass-panel" style={{ padding: '24px' }}>
@@ -4096,6 +4115,61 @@ function App() {
                               </p>
                             </div>
                           </div>
+
+                          {/* Poll Creator */}
+                          <div className="glass-panel" style={{ padding: '24px', marginTop: '24px' }}>
+                            <div className="chart-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <BarChart2 size={15} color="var(--primary)" /> Poll Creator
+                            </div>
+                            <form onSubmit={sendPoll} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
+                              {/* Left: question + channel */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                  <label>Target Channel</label>
+                                  <select className="form-select" value={pollForm.channelId} onChange={e => setPollForm(p => ({ ...p, channelId: e.target.value }))} required>
+                                    <option value="">— Select Channel —</option>
+                                    {telemetry.guild.channels.map(c => <option key={c.id} value={c.id}># {c.name}</option>)}
+                                  </select>
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                  <label>Question</label>
+                                  <input className="form-input" type="text" placeholder="e.g. What's your favourite language?" value={pollForm.question} onChange={e => setPollForm(p => ({ ...p, question: e.target.value }))} required maxLength={256} />
+                                </div>
+                                <button className="btn btn-primary" type="submit" disabled={!pollForm.channelId || !pollForm.question || pollForm.options.filter(o => o.trim()).length < 2}>
+                                  <BarChart2 size={15} /> Post Poll
+                                </button>
+                              </div>
+                              {/* Right: options */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Options (2–10)</label>
+                                {pollForm.options.map((opt, i) => (
+                                  <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '16px', width: '20px', flexShrink: 0 }}>{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i]}</span>
+                                    <input
+                                      className="form-input"
+                                      type="text"
+                                      placeholder={`Option ${i + 1}`}
+                                      value={opt}
+                                      onChange={e => setPollForm(p => { const opts = [...p.options]; opts[i] = e.target.value; return { ...p, options: opts }; })}
+                                      style={{ flex: 1 }}
+                                      maxLength={100}
+                                    />
+                                    {pollForm.options.length > 2 && (
+                                      <button type="button" className="btn btn-secondary" style={{ padding: '6px 8px', flexShrink: 0 }} onClick={() => setPollForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i) }))}>
+                                        <X size={12} />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                {pollForm.options.length < 10 && (
+                                  <button type="button" className="btn btn-secondary" style={{ marginTop: '4px', fontSize: '12px' }} onClick={() => setPollForm(p => ({ ...p, options: [...p.options, ''] }))}>
+                                    + Add Option
+                                  </button>
+                                )}
+                              </div>
+                            </form>
+                          </div>
+                          </>
                         )}
 
                       </>
