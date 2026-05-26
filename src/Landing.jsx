@@ -492,49 +492,6 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
                   </div>
                 </div>
                 <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '10px' }}>Punishment Escalation Rules</div>
-                  <table className="lp-dash-table">
-                    <thead><tr><th>Warning Threshold</th><th>Punishment</th><th>Duration</th></tr></thead>
-                    <tbody>
-                      {[
-                        { thresh: 3, type: 'TIMEOUT', dur: '60 min', cls: 'lp-badge-info' },
-                        { thresh: 5, type: 'KICK',    dur: '—',      cls: 'lp-badge-warn' },
-                        { thresh: 8, type: 'BAN',     dur: '—',      cls: 'lp-badge-danger' },
-                      ].map(({ thresh, type, dur, cls }) => (
-                        <tr key={thresh}>
-                          <td className="lp-dash-td-bold">{thresh} warnings</td>
-                          <td><span className={`lp-dash-badge ${cls}`}>{type}</span></td>
-                          <td className="lp-dash-td-muted">{dur}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="lp-am-rule-form">
-                    <div className="lp-am-rule-field"><label className="lp-gw-label">Warn Threshold</label><div className="lp-gw-input-mock">e.g. 3</div></div>
-                    <div className="lp-am-rule-field"><label className="lp-gw-label">Punishment</label><div className="lp-gw-select-mock">TIMEOUT (Mute) ▾</div></div>
-                    <button className="lp-gw-launch-btn" style={{ flex: '0 0 auto', padding: '0 12px', height: '30px', marginTop: '16px' }}>+ Add Rule</button>
-                  </div>
-                </div>
-                <div className="lp-dash-chart-panel">
-                  <div className="lp-dash-chart-title">Whitelisted Exemptions</div>
-                  <div className="lp-am-exempt-form">
-                    <div className="lp-am-rule-field" style={{ flex: 1 }}><label className="lp-gw-label">Type</label><div className="lp-gw-select-mock">CHANNEL ▾</div></div>
-                    <div className="lp-am-rule-field" style={{ flex: 2 }}><label className="lp-gw-label">Target</label><div className="lp-gw-select-mock"># moderators ▾</div></div>
-                    <button className="lp-gw-launch-btn" style={{ flex: '0 0 auto', padding: '0 12px', height: '30px', marginTop: '16px' }}>+ Whitelist</button>
-                  </div>
-                  <table className="lp-dash-table" style={{ marginTop: '10px' }}>
-                    <thead><tr><th>Type</th><th>Entity</th></tr></thead>
-                    <tbody>
-                      {[
-                        { type: 'CHANNEL', cls: 'lp-badge-info', name: '# moderators' },
-                        { type: 'ROLE',    cls: 'lp-badge-warn', name: 'Server Booster' },
-                      ].map(({ type, cls, name }) => (
-                        <tr key={name}><td><span className={`lp-dash-badge ${cls}`}>{type}</span></td><td className="lp-dash-td-bold">{name}</td></tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="lp-dash-chart-panel">
                   <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '10px' }}>Channel Opt-Outs per Filter</div>
                   <div className="lp-am-optout-form">
                     <div className="lp-am-rule-field" style={{ flex: 2 }}><label className="lp-gw-label">Filter</label><div className="lp-gw-select-mock">Link Blockers ▾</div></div>

@@ -65,6 +65,7 @@ function App() {
   const [newExemptionTargetId, setNewExemptionTargetId] = useState('');
   const [newShopItem, setNewShopItem] = useState({ name: '', cost: '', description: '', roleRewardId: '' });
   const [newRule, setNewRule] = useState({ threshold: '', type: 'TIMEOUT', duration: '3600000' });
+  const [newOptOut, setNewOptOut] = useState({ filter: 'links', channelId: '' });
   const [newMilestone, setNewMilestone] = useState({ level: '', roleId: '' });
 
   // Onboarding state
@@ -427,6 +428,35 @@ function App() {
       if (res.ok) {
         setTelemetry(p => ({ ...p, punishmentRules: (p.punishmentRules || []).filter(r => r.warnThreshold !== threshold) }));
         showNotification('success', 'Escalation rule removed.');
+      }
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const addFilterOptOut = async (e) => {
+    e.preventDefault();
+    if (!newOptOut.channelId) return;
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/filter-optouts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ filter: newOptOut.filter, channelId: newOptOut.channelId }),
+      });
+      if (res.ok) {
+        setTelemetry(p => ({ ...p, filterOptOuts: [...(p.filterOptOuts || []), { filter: newOptOut.filter, channelId: newOptOut.channelId }] }));
+        setNewOptOut(p => ({ ...p, channelId: '' }));
+        showNotification('success', 'Channel opt-out added.');
+      }
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const removeFilterOptOut = async (filter, channelId) => {
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/filter-optouts/${filter}/${channelId}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setTelemetry(p => ({ ...p, filterOptOuts: (p.filterOptOuts || []).filter(o => !(o.filter === filter && o.channelId === channelId)) }));
+        showNotification('success', 'Channel opt-out removed.');
       }
     } catch (err) { showNotification('error', err.message); }
   };
@@ -1927,6 +1957,50 @@ function App() {
                                       );
                                     })}
                                     {telemetry.exemptions.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No exemptions — bot scans entire server.</td></tr>}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+
+                            <div className="glass-panel" style={{ padding: '24px', gridColumn: 'span 2' }}>
+                              <div className="chart-title" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px' }}>Channel Opt-Outs per Filter</div>
+                              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>Exempt a channel from a specific filter. Other AutoMod rules still apply in that channel.</p>
+                              <form onSubmit={addFilterOptOut} style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                                <div className="form-group" style={{ flex: '0 0 200px', marginBottom: 0 }}>
+                                  <label>Filter</label>
+                                  <select className="form-select" value={newOptOut.filter} onChange={(e) => setNewOptOut(p => ({ ...p, filter: e.target.value }))}>
+                                    <option value="links">Link Blockers</option>
+                                    <option value="invites">Discord Invite Filter</option>
+                                    <option value="caps">Excessive Caps Filter</option>
+                                    <option value="spam">Anti-Spam Filter</option>
+                                  </select>
+                                </div>
+                                <div className="form-group" style={{ flex: 2, minWidth: '250px', marginBottom: 0 }}>
+                                  <label>Channel</label>
+                                  <select className="form-select" value={newOptOut.channelId} onChange={(e) => setNewOptOut(p => ({ ...p, channelId: e.target.value }))}>
+                                    <option value="">— Choose Channel —</option>
+                                    {telemetry.guild.channels.map(c => <option key={c.id} value={c.id}># {c.name}</option>)}
+                                  </select>
+                                </div>
+                                <button className="btn btn-primary" type="submit" disabled={!newOptOut.channelId}><Plus size={16} /> Add Opt-Out</button>
+                              </form>
+                              <div className="table-container">
+                                <table className="dashboard-table">
+                                  <thead><tr><th>Filter</th><th>Channel</th><th>Action</th></tr></thead>
+                                  <tbody>
+                                    {(telemetry.filterOptOuts || []).map(o => {
+                                      const filterLabels = { links: 'Link Blockers', invites: 'Discord Invite Filter', caps: 'Excessive Caps Filter', spam: 'Anti-Spam Filter' };
+                                      const filterBadge = { links: 'badge-primary', invites: 'badge-warning', caps: 'badge-success', spam: 'badge-danger' };
+                                      const chName = telemetry.guild.channels.find(c => c.id === o.channelId)?.name || o.channelId;
+                                      return (
+                                        <tr key={`${o.filter}-${o.channelId}`}>
+                                          <td><span className={`badge ${filterBadge[o.filter] || 'badge-primary'}`}>{filterLabels[o.filter] || o.filter}</span></td>
+                                          <td style={{ fontWeight: 600 }}># {chName}</td>
+                                          <td><button className="logout-btn" onClick={() => removeFilterOptOut(o.filter, o.channelId)}><Trash2 size={15} /></button></td>
+                                        </tr>
+                                      );
+                                    })}
+                                    {!(telemetry.filterOptOuts || []).length && <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No opt-outs configured.</td></tr>}
                                   </tbody>
                                 </table>
                               </div>
