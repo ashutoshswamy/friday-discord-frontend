@@ -1147,6 +1147,17 @@ const COMMANDS = [
     admin: false,
     dashboard: false,
   },
+  {
+    name: 'meme',
+    category: 'utility',
+    desc: 'Fetches a random meme from Reddit. Optionally target a specific subreddit.',
+    usage: '/meme [subreddit?]',
+    options: [
+      { name: 'subreddit', type: 'String', required: false, desc: 'Subreddit to fetch from (e.g. programmerhumor)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
 
   // ── AUDITING ──
   {
