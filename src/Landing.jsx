@@ -420,127 +420,234 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
       {/* ── HOW IT WORKS ── */}
       <section className="lp-how" id="how">
         <div className="lp-container">
-          <div className="lp-how-layout">
-            {/* Left: steps */}
-            <div className="lp-how-left">
-              <div className="lp-section-eyebrow">
-                <span className="lp-section-eyebrow-line" />
-                <span className="lp-section-label">HOW IT WORKS</span>
-              </div>
-              <h2 className="lp-section-title">Up and Running in Minutes</h2>
-              <p className="lp-section-desc">
-                No complicated setup. No technical knowledge required. Just invite, configure, and watch Friday work.
-              </p>
 
-              <div className="lp-timeline">
-                {STEPS.map(({ Icon, number, title, desc }, i) => (
-                  <div key={number} className="lp-tl-step">
-                    <div className="lp-tl-left">
-                      <div className="lp-tl-num-wrap">
-                        <span className="lp-tl-num">{number}</span>
+          {/* ── Header ── */}
+          <div className="lp-how-header">
+            <div className="lp-section-eyebrow" style={{ justifyContent: 'center' }}>
+              <span className="lp-section-eyebrow-line" />
+              <span className="lp-section-label">HOW IT WORKS</span>
+            </div>
+            <h2 className="lp-section-title" style={{ textAlign: 'center' }}>Up and Running in Minutes</h2>
+            <p className="lp-section-desc" style={{ textAlign: 'center', margin: '0 auto' }}>
+              No complicated setup. No technical knowledge required. Just invite, configure, and watch Friday work.
+            </p>
+          </div>
+
+          {/* ── Steps ── */}
+          <div className="lp-how-steps">
+            {STEPS.map(({ Icon, number, title, desc }, i) => (
+              <div key={number} className="lp-how-step-card">
+                <div className="lp-how-step-num">{number}</div>
+                <div className="lp-how-step-icon-wrap">
+                  <Icon size={20} color="var(--lp-primary)" />
+                </div>
+                <h3 className="lp-how-step-title">{title}</h3>
+                <p className="lp-how-step-desc">{desc}</p>
+                {i < STEPS.length - 1 && (
+                  <div className="lp-how-step-arrow"><ArrowRight size={16} color="rgba(59,157,255,0.35)" /></div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* ── Dashboard Preview Grid ── */}
+          <div className="lp-how-cards-grid">
+
+            {/* AutoMod */}
+            <div className="lp-dash-card">
+              <div className="lp-dash-titlebar">
+                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
+                <span className="lp-dash-titlebar-label">Friday Dashboard — AutoMod</span>
+              </div>
+              <div className="lp-dash-body">
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '0' }}>AutoMod Filters</div>
+                  {[
+                    { label: 'Spam Regulation',      desc: 'Deletes messages sent in rapid succession.',          on: true },
+                    { label: 'Mass Caps Filtering',  desc: 'Filters messages with excessive capital letters.',     on: true },
+                    { label: 'Link Blockers',         desc: 'Blocks URLs posted by non-whitelisted members.',      on: true },
+                    { label: 'Discord Invite Filter', desc: 'Blocks Discord invite links posted by members.',      on: true },
+                  ].map(({ label, desc, on }) => (
+                    <div key={label} className="lp-am-toggle-row">
+                      <div className="lp-am-toggle-info">
+                        <div className="lp-am-toggle-h4">{label}</div>
+                        <div className="lp-am-toggle-p">{desc}</div>
                       </div>
-                      {i < STEPS.length - 1 && (
-                        <div className="lp-tl-connector">
-                          <div className="lp-tl-line" />
-                        </div>
-                      )}
+                      <div className="lp-am-switch">
+                        <div className={`lp-am-slider ${on ? 'lp-am-slider--on' : ''}`}><div className="lp-am-knob" /></div>
+                      </div>
                     </div>
-                    <div className="lp-tl-content">
-                      <div className="lp-tl-icon-wrap">
-                        <Icon size={17} color="var(--lp-primary)" />
+                  ))}
+                </div>
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title">Blocked Words &amp; Patterns</div>
+                  <div className="lp-am-bw-input-row">
+                    <div className="lp-am-bw-input">Word or regex pattern...</div>
+                    <button className="lp-am-bw-add-btn">+ Add</button>
+                  </div>
+                  <div className="lp-am-bw-chips">
+                    {['badword', 'scam*', '/free.nitro/i', 'offensive'].map(w => (
+                      <div key={w} className="lp-am-bw-chip"><span>{w}</span><X size={11} /></div>
+                    ))}
+                  </div>
+                </div>
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title" style={{ borderBottom: '1px solid rgba(59,157,255,0.09)', paddingBottom: '10px', marginBottom: '10px' }}>Punishment Escalation Rules</div>
+                  <table className="lp-dash-table">
+                    <thead><tr><th>Warning Threshold</th><th>Punishment</th><th>Duration</th></tr></thead>
+                    <tbody>
+                      {[
+                        { thresh: 3, type: 'TIMEOUT', dur: '60 min', cls: 'lp-badge-info' },
+                        { thresh: 5, type: 'KICK',    dur: '—',      cls: 'lp-badge-warn' },
+                        { thresh: 8, type: 'BAN',     dur: '—',      cls: 'lp-badge-danger' },
+                      ].map(({ thresh, type, dur, cls }) => (
+                        <tr key={thresh}>
+                          <td className="lp-dash-td-bold">{thresh} warnings</td>
+                          <td><span className={`lp-dash-badge ${cls}`}>{type}</span></td>
+                          <td className="lp-dash-td-muted">{dur}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="lp-am-rule-form">
+                    <div className="lp-am-rule-field"><label className="lp-gw-label">Warn Threshold</label><div className="lp-gw-input-mock">e.g. 3</div></div>
+                    <div className="lp-am-rule-field"><label className="lp-gw-label">Punishment</label><div className="lp-gw-select-mock">TIMEOUT (Mute) ▾</div></div>
+                    <button className="lp-gw-launch-btn" style={{ flex: '0 0 auto', padding: '0 12px', height: '30px', marginTop: '16px' }}>+ Add Rule</button>
+                  </div>
+                </div>
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title">Whitelisted Exemptions</div>
+                  <div className="lp-am-exempt-form">
+                    <div className="lp-am-rule-field" style={{ flex: 1 }}><label className="lp-gw-label">Type</label><div className="lp-gw-select-mock">CHANNEL ▾</div></div>
+                    <div className="lp-am-rule-field" style={{ flex: 2 }}><label className="lp-gw-label">Target</label><div className="lp-gw-select-mock"># moderators ▾</div></div>
+                    <button className="lp-gw-launch-btn" style={{ flex: '0 0 auto', padding: '0 12px', height: '30px', marginTop: '16px' }}>+ Whitelist</button>
+                  </div>
+                  <table className="lp-dash-table" style={{ marginTop: '10px' }}>
+                    <thead><tr><th>Type</th><th>Entity</th></tr></thead>
+                    <tbody>
+                      {[
+                        { type: 'CHANNEL', cls: 'lp-badge-info', name: '# moderators' },
+                        { type: 'ROLE',    cls: 'lp-badge-warn', name: 'Server Booster' },
+                      ].map(({ type, cls, name }) => (
+                        <tr key={name}><td><span className={`lp-dash-badge ${cls}`}>{type}</span></td><td className="lp-dash-td-bold">{name}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Leaderboard */}
+            <div className="lp-dash-card">
+              <div className="lp-dash-titlebar">
+                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
+                <span className="lp-dash-titlebar-label">Friday Dashboard — Leaderboard</span>
+              </div>
+              <div className="lp-dash-body">
+                <div className="lp-lb-ticker">
+                  {[
+                    { label: 'Total XP',       value: '284,500', color: '#8b5cf6' },
+                    { label: 'Coins Circ.',    value: '4.2M',    color: '#00c853' },
+                    { label: 'Peak Level',     value: 'Lv. 42',  color: '#f59e0b' },
+                    { label: 'Active Members', value: '312',     color: '#3b9dff' },
+                  ].map(({ label, value, color }) => (
+                    <div key={label} className="lp-lb-ticker-cell">
+                      <div className="lp-lb-ticker-label">{label}</div>
+                      <div className="lp-lb-ticker-value" style={{ color }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="lp-lb-board-header">
+                  <Zap size={13} color="#8b5cf6" />
+                  <span className="lp-lb-board-title">XP RANKINGS</span>
+                  <span className="lp-lb-board-count"><UserPlus size={10}/> 312</span>
+                </div>
+                <div className="lp-lb-podium">
+                  {[
+                    { name: 'nova_knight',  level: 42, xp: 9400, pct: 88, pc: { glow: '#f59e0b', ring: 'linear-gradient(135deg,#f59e0b,#fcd34d)', label: 'GOLD',   num: '1' }, order: 0 },
+                    { name: 'crystal_void', level: 38, xp: 7800, pct: 72, pc: { glow: '#94a3b8', ring: 'linear-gradient(135deg,#94a3b8,#cbd5e1)', label: 'SILVER', num: '2' }, order: -1 },
+                    { name: 'blazex99',     level: 35, xp: 6600, pct: 61, pc: { glow: '#b45309', ring: 'linear-gradient(135deg,#b45309,#d97706)', label: 'BRONZE', num: '3' }, order: 1 },
+                  ].map(({ name, level, xp, pct, pc, order }) => (
+                    <div key={name} className="lp-lb-podium-card" style={{ border: `1px solid ${pc.glow}30`, boxShadow: `0 0 20px ${pc.glow}14`, order }}>
+                      <div className="lp-lb-podium-watermark" style={{ color: `${pc.glow}10` }}>{pc.num}</div>
+                      <div className="lp-lb-podium-badge" style={{ color: pc.glow, background: `${pc.glow}18`, border: `1px solid ${pc.glow}40` }}>{pc.label}</div>
+                      <div className="lp-lb-podium-avatar-wrap" style={{ padding: '2px', background: pc.ring }}>
+                        <div className="lp-lb-podium-avatar">{name[0].toUpperCase()}</div>
                       </div>
-                      <div className="lp-tl-body">
-                        <h3 className="lp-tl-title">{title}</h3>
-                        <p className="lp-tl-desc">{desc}</p>
-                      </div>
+                      <div className="lp-lb-podium-name">{name}</div>
+                      <div className="lp-lb-podium-level" style={{ color: '#8b5cf6' }}>LVL {level}</div>
+                      <div className="lp-lb-podium-xp">{xp.toLocaleString()} XP</div>
+                      <div className="lp-lb-podium-bar"><div className="lp-lb-podium-bar-fill" style={{ width: `${pct}%` }} /></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="lp-lb-rows-label">Ranked 4–6</div>
+                {[
+                  { rank: 4, name: 'lunaris',     level: 31, xp: 5100, pct: 47 },
+                  { rank: 5, name: 'axion_drift',  level: 28, xp: 4200, pct: 38 },
+                  { rank: 6, name: 'dusk_angel',   level: 24, xp: 3500, pct: 29 },
+                ].map(({ rank, name, level, xp, pct }) => (
+                  <div key={rank} className="lp-lb-rank-row">
+                    <span className="lp-lb-rank-num">#{rank}</span>
+                    <div className="lp-lb-rank-avatar">{name[0].toUpperCase()}</div>
+                    <div className="lp-lb-rank-info">
+                      <div className="lp-lb-rank-name">{name}</div>
+                      <div className="lp-lb-rank-bar-track"><div className="lp-lb-rank-bar-fill" style={{ width: `${pct}%` }} /></div>
+                    </div>
+                    <div className="lp-lb-rank-stat">
+                      <div className="lp-lb-rank-level">LVL {level}</div>
+                      <div className="lp-lb-rank-xp">{xp.toLocaleString()} xp</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right: AutoMod dashboard visual */}
-            <div className="lp-how-right">
-              <div className="lp-automod-card">
-                {/* Window chrome */}
-                <div className="lp-automod-titlebar">
-                  <div className="lp-automod-dots">
-                    <span className="lp-dot lp-dot-r" />
-                    <span className="lp-dot lp-dot-y" />
-                    <span className="lp-dot lp-dot-g" />
+            {/* Giveaways */}
+            <div className="lp-dash-card">
+              <div className="lp-dash-titlebar">
+                <div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div>
+                <span className="lp-dash-titlebar-label">Friday Dashboard — Giveaways</span>
+              </div>
+              <div className="lp-dash-body">
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    Active Giveaways
+                    <span className="lp-gw-refresh-btn"><Star size={11}/></span>
                   </div>
-                  <span className="lp-automod-titlebar-label">Friday Dashboard — AutoMod</span>
-                  <span className="lp-automod-active-badge">
-                    <span className="lp-automod-active-dot" />
-                    Active
-                  </span>
-                </div>
-
-                {/* Server selector */}
-                <div className="lp-automod-server-row">
-                  <div className="lp-automod-server-icon">
-                    <Shield size={14} color="#3b9dff" />
-                  </div>
-                  <span className="lp-automod-server-name">My Awesome Server</span>
-                  <ChevronRight size={13} color="#546b87" />
-                  <span className="lp-automod-server-section">AutoMod</span>
-                </div>
-
-                {/* Filters panel */}
-                <div className="lp-automod-section">
-                  <div className="lp-automod-section-label">Filters</div>
-                  <div className="lp-automod-filters">
-                    {[
-                      { label: 'Spam Detection',    sub: '5 msg / 10s',     on: true,  color: '#3b9dff' },
-                      { label: 'Caps Lock Filter',  sub: '70% threshold',   on: true,  color: '#8b5cf6' },
-                      { label: 'Link Filter',       sub: 'Warn on trigger', on: true,  color: '#00c853' },
-                      { label: 'Discord Invites',   sub: 'Block & delete',  on: true,  color: '#f59e0b' },
-                    ].map(({ label, sub, on, color }) => (
-                      <div key={label} className="lp-automod-filter-row">
-                        <div className="lp-automod-filter-info">
-                          <span className="lp-automod-filter-name">{label}</span>
-                          <span className="lp-automod-filter-sub">{sub}</span>
-                        </div>
-                        <div className={`lp-automod-toggle ${on ? 'lp-automod-toggle--on' : ''}`} style={on ? { '--tog-color': color } : {}}>
-                          <div className="lp-automod-toggle-knob" />
+                  {[
+                    { prize: 'Discord Nitro Classic', winners: 1, ends: 'Dec 25, 2025, 8:00 PM' },
+                    { prize: '$50 Steam Gift Card',   winners: 2, ends: 'Dec 28, 2025, 5:00 PM' },
+                  ].map(({ prize, winners, ends }) => (
+                    <div key={prize} className="lp-gw-item">
+                      <div className="lp-gw-item-top">
+                        <div>
+                          <div className="lp-gw-item-prize"><Gift size={13} color="#ff9100" style={{ flexShrink: 0 }}/> {prize}</div>
+                          <div className="lp-gw-item-meta">{winners} winner{winners !== 1 ? 's' : ''} · ends {ends}</div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="lp-automod-divider" />
-
-                {/* Recent actions */}
-                <div className="lp-automod-section">
-                  <div className="lp-automod-section-label">Recent Actions</div>
-                  <div className="lp-automod-log">
-                    {[
-                      { user: 'spammer_99',  action: 'Spam detected',  result: 'Warned',    color: '#ff4569', tag: 'WARN' },
-                      { user: 'ALLCAPSUSER', action: 'Caps violation',  result: 'Timed out', color: '#f59e0b', tag: 'MUTE' },
-                      { user: 'link_bot',    action: 'Link blocked',    result: 'Message deleted', color: '#3b9dff', tag: 'DEL' },
-                      { user: 'inv1te_spam', action: 'Invite blocked',  result: 'Warned',    color: '#ff4569', tag: 'WARN' },
-                    ].map(({ user, action, result, color, tag }) => (
-                      <div key={user} className="lp-automod-log-row">
-                        <span className="lp-automod-log-tag" style={{ color, borderColor: color + '40', background: color + '12' }}>{tag}</span>
-                        <div className="lp-automod-log-info">
-                          <span className="lp-automod-log-user">@{user}</span>
-                          <span className="lp-automod-log-action">{action} · {result}</span>
-                        </div>
-                        <span className="lp-automod-log-dot" style={{ background: color }} />
+                      <div className="lp-gw-item-btns">
+                        <button className="lp-gw-btn lp-gw-btn-end">End Now</button>
+                        <button className="lp-gw-btn">Reroll</button>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-
-                {/* Save button row */}
-                <div className="lp-automod-footer">
-                  <span className="lp-automod-footer-hint">Changes auto-save</span>
-                  <button className="lp-automod-save-btn">Save Settings</button>
+                <div className="lp-dash-chart-panel">
+                  <div className="lp-dash-chart-title"><Gift size={13} style={{ display: 'inline', marginRight: '7px', color: '#ff9100' }}/>Launch Giveaway</div>
+                  <div className="lp-gw-form">
+                    <div className="lp-gw-form-group"><label className="lp-gw-label">Prize</label><div className="lp-gw-input-mock">e.g. Discord Nitro</div></div>
+                    <div className="lp-gw-form-row">
+                      <div className="lp-gw-form-group"><label className="lp-gw-label">Duration</label><div className="lp-gw-select-mock">30 Minutes ▾</div></div>
+                      <div className="lp-gw-form-group"><label className="lp-gw-label">Winners</label><div className="lp-gw-select-mock">1 ▾</div></div>
+                    </div>
+                    <div className="lp-gw-form-group"><label className="lp-gw-label">Channel</label><div className="lp-gw-select-mock"># giveaways ▾</div></div>
+                    <button className="lp-gw-launch-btn"><Gift size={13}/> Launch Giveaway</button>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
