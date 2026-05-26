@@ -2835,6 +2835,7 @@ function App() {
 
                         {/* ── GIVEAWAYS ── */}
                         {activeTab === 'giveaways' && (
+                          <>
                           <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '24px' }}>
                             {/* Active giveaways list */}
                             <div className="glass-panel" style={{ padding: '24px' }}>
@@ -3019,6 +3020,7 @@ function App() {
                               )}
                             </div>
                           </div>
+                          </>
                         )}
 
                         {/* ── CUSTOM COMMANDS ── */}
