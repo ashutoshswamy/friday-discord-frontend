@@ -234,7 +234,7 @@ const COMMANDS = [
   {
     name: 'work',
     category: 'economy',
-    desc: 'Works a shift for coins. Pay scales with your active job tier — from 50 coins (no job) up to 660 coins (Elite tier). 5-minute cooldown.',
+    desc: 'Works a shift for coins. Pay scales with your active job tier — from 50 coins (no job) up to 20,000 coins (Elite tier). 1-hour cooldown.',
     usage: '/work',
     options: [],
     admin: false,
@@ -243,7 +243,7 @@ const COMMANDS = [
   {
     name: 'job list',
     category: 'economy',
-    desc: 'Browse all 12 available careers across 4 tiers (Starter → Elite) with pay ranges, level requirements, and XP bonuses per shift.',
+    desc: 'Browse all 24 available careers across 4 tiers (Starter → Elite) with pay ranges, level requirements, and XP bonuses per shift.',
     usage: '/job list',
     options: [],
     admin: false,
@@ -255,7 +255,7 @@ const COMMANDS = [
     desc: 'Apply for a career. Must meet the level requirement. Unlocks tier-scaled pay on /work. Job switch cooldown: 1 hour.',
     usage: '/job apply [job]',
     options: [
-      { name: 'job', type: 'Choice', required: true, desc: 'One of 12 available careers across 4 tiers' },
+      { name: 'job', type: 'Choice', required: true, desc: 'One of 24 available careers across 4 tiers' },
     ],
     admin: false,
     dashboard: false,

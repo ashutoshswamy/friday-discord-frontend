@@ -3430,18 +3430,34 @@ function App() {
                         {/* ── JOBS ── */}
                         {activeTab === 'jobs' && (() => {
                           const JOBS_DEF = {
-                            cashier:   { name: 'Cashier',           emoji: '🛒', tier: 1, levelRequired: 1,  minPay: 60,  maxPay: 120, xpBonus: 0,  description: 'Scan items and manage the checkout lane.' },
-                            performer: { name: 'Street Performer',  emoji: '🎸', tier: 1, levelRequired: 1,  minPay: 30,  maxPay: 180, xpBonus: 0,  description: 'Entertain passersby for tips — volatile income.' },
-                            delivery:  { name: 'Delivery Driver',   emoji: '🚗', tier: 1, levelRequired: 1,  minPay: 70,  maxPay: 130, xpBonus: 5,  description: 'Deliver packages across the city.' },
-                            chef:      { name: 'Chef',              emoji: '👨‍🍳', tier: 2, levelRequired: 5,  minPay: 120, maxPay: 210, xpBonus: 10, description: 'Cook gourmet dishes in a busy kitchen.' },
-                            mechanic:  { name: 'Mechanic',          emoji: '🔧', tier: 2, levelRequired: 5,  minPay: 130, maxPay: 220, xpBonus: 0,  description: 'Repair vehicles and heavy machinery.' },
-                            guard:     { name: 'Security Guard',    emoji: '💂', tier: 2, levelRequired: 5,  minPay: 110, maxPay: 190, xpBonus: 0,  description: 'Patrol premises and maintain order.' },
-                            engineer:  { name: 'Software Engineer', emoji: '💻', tier: 3, levelRequired: 10, minPay: 200, maxPay: 360, xpBonus: 20, description: 'Build and ship software products.' },
-                            doctor:    { name: 'Doctor',            emoji: '🩺', tier: 3, levelRequired: 10, minPay: 220, maxPay: 390, xpBonus: 15, description: 'Treat patients and perform procedures.' },
-                            lawyer:    { name: 'Lawyer',            emoji: '⚖️', tier: 3, levelRequired: 10, minPay: 210, maxPay: 370, xpBonus: 10, description: 'Argue cases and draft contracts.' },
-                            ceo:       { name: 'CEO',               emoji: '🏢', tier: 4, levelRequired: 20, minPay: 360, maxPay: 620, xpBonus: 25, description: 'Lead a corporation and make high-stakes decisions.' },
-                            banker:    { name: 'Investment Banker', emoji: '💰', tier: 4, levelRequired: 20, minPay: 300, maxPay: 660, xpBonus: 15, description: 'Manage portfolios and execute financial deals.' },
-                            gamedev:   { name: 'Game Developer',    emoji: '🎮', tier: 4, levelRequired: 20, minPay: 280, maxPay: 600, xpBonus: 30, description: 'Design and ship immersive games.' },
+                            // Tier 1
+                            cashier:     { name: 'Cashier',            emoji: '🛒', tier: 1, levelRequired: 1,  minPay: 60,   maxPay: 130,   xpBonus: 0,  description: 'Scan items and manage the checkout lane at a local store.' },
+                            performer:   { name: 'Street Performer',   emoji: '🎸', tier: 1, levelRequired: 1,  minPay: 20,   maxPay: 300,   xpBonus: 5,  description: 'Entertain passersby for tips — volatile but potentially lucrative.' },
+                            delivery:    { name: 'Delivery Driver',    emoji: '🚗', tier: 1, levelRequired: 1,  minPay: 80,   maxPay: 180,   xpBonus: 5,  description: 'Deliver packages across the city on a tight schedule.' },
+                            janitor:     { name: 'Janitor',            emoji: '🧹', tier: 1, levelRequired: 1,  minPay: 50,   maxPay: 110,   xpBonus: 0,  description: 'Keep facilities spotless — steady, reliable, unglamorous.' },
+                            barista:     { name: 'Barista',            emoji: '☕', tier: 1, levelRequired: 1,  minPay: 70,   maxPay: 160,   xpBonus: 0,  description: 'Craft espresso drinks and charm café regulars for tips.' },
+                            farmhand:    { name: 'Farmhand',           emoji: '🌾', tier: 1, levelRequired: 1,  minPay: 55,   maxPay: 140,   xpBonus: 8,  description: 'Work the fields from dawn to dusk — honest outdoor labour.' },
+                            // Tier 2
+                            chef:        { name: 'Chef',               emoji: '👨‍🍳', tier: 2, levelRequired: 5,  minPay: 420,  maxPay: 780,   xpBonus: 12, description: 'Cook gourmet dishes under pressure in a busy restaurant kitchen.' },
+                            mechanic:    { name: 'Mechanic',           emoji: '🔧', tier: 2, levelRequired: 5,  minPay: 450,  maxPay: 850,   xpBonus: 10, description: 'Diagnose and repair vehicles and heavy machinery at the garage.' },
+                            guard:       { name: 'Security Guard',     emoji: '💂', tier: 2, levelRequired: 5,  minPay: 400,  maxPay: 680,   xpBonus: 0,  description: 'Patrol premises and maintain order at venues and events.' },
+                            plumber:     { name: 'Plumber',            emoji: '🪠', tier: 2, levelRequired: 5,  minPay: 480,  maxPay: 900,   xpBonus: 10, description: 'Fix leaks, install pipework, and keep water flowing.' },
+                            electrician: { name: 'Electrician',        emoji: '⚡', tier: 2, levelRequired: 5,  minPay: 500,  maxPay: 920,   xpBonus: 12, description: 'Wire buildings, replace fuses, and troubleshoot circuits.' },
+                            nurse:       { name: 'Nurse',              emoji: '🏥', tier: 2, levelRequired: 5,  minPay: 440,  maxPay: 820,   xpBonus: 15, description: 'Care for patients, administer medication, and assist surgeons.' },
+                            // Tier 3
+                            engineer:    { name: 'Software Engineer',  emoji: '💻', tier: 3, levelRequired: 10, minPay: 1400, maxPay: 2800,  xpBonus: 25, description: 'Build and ship software products at a fast-growing tech company.' },
+                            doctor:      { name: 'Doctor',             emoji: '🩺', tier: 3, levelRequired: 10, minPay: 1800, maxPay: 3500,  xpBonus: 20, description: 'Treat patients, run diagnostics, and perform clinical procedures.' },
+                            lawyer:      { name: 'Lawyer',             emoji: '⚖️', tier: 3, levelRequired: 10, minPay: 1600, maxPay: 3200,  xpBonus: 15, description: 'Argue high-profile cases and draft watertight contracts.' },
+                            architect:   { name: 'Architect',          emoji: '🏗️', tier: 3, levelRequired: 10, minPay: 1200, maxPay: 2400,  xpBonus: 20, description: 'Design striking buildings and oversee construction projects.' },
+                            pharmacist:  { name: 'Pharmacist',         emoji: '💊', tier: 3, levelRequired: 10, minPay: 1300, maxPay: 2600,  xpBonus: 18, description: 'Dispense medication, counsel patients, and manage drug inventory.' },
+                            analyst:     { name: 'Financial Analyst',  emoji: '📊', tier: 3, levelRequired: 10, minPay: 1250, maxPay: 2500,  xpBonus: 15, description: 'Model markets, build forecasts, and advise on financial strategy.' },
+                            // Tier 4
+                            ceo:         { name: 'CEO',                emoji: '🏢', tier: 4, levelRequired: 20, minPay: 8000, maxPay: 16000, xpBonus: 30, description: 'Lead a corporation, close deals, and drive shareholder value.' },
+                            banker:      { name: 'Investment Banker',  emoji: '💰', tier: 4, levelRequired: 20, minPay: 6000, maxPay: 14000, xpBonus: 20, description: 'Execute M&A deals, IPOs, and large-scale financial transactions.' },
+                            gamedev:     { name: 'Game Developer',     emoji: '🎮', tier: 4, levelRequired: 20, minPay: 5000, maxPay: 10000, xpBonus: 35, description: 'Design and ship immersive games that top the download charts.' },
+                            surgeon:     { name: 'Surgeon',            emoji: '🔬', tier: 4, levelRequired: 20, minPay: 9000, maxPay: 18000, xpBonus: 25, description: 'Perform complex surgical procedures with precision and composure.' },
+                            aerospace:   { name: 'Aerospace Engineer', emoji: '🚀', tier: 4, levelRequired: 20, minPay: 5500, maxPay: 11000, xpBonus: 30, description: 'Design spacecraft, propulsion systems, and aerospace hardware.' },
+                            hedgefund:   { name: 'Hedge Fund Manager', emoji: '📈', tier: 4, levelRequired: 20, minPay: 5000, maxPay: 20000, xpBonus: 20, description: 'Run a multi-billion fund — extreme volatility, extreme rewards.' },
                           };
                           const TIER_COLORS = { 1: '#9CA3AF', 2: '#60A5FA', 3: '#A78BFA', 4: '#FBBF24' };
                           const TIER_LABELS = { 1: 'Starter', 2: 'Skilled', 3: 'Professional', 4: 'Elite' };

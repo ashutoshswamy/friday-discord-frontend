@@ -41,7 +41,7 @@ const FEATURES = [
   {
     Icon: Coins,
     title: 'Economy, Jobs & Games',
-    desc: 'Virtual economy with a tiered job system (12 careers, 4 tiers) that scales /work pay from 50 to 660 coins. Daily rewards, hunting, fishing, digging — plus a real-time stock market with 5× leveraged trading. Blackjack, roulette, slots, and more.',
+    desc: 'Virtual economy with a tiered job system (24 careers, 4 tiers) that scales /work pay from 50 to 20,000 coins. Daily rewards, hunting, fishing, digging — plus a real-time stock market with 5× leveraged trading. Blackjack, roulette, slots, and more.',
     color: '#00c853',
     num: '03',
     pos: { gridColumn: '1 / 2', gridRow: '2 / 3' },
