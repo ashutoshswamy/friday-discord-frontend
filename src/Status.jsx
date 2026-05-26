@@ -2,11 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   Activity, Server, Users, Zap, Terminal, RefreshCw,
-  CheckCircle2, XCircle, Clock, Hash, ArrowLeft,
+  CheckCircle2, XCircle, Clock, Hash, ArrowLeft, Shield,
+  Coins, Bell, LifeBuoy, TrendingUp, Wifi,
 } from 'lucide-react';
 import Footer from './Footer';
+import './Status.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 
 function formatUptime(ms) {
   if (!ms || ms <= 0) return '—';
@@ -18,26 +21,53 @@ function formatUptime(ms) {
   if (d > 0) parts.push(`${d}d`);
   if (h > 0) parts.push(`${h}h`);
   if (m > 0) parts.push(`${m}m`);
-  if (parts.length === 0) parts.push(`${s % 60}s`);
+  if (d === 0 && h === 0 && m === 0) parts.push(`${s % 60}s`);
   return parts.join(' ');
 }
 
 function formatNumber(n) {
+  if (n == null) return '—';
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
   if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
   return String(n);
 }
 
-export default function Status() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [lastFetched, setLastFetched] = useState(null);
-  const [countdown, setCountdown] = useState(30);
+function LatencyBar({ ms }) {
+  if (ms < 0) return null;
+  const pct = Math.min(100, (ms / 400) * 100);
+  const color = ms < 80 ? '#00e676' : ms < 200 ? '#ff9100' : '#ff1744';
+  const label = ms < 80 ? 'Excellent' : ms < 200 ? 'Good' : 'Degraded';
+  return (
+    <div className="st-latency-bar">
+      <div className="st-latency-track">
+        <div className="st-latency-fill" style={{ width: `${pct}%`, background: color, boxShadow: `0 0 8px ${color}80` }} />
+      </div>
+      <span className="st-latency-label" style={{ color }}>{label}</span>
+    </div>
+  );
+}
 
-  const fetch_ = useCallback(async () => {
+const SERVICES = [
+  { key: 'gateway',  name: 'Discord Gateway',  desc: 'WebSocket connection to Discord',  Icon: Wifi,       check: (online) => online },
+  { key: 'commands', name: 'Command Handler',   desc: 'Slash command processing',          Icon: Terminal,   check: (online, stats) => online && (stats.commandCount || 0) > 0 },
+  { key: 'economy',  name: 'Economy Engine',    desc: 'Coins, inventory, pets & market',   Icon: Coins,      check: (online) => online },
+  { key: 'automod',  name: 'AutoMod',           desc: 'Spam, caps & link filtering',       Icon: Shield,     check: (online) => online },
+  { key: 'leveling', name: 'Leveling System',   desc: 'XP tracking & rank cards',          Icon: TrendingUp, check: (online) => online },
+  { key: 'alerts',   name: 'Alerts & Notifs',   desc: 'YouTube & Twitch stream alerts',    Icon: Bell,       check: (online) => online },
+  { key: 'tickets',  name: 'Ticket System',     desc: 'Support ticket management',         Icon: LifeBuoy,   check: (online) => online },
+  { key: 'api',      name: 'Dashboard API',     desc: 'REST API for this dashboard',       Icon: Activity,   check: (_, __, data) => !!data && !data.error },
+];
+
+export default function Status() {
+  const [data, setData]               = useState(null);
+  const [loading, setLoading]         = useState(true);
+  const [lastFetched, setLastFetched] = useState(null);
+  const [countdown, setCountdown]     = useState(30);
+
+  const doFetch = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/status`);
+      const res  = await fetch(`${API_BASE}/status`);
       const json = await res.json();
       setData(json);
       setLastFetched(new Date());
@@ -50,167 +80,176 @@ export default function Status() {
     }
   }, []);
 
-  useEffect(() => { fetch_(); }, [fetch_]);
-
+  useEffect(() => { doFetch(); }, [doFetch]);
   useEffect(() => {
-    const interval = setInterval(fetch_, 30_000);
-    return () => clearInterval(interval);
-  }, [fetch_]);
-
+    const id = setInterval(doFetch, 30_000);
+    return () => clearInterval(id);
+  }, [doFetch]);
   useEffect(() => {
-    const tick = setInterval(() => setCountdown(c => (c <= 1 ? 30 : c - 1)), 1000);
-    return () => clearInterval(tick);
+    const id = setInterval(() => setCountdown(c => (c <= 1 ? 30 : c - 1)), 1000);
+    return () => clearInterval(id);
   }, [lastFetched]);
 
   const online = data?.online ?? false;
-  const stats = data?.stats ?? {};
-  const bot = data?.bot ?? null;
+  const stats  = data?.stats  ?? {};
+  const bot    = data?.bot    ?? null;
 
-  const latencyColor = stats.latencyMs < 0 ? '#546b87'
-    : stats.latencyMs < 80 ? '#00e676'
-    : stats.latencyMs < 200 ? '#ff9100'
-    : '#ff1744';
+  const latencyMs    = stats.latencyMs ?? -1;
+  const latencyColor = latencyMs < 0 ? '#546b87' : latencyMs < 80 ? '#00e676' : latencyMs < 200 ? '#ff9100' : '#ff1744';
 
   const statCards = [
-    { icon: <Server size={22} />, label: 'Servers', value: stats.guildCount != null ? formatNumber(stats.guildCount) : '—', accent: '#3b9dff' },
-    { icon: <Users size={22} />, label: 'Members', value: stats.memberCount != null ? formatNumber(stats.memberCount) : '—', accent: '#8b5cf6' },
-    { icon: <Hash size={22} />, label: 'Commands', value: stats.commandCount != null ? String(stats.commandCount) : '—', accent: '#00c853' },
-    { icon: <Clock size={22} />, label: 'Uptime', value: formatUptime(stats.uptimeMs), accent: '#ff9100' },
-    { icon: <Zap size={22} />, label: 'Latency', value: stats.latencyMs >= 0 ? `${stats.latencyMs}ms` : '—', accent: latencyColor },
+    { icon: <Server  size={20} />, label: 'Servers',   value: formatNumber(stats.guildCount),   accent: '#3b9dff' },
+    { icon: <Users   size={20} />, label: 'Members',   value: formatNumber(stats.memberCount),  accent: '#8b5cf6' },
+    { icon: <Hash    size={20} />, label: 'Commands',  value: stats.commandCount != null ? String(stats.commandCount) : '—', accent: '#00c853' },
+    { icon: <Clock   size={20} />, label: 'Uptime',    value: formatUptime(stats.uptimeMs),     accent: '#ff9100' },
+    { icon: <Zap     size={20} />, label: 'Latency',   value: latencyMs >= 0 ? `${latencyMs}ms` : '—', accent: latencyColor },
   ];
 
+  const allOk  = SERVICES.every(s => s.check(online, stats, data));
+  const someOk = !allOk && SERVICES.some(s => s.check(online, stats, data));
+
+  const overallColor = !online ? '#ff1744' : allOk ? '#00e676' : someOk ? '#ff9100' : '#ff1744';
+  const overallLabel = !online ? 'Offline' : allOk ? 'All Systems Operational' : someOk ? 'Partial Outage' : 'Major Outage';
+  const overallSub   = !online
+    ? 'Friday is currently unreachable. Please check back shortly.'
+    : allOk
+    ? 'All services are running normally with no issues detected.'
+    : 'Some services are experiencing disruptions.';
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-display)' }}>
-      {/* Nav */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, padding: '0 32px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(4,7,18,0.88)', backdropFilter: 'blur(18px)', borderBottom: '1px solid var(--border)' }}>
-        <RouterLink to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 600 }}>
-          <ArrowLeft size={15} /> Home
-        </RouterLink>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-          <Activity size={16} color="#3b9dff" /> Status
+    <div className="st-root lp-root">
+      {/* ── NAV ── */}
+      <header className="st-nav">
+        <div className="st-nav-inner">
+          <RouterLink to="/" className="st-nav-back">
+            <ArrowLeft size={14} /> Home
+          </RouterLink>
+
+          <RouterLink to="/" className="lp-nav-brand" style={{ textDecoration: 'none' }}>
+            <img src="/logo.png" alt="Friday" className="lp-nav-logo" />
+            <span className="lp-nav-name">FRIDAY</span>
+          </RouterLink>
+
+          <button className="st-refresh-btn" onClick={doFetch} disabled={loading}>
+            <RefreshCw size={13} className={loading ? 'st-spin' : ''} />
+            {loading ? 'Checking…' : `${countdown}s`}
+          </button>
         </div>
-        <button
-          onClick={fetch_}
-          disabled={loading}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(59,157,255,0.07)', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-        >
-          <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-          {loading ? 'Checking…' : `Refresh (${countdown}s)`}
-        </button>
       </header>
 
-      <main style={{ flex: 1, maxWidth: '860px', width: '100%', margin: '0 auto', padding: '60px 24px' }}>
-        {/* Hero status banner */}
-        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          {bot?.avatar && (
-            <img
-              src={bot.avatar}
-              alt={bot.username}
-              style={{ width: '80px', height: '80px', borderRadius: '50%', border: `3px solid ${online ? 'var(--success)' : '#ff1744'}`, marginBottom: '20px', boxShadow: `0 0 24px ${online ? 'rgba(0,230,118,0.3)' : 'rgba(255,23,68,0.3)'}` }}
-            />
+      <main className="st-main">
+
+        {/* ── HERO ── */}
+        <section className="st-hero">
+          {bot?.avatar ? (
+            <div className="st-avatar-wrap" style={{ '--glow': overallColor }}>
+              <img src={bot.avatar} alt={bot.username} className="st-avatar" />
+              <div className="st-avatar-ring" style={{ borderColor: overallColor, boxShadow: `0 0 24px ${overallColor}50` }} />
+              <div className="st-avatar-dot" style={{ background: overallColor, boxShadow: `0 0 8px ${overallColor}` }} />
+            </div>
+          ) : (
+            <div className="st-avatar-placeholder" style={{ borderColor: overallColor }}>
+              <Activity size={32} color={overallColor} />
+            </div>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}>
-            {online
-              ? <CheckCircle2 size={28} color="#00e676" />
-              : <XCircle size={28} color="#ff1744" />}
-            <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)' }}>
-              {online ? 'All Systems Operational' : 'Bot Offline'}
-            </h1>
+
+          <div className="st-hero-status" style={{ color: overallColor }}>
+            {online && allOk
+              ? <CheckCircle2 size={22} />
+              : online && someOk
+              ? <Activity size={22} />
+              : <XCircle size={22} />}
+            <span>{overallLabel}</span>
           </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-            {bot ? `${bot.username} is ${online ? 'online and running' : 'currently offline'}.` : 'Friday Bot status dashboard.'}
-          </p>
+
+          <p className="st-hero-sub">{overallSub}</p>
+
           {lastFetched && (
-            <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '8px' }}>
-              Last checked: {lastFetched.toLocaleTimeString()}
+            <p className="st-hero-ts">
+              Last updated · {lastFetched.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </p>
           )}
-        </div>
+        </section>
 
-        {/* Status indicator bar */}
-        <div style={{ marginBottom: '40px', padding: '18px 24px', borderRadius: '14px', border: `1px solid ${online ? 'rgba(0,230,118,0.2)' : 'rgba(255,23,68,0.2)'}`, background: online ? 'rgba(0,230,118,0.05)' : 'rgba(255,23,68,0.05)', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: online ? '#00e676' : '#ff1744', flexShrink: 0, boxShadow: `0 0 8px ${online ? '#00e676' : '#ff1744'}`, animation: online ? 'pulse 2s infinite' : 'none' }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '14px', color: online ? '#00e676' : '#ff1744' }}>
-              {online ? 'Operational' : 'Offline'}
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-              Discord Bot — {online ? 'Connected to Discord Gateway' : 'Not connected'}
-            </div>
+        {/* ── OVERALL BANNER ── */}
+        <div className="st-banner" style={{ '--color': overallColor, '--bg': `${overallColor}0d`, '--border': `${overallColor}30` }}>
+          <div className="st-banner-dot" style={{ background: overallColor, boxShadow: `0 0 8px ${overallColor}` }} />
+          <div className="st-banner-text">
+            <strong>{overallLabel}</strong>
+            <span>{bot ? `${bot.username}` : 'Friday Bot'} · Discord Bot Service</span>
           </div>
-          {online && stats.latencyMs >= 0 && (
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>WS Ping</div>
-              <div style={{ fontWeight: 700, fontSize: '15px', color: latencyColor }}>{stats.latencyMs}ms</div>
+          {online && latencyMs >= 0 && (
+            <div className="st-banner-ping">
+              <span className="st-banner-ping-label">WS Ping</span>
+              <span className="st-banner-ping-val" style={{ color: latencyColor }}>{latencyMs}ms</span>
+              <LatencyBar ms={latencyMs} />
             </div>
           )}
         </div>
 
-        {/* Stat cards */}
+        {/* ── STAT CARDS ── */}
         {loading && !data ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}>
-            <RefreshCw size={32} color="#3b9dff" className="animate-spin" />
-          </div>
+          <div className="st-loader"><RefreshCw size={30} color="#3b9dff" className="st-spin" /></div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))', gap: '14px', marginBottom: '48px' }}>
+          <div className="st-cards">
             {statCards.map(({ icon, label, value, accent }) => (
-              <div
-                key={label}
-                style={{ padding: '20px 18px', borderRadius: '14px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)', display: 'flex', flexDirection: 'column', gap: '10px' }}
-              >
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: `${accent}18`, border: `1px solid ${accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: accent }}>
-                  {icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>{value}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-                </div>
+              <div key={label} className="st-card" style={{ '--accent': accent }}>
+                <div className="st-card-icon">{icon}</div>
+                <div className="st-card-val">{value}</div>
+                <div className="st-card-label">{label}</div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Services table */}
-        <div style={{ borderRadius: '14px', border: '1px solid var(--border)', overflow: 'hidden', background: 'rgba(255,255,255,0.015)' }}>
-          <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Terminal size={15} color="#3b9dff" />
-            <span style={{ fontWeight: 700, fontSize: '14px' }}>Services</span>
-          </div>
-          {[
-            { name: 'Discord Gateway', desc: 'WebSocket connection to Discord', ok: online },
-            { name: 'Command Handler', desc: 'Slash command processing', ok: online && (stats.commandCount || 0) > 0 },
-            { name: 'Economy Engine', desc: 'Coins, inventory, pets, market', ok: online },
-            { name: 'AutoMod', desc: 'Spam, caps, link detection', ok: online },
-            { name: 'Leveling System', desc: 'XP tracking and rank cards', ok: online },
-            { name: 'Dashboard API', desc: 'REST API for this dashboard', ok: !!data && !data.error },
-          ].map((svc, i, arr) => (
-            <div
-              key={svc.name}
-              style={{ padding: '14px 24px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none' }}
-            >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: svc.ok ? '#00e676' : '#ff1744', flexShrink: 0, boxShadow: `0 0 6px ${svc.ok ? '#00e676' : '#ff1744'}` }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: '13px' }}>{svc.name}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{svc.desc}</div>
-              </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: svc.ok ? '#00e676' : '#ff1744', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {svc.ok ? 'Operational' : 'Down'}
-              </span>
+        {/* ── SERVICES ── */}
+        <div className="st-section">
+          <div className="st-section-hd">
+            <Terminal size={14} color="#3b9dff" />
+            <span>Services</span>
+            <div className="st-section-hd-pill" style={{ background: allOk ? 'rgba(0,230,118,0.1)' : 'rgba(255,145,0,0.1)', color: allOk ? '#00e676' : '#ff9100', border: `1px solid ${allOk ? 'rgba(0,230,118,0.25)' : 'rgba(255,145,0,0.25)'}` }}>
+              {SERVICES.filter(s => s.check(online, stats, data)).length} / {SERVICES.length} operational
             </div>
-          ))}
+          </div>
+
+          <div className="st-services">
+            {SERVICES.map((svc, i) => {
+              const ok = svc.check(online, stats, data);
+              return (
+                <div key={svc.key} className="st-svc" style={{ animationDelay: `${i * 40}ms` }}>
+                  <div className="st-svc-icon-wrap" style={{ background: ok ? 'rgba(0,230,118,0.07)' : 'rgba(255,23,68,0.07)', border: `1px solid ${ok ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)'}` }}>
+                    <svc.Icon size={16} color={ok ? '#00e676' : '#ff4d6d'} />
+                  </div>
+                  <div className="st-svc-info">
+                    <span className="st-svc-name">{svc.name}</span>
+                    <span className="st-svc-desc">{svc.desc}</span>
+                  </div>
+                  <div className="st-svc-badge" style={{ background: ok ? 'rgba(0,230,118,0.08)' : 'rgba(255,23,68,0.08)', color: ok ? '#00e676' : '#ff4d6d', border: `1px solid ${ok ? 'rgba(0,230,118,0.2)' : 'rgba(255,23,68,0.2)'}` }}>
+                    <div className="st-svc-dot" style={{ background: ok ? '#00e676' : '#ff1744', boxShadow: `0 0 5px ${ok ? '#00e676' : '#ff1744'}` }} />
+                    {ok ? 'Operational' : 'Down'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* ── INCIDENT HISTORY ── */}
+        <div className="st-section">
+          <div className="st-section-hd">
+            <Clock size={14} color="#3b9dff" />
+            <span>Incident History</span>
+          </div>
+          <div className="st-incident-empty">
+            <CheckCircle2 size={28} color="#00e67640" />
+            <p>No incidents reported.</p>
+            <span>Friday has been running without any recorded incidents.</span>
+          </div>
+        </div>
+
       </main>
 
       <Footer />
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 }
