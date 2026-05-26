@@ -1210,9 +1210,6 @@ function App() {
                       <button className="sf-icon-btn" onClick={() => navigate('/commands')} title="Commands">
                         <BookOpen size={13} /> Commands
                       </button>
-                      <button className="sf-icon-btn" onClick={() => navigate('/updates')} title="Updates">
-                        <Activity size={13} /> Updates
-                      </button>
                     </div>
                     <div className="sf-user">
                       {user?.avatar
