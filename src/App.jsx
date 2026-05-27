@@ -141,7 +141,7 @@ function App() {
   const [purgeFilter, setPurgeFilter]       = useState('');
 
   const [embedForm, setEmbedForm] = useState({ channelId: '', title: '', description: '', color: '#00FFCC', image: '', thumbnail: '' });
-  const [pollForm, setPollForm] = useState({ channelId: '', question: '', options: ['', ''], emojis: ['', ''] });
+  const [pollForm, setPollForm] = useState({ channelId: '', question: '', options: ['', ''], duration: 24, allowMultiselect: false });
   const [pollsList, setPollsList] = useState([]);
   const [pollsLoaded, setPollsLoaded] = useState(false);
 
@@ -1214,23 +1214,24 @@ function App() {
 
   const sendPoll = async (e) => {
     e.preventDefault();
-    const filledIndices = pollForm.options.map((o, i) => o.trim() !== '' ? i : -1).filter(i => i >= 0);
-    const filledOptions = filledIndices.map(i => pollForm.options[i]);
-    const filledEmojis = filledIndices.map(i => pollForm.emojis[i] || '');
-    const hasCustomEmojis = filledEmojis.some(e => e.trim() !== '');
+    const filledOptions = pollForm.options.map(o => o.trim()).filter(o => o);
     if (!pollForm.channelId || !pollForm.question || filledOptions.length < 2) return;
     try {
-      const body = { channelId: pollForm.channelId, question: pollForm.question, options: filledOptions };
-      if (hasCustomEmojis) body.emojis = filledEmojis;
+      const body = {
+        channelId: pollForm.channelId,
+        question: pollForm.question,
+        options: filledOptions,
+        duration: Number(pollForm.duration) || 24,
+        allowMultiselect: Boolean(pollForm.allowMultiselect),
+      };
       const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/poll`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),
       });
       if (res.ok) {
-        const data = await res.json();
-        showNotification(data.warning ? 'error' : 'success', data.warning || 'Poll posted successfully!');
-        setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''], emojis: ['', ''] });
+        showNotification('success', 'Poll posted successfully!');
+        setPollForm({ channelId: pollForm.channelId, question: '', options: ['', ''], duration: 24, allowMultiselect: false });
         setPollsLoaded(false);
         fetchPolls();
       } else throw new Error((await res.json()).error);
@@ -4124,24 +4125,12 @@ function App() {
                                 </div>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                   <label>Question</label>
-                                  <input className="form-input" type="text" placeholder="e.g. What's your favourite language?" value={pollForm.question} onChange={e => setPollForm(p => ({ ...p, question: e.target.value }))} required maxLength={256} />
+                                  <input className="form-input" type="text" placeholder="e.g. What's your favourite language?" value={pollForm.question} onChange={e => setPollForm(p => ({ ...p, question: e.target.value }))} required maxLength={300} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Options (2–10)</label>
-                                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Emoji optional — defaults to 1️⃣2️⃣...</span>
-                                  </div>
+                                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Options (2–10)</label>
                                   {pollForm.options.map((opt, i) => (
                                     <div key={i} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                      <input
-                                        className="form-input"
-                                        type="text"
-                                        placeholder="😀"
-                                        value={pollForm.emojis[i] || ''}
-                                        onChange={e => setPollForm(p => { const emojis = [...p.emojis]; emojis[i] = e.target.value; return { ...p, emojis }; })}
-                                        style={{ width: '52px', flexShrink: 0, textAlign: 'center', fontSize: '18px', padding: '6px 4px' }}
-                                        maxLength={8}
-                                      />
                                       <input
                                         className="form-input"
                                         type="text"
@@ -4149,20 +4138,30 @@ function App() {
                                         value={opt}
                                         onChange={e => setPollForm(p => { const opts = [...p.options]; opts[i] = e.target.value; return { ...p, options: opts }; })}
                                         style={{ flex: 1 }}
-                                        maxLength={100}
+                                        maxLength={55}
                                       />
                                       {pollForm.options.length > 2 && (
-                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 8px', flexShrink: 0 }} onClick={() => setPollForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i), emojis: p.emojis.filter((_, idx) => idx !== i) }))}>
+                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 8px', flexShrink: 0 }} onClick={() => setPollForm(p => ({ ...p, options: p.options.filter((_, idx) => idx !== i) }))}>
                                           <X size={12} />
                                         </button>
                                       )}
                                     </div>
                                   ))}
                                   {pollForm.options.length < 10 && (
-                                    <button type="button" className="btn btn-secondary" style={{ fontSize: '12px' }} onClick={() => setPollForm(p => ({ ...p, options: [...p.options, ''], emojis: [...p.emojis, ''] }))}>
+                                    <button type="button" className="btn btn-secondary" style={{ fontSize: '12px' }} onClick={() => setPollForm(p => ({ ...p, options: [...p.options, ''] }))}>
                                       + Add Option
                                     </button>
                                   )}
+                                </div>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                                  <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+                                    <label>Duration (hours)</label>
+                                    <input className="form-input" type="number" min="1" max="168" value={pollForm.duration} onChange={e => setPollForm(p => ({ ...p, duration: e.target.value }))} />
+                                  </div>
+                                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)', paddingBottom: '2px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                                    <input type="checkbox" checked={pollForm.allowMultiselect} onChange={e => setPollForm(p => ({ ...p, allowMultiselect: e.target.checked }))} />
+                                    Multi-select
+                                  </label>
                                 </div>
                                 <button className="btn btn-primary" type="submit" disabled={!pollForm.channelId || !pollForm.question || pollForm.options.filter(o => o.trim()).length < 2}>
                                   <BarChart2 size={14} /> Post Poll
