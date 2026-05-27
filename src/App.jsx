@@ -145,7 +145,7 @@ function App() {
   const [pollsList, setPollsList] = useState([]);
   const [pollsLoaded, setPollsLoaded] = useState(false);
 
-  const [modstatsList, setModstatsList]     = useState([]);
+  const [modstatsList, setModstatsList]     = useState({ types: [], stats: [] });
   const [modstatsLoaded, setModstatsLoaded] = useState(false);
 
   // Stocks state
@@ -1123,7 +1123,11 @@ function App() {
   const fetchModstats = async () => {
     try {
       const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/modstats`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setModstatsList(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        // Support both old array format and new { types, stats } format
+        setModstatsList(Array.isArray(data) ? { types: ['WARN','TIMEOUT','KICK','BAN'], stats: data } : data);
+      }
     } catch { /* silent */ }
     finally { setModstatsLoaded(true); }
   };
@@ -2524,37 +2528,56 @@ function App() {
                               </div>
                               {!modstatsLoaded ? (
                                 <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}><RefreshCw className="animate-spin" size={20} color="var(--primary)" /></div>
-                              ) : modstatsList.length === 0 ? (
+                              ) : modstatsList.stats.length === 0 ? (
                                 <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontSize: '13px' }}>No moderation activity recorded yet.</div>
-                              ) : (
-                                <div className="table-container">
-                                  <table className="dashboard-table">
-                                    <thead><tr><th>Moderator</th><th>Warns</th><th>Timeouts</th><th>Kicks</th><th>Bans</th><th>Total</th></tr></thead>
-                                    <tbody>
-                                      {modstatsList.map(s => {
-                                        const mod = members.find(m => m.id === s.moderatorId);
-                                        return (
-                                          <tr key={s.moderatorId}>
-                                            <td style={{ fontWeight: 600 }}>
-                                              {mod ? (
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                  <img className="user-avatar-sm" src={mod.avatar} alt={mod.username} style={{ width: '24px', height: '24px' }} onError={e => { e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }} />
-                                                  {mod.username}
-                                                </div>
-                                              ) : `ID:${s.moderatorId}`}
-                                            </td>
-                                            <td><span className="badge badge-warning">{s.WARN}</span></td>
-                                            <td><span className="badge badge-primary">{s.TIMEOUT}</span></td>
-                                            <td><span className="badge badge-warning">{s.KICK}</span></td>
-                                            <td><span className="badge badge-danger">{s.BAN}</span></td>
-                                            <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{s.total}</td>
-                                          </tr>
-                                        );
-                                      })}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )}
+                              ) : (() => {
+                                const { types, stats } = modstatsList;
+                                const badgeClass = (type) => {
+                                  if (type.includes('BAN'))     return 'badge-danger';
+                                  if (type.includes('KICK'))    return 'badge-danger';
+                                  if (type.includes('WARN'))    return 'badge-warning';
+                                  if (type.includes('TIMEOUT')) return 'badge-warning';
+                                  if (type.includes('XP'))      return 'badge-primary';
+                                  if (type.includes('ECONOMY')) return 'badge-primary';
+                                  return 'badge-primary';
+                                };
+                                return (
+                                  <div className="table-container" style={{ overflowX: 'auto' }}>
+                                    <table className="dashboard-table">
+                                      <thead>
+                                        <tr>
+                                          <th>Moderator</th>
+                                          {types.map(t => <th key={t} style={{ whiteSpace: 'nowrap', fontSize: '11px' }}>{t.replace(/_/g, ' ')}</th>)}
+                                          <th>Total</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {stats.map(s => {
+                                          const mod = members.find(m => m.id === s.moderatorId);
+                                          return (
+                                            <tr key={s.moderatorId}>
+                                              <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                                                {mod ? (
+                                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <img className="user-avatar-sm" src={mod.avatar} alt={mod.username} style={{ width: '24px', height: '24px' }} onError={e => { e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; }} />
+                                                    {mod.username}
+                                                  </div>
+                                                ) : <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID:{s.moderatorId}</span>}
+                                              </td>
+                                              {types.map(t => (
+                                                <td key={t}>
+                                                  {s[t] ? <span className={`badge ${badgeClass(t)}`}>{s[t]}</span> : <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>—</span>}
+                                                </td>
+                                              ))}
+                                              <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{s.total}</td>
+                                            </tr>
+                                          );
+                                        })}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                );
+                              })()}
                             </div>
                           </div>
                         )}
