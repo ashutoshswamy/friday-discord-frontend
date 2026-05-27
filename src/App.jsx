@@ -56,6 +56,8 @@ function App() {
   const [coinChangeAction, setCoinChangeAction] = useState('ADD');
   const [xpChangeAmount, setXpChangeAmount]   = useState('');
   const [xpChangeAction, setXpChangeAction]   = useState('ADD');
+  const [userXpMultiplier, setUserXpMultiplier] = useState('');
+  const [customGuildMultiplier, setCustomGuildMultiplier] = useState('');
   const [lockdownChannelId, setLockdownChannelId] = useState('');
   const [slowmodeChannelId, setSlowmodeChannelId] = useState('');
   const [slowmodeSeconds, setSlowmodeSeconds] = useState('0');
@@ -626,6 +628,25 @@ function App() {
       });
       const data = await res.json();
       if (res.ok) { showNotification('success', `XP updated! Level: ${data.level} (XP: ${data.xp})`); setXpChangeAmount(''); fetchTelemetry(); setShowMemberModal(false); }
+    } catch (err) { showNotification('error', err.message); }
+  };
+
+  const executeUserMultiplierUpdate = async () => {
+    if (!selectedMember || !userXpMultiplier) return;
+    const parsed = parseFloat(userXpMultiplier);
+    if (isNaN(parsed) || parsed < 0.1 || parsed > 10.0) {
+      showNotification('error', 'Multiplier must be between 0.1 and 10.0');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/members/${selectedMember.id}/multiplier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ multiplier: parsed }),
+      });
+      const data = await res.json();
+      if (res.ok) { showNotification('success', `XP multiplier set to ${parsed}x for ${selectedMember.username}`); setUserXpMultiplier(''); fetchTelemetry(); }
+      else throw new Error(data.error);
     } catch (err) { showNotification('error', err.message); }
   };
 
@@ -2281,13 +2302,26 @@ function App() {
                               </form>
                               <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
-                                  <label>XP Generation Multiplier</label>
-                                  <select className="form-select" value={telemetry.config.xpMultiplier} onChange={(e) => updateAutoModConfig({ xpMultiplier: parseFloat(e.target.value) })}>
-                                    <option value="0.5">0.5× Slow</option>
-                                    <option value="1.0">1.0× Standard</option>
-                                    <option value="1.5">1.5× Boosted</option>
-                                    <option value="2.0">2.0× Double XP</option>
-                                  </select>
+                                  <label>XP Generation Multiplier <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '11px' }}>(current: {telemetry.config.xpMultiplier ?? 1.0}×)</span></label>
+                                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
+                                    {[0.5, 1.0, 1.5, 2.0, 3.0, 5.0].map(v => (
+                                      <button key={v} className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '12px', background: telemetry.config.xpMultiplier === v ? 'var(--primary)' : undefined, color: telemetry.config.xpMultiplier === v ? '#060912' : undefined }} onClick={() => updateAutoModConfig({ xpMultiplier: v })}>{v}×</button>
+                                    ))}
+                                  </div>
+                                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <input
+                                      className="form-input"
+                                      type="number"
+                                      step="0.1"
+                                      min="0.1"
+                                      max="10"
+                                      placeholder="Custom (e.g. 2.5)"
+                                      value={customGuildMultiplier}
+                                      onChange={(e) => setCustomGuildMultiplier(e.target.value)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter' && customGuildMultiplier) { const v = parseFloat(customGuildMultiplier); if (!isNaN(v) && v >= 0.1 && v <= 10) { updateAutoModConfig({ xpMultiplier: v }); setCustomGuildMultiplier(''); } } }}
+                                    />
+                                    <button className="btn btn-primary" style={{ whiteSpace: 'nowrap' }} onClick={() => { const v = parseFloat(customGuildMultiplier); if (!isNaN(v) && v >= 0.1 && v <= 10) { updateAutoModConfig({ xpMultiplier: v }); setCustomGuildMultiplier(''); } else showNotification('error', 'Enter a value between 0.1 and 10'); }}>Set</button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -4473,6 +4507,33 @@ function App() {
                           </select>
                           <input className="form-input" type="number" min="0" placeholder="XP amount..." value={xpChangeAmount} onChange={(e) => setXpChangeAmount(e.target.value)} />
                           <button className="btn btn-primary" style={{ background: 'var(--info)', color: 'white', whiteSpace: 'nowrap' }} onClick={executeXpAdjustment}>Apply</button>
+                        </div>
+                      </div>
+
+                      {/* ── Per-User XP Multiplier ── */}
+                      <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '20px', marginBottom: '20px' }}>
+                        <h4 style={{ marginBottom: '4px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}><Zap size={15} /> XP Multiplier Override</h4>
+                        <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                          Set a personal XP multiplier for this user. Stacks with the server-wide multiplier.<br />
+                          Current: <strong>{selectedMember?.xpMultiplier ?? 1.0}×</strong>
+                        </p>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
+                          {[0.5, 1.0, 1.5, 2.0, 3.0].map(v => (
+                            <button key={v} className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '12px' }} onClick={() => { setUserXpMultiplier(String(v)); }}>{v}×</button>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input
+                            className="form-input"
+                            type="number"
+                            step="0.1"
+                            min="0.1"
+                            max="10"
+                            placeholder="Custom (e.g. 2.5)"
+                            value={userXpMultiplier}
+                            onChange={(e) => setUserXpMultiplier(e.target.value)}
+                          />
+                          <button className="btn btn-primary" style={{ background: 'var(--primary)', color: '#060912', whiteSpace: 'nowrap' }} onClick={executeUserMultiplierUpdate}>Set</button>
                         </div>
                       </div>
 
