@@ -1243,11 +1243,16 @@ function App() {
       const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/polls/${messageId}/close`, {
         method: 'POST', headers: { Authorization: `Bearer ${token}` },
       });
+      const data = await res.json();
       if (res.ok) {
-        showNotification('success', 'Poll closed and results posted!');
+        const winner = data.results?.find(r => r.winner);
+        const msg = winner
+          ? `Poll closed! 🏆 Winner: "${winner.text}" — ${winner.pct}% (${winner.count} votes)`
+          : 'Poll closed! No votes recorded.';
+        showNotification('success', msg);
         setPollsLoaded(false);
         fetchPolls();
-      } else throw new Error((await res.json()).error);
+      } else throw new Error(data.error);
     } catch (err) { showNotification('error', err.message); }
   };
 
@@ -4197,15 +4202,33 @@ function App() {
                                             {isActive ? '🟢 Active' : '🔒 Closed'}
                                           </span>
                                         </div>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
-                                          {poll.options.map((opt, i) => {
-                                            const emoji = poll.emojis?.[i] || ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i];
-                                            return (
-                                            <span key={i} style={{ fontSize: '12px', padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', color: 'var(--text-secondary)' }}>
-                                              {emoji} {opt}
-                                            </span>
-                                            );
-                                          })}
+                                        {/* Results bars (closed) or option chips (active) */}
+                                        <div style={{ marginBottom: '10px' }}>
+                                          {poll.status === 'closed' && poll.results ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                              {poll.results.map((r, i) => (
+                                                <div key={i}>
+                                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
+                                                    <span style={{ color: r.winner ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: r.winner ? 600 : 400 }}>
+                                                      {r.winner ? '🏆 ' : ''}{r.text}
+                                                    </span>
+                                                    <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '11px' }}>{r.pct}% · {r.count}v</span>
+                                                  </div>
+                                                  <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                                    <div style={{ height: '100%', width: `${r.pct}%`, borderRadius: '2px', background: r.winner ? 'var(--primary)' : 'rgba(255,255,255,0.2)', transition: 'width 0.4s ease' }} />
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          ) : (
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                              {poll.options.map((opt, i) => (
+                                                <span key={i} style={{ fontSize: '12px', padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', color: 'var(--text-secondary)' }}>
+                                                  {opt}
+                                                </span>
+                                              ))}
+                                            </div>
+                                          )}
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                           <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(poll.createdAt).toLocaleDateString()}{poll.closedAt ? ` → closed ${new Date(poll.closedAt).toLocaleDateString()}` : ''}</span>
