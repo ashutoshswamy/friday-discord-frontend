@@ -137,7 +137,7 @@ function App() {
   const [jobsLoaded, setJobsLoaded]         = useState(false);
   const [jobsAssignModal, setJobsAssignModal] = useState(null); // { userId, username, avatar }
   const [jobsAssignKey, setJobsAssignKey]   = useState('');
-  const [jobsAssignTierFilter, setJobsAssignTierFilter] = useState('all');
+  const [jobsAssignTierFilter, setJobsAssignTierFilter] = useState('1');
 
   const [purgeChannelId, setPurgeChannelId] = useState('');
   const [purgeAmount, setPurgeAmount]       = useState('10');
@@ -4042,7 +4042,7 @@ function App() {
 
                                       {/* Tier filter */}
                                       <div style={{ padding: '10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0, background: 'rgba(0,0,0,0.15)' }}>
-                                        {[['all', 'All Jobs', '#94a3b8'], ['1', 'Starter', TIER_COLORS[1]], ['2', 'Skilled', TIER_COLORS[2]], ['3', 'Professional', TIER_COLORS[3]], ['4', 'Elite', TIER_COLORS[4]]].map(([val, label, color]) => (
+                                        {[['1', 'Starter', TIER_COLORS[1]], ['2', 'Skilled', TIER_COLORS[2]], ['3', 'Professional', TIER_COLORS[3]], ['4', 'Elite', TIER_COLORS[4]]].map(([val, label, color]) => (
                                           <button
                                             key={val}
                                             onClick={() => setJobsAssignTierFilter(val)}
@@ -4128,11 +4128,11 @@ function App() {
                                             className="btn btn-primary"
                                             style={{ flex: 1, opacity: jobsAssignKey ? 1 : 0.45 }}
                                             disabled={!jobsAssignKey}
-                                            onClick={async () => { await adminSetJob(jobsAssignModal.id, jobsAssignKey); setJobsAssignModal(null); setJobsAssignTierFilter('all'); }}
+                                            onClick={async () => { await adminSetJob(jobsAssignModal.id, jobsAssignKey); setJobsAssignModal(null); setJobsAssignTierFilter('1'); }}
                                           >
                                             <Briefcase size={14} /> Assign Job
                                           </button>
-                                          <button className="btn btn-secondary" onClick={() => { setJobsAssignModal(null); setJobsAssignTierFilter('all'); }}>Cancel</button>
+                                          <button className="btn btn-secondary" onClick={() => { setJobsAssignModal(null); setJobsAssignTierFilter('1'); }}>Cancel</button>
                                         </div>
                                       </div>
                                     </div>
