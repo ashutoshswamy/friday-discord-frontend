@@ -112,12 +112,6 @@ const AI_COMMANDS = [
     desc: 'Direct AI query answered in Friday\'s system persona — sharp, contextual, direct.',
   },
   {
-    cmd: '/friday imagine',
-    args: '[prompt]',
-    color: '#ec4899',
-    desc: 'Generate a synthetic image from any text description. Costs 50 coins per generation.',
-  },
-  {
     cmd: '/friday rewrite',
     args: '[style] [text]',
     color: '#10b981',

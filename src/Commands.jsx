@@ -1312,17 +1312,6 @@ const COMMANDS = [
     dashboard: false,
   },
   {
-    name: 'friday imagine',
-    category: 'core',
-    desc: 'Generates a synthetic image from a text description using AI. Costs 50 coins per generation.',
-    usage: '/friday imagine [prompt]',
-    options: [
-      { name: 'prompt', type: 'String', required: true, desc: 'Visual description for the image generator' },
-    ],
-    admin: false,
-    dashboard: false,
-  },
-  {
     name: 'help',
     category: 'core',
     desc: 'Displays an interactive help manual listing all Friday bot commands, grouped by category with descriptions.',
