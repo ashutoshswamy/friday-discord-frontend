@@ -44,6 +44,14 @@ function App() {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showGuildDropdown, setShowGuildDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const isMobile = windowWidth < 480;
+  const isTablet = windowWidth < 768;
 
   const [warnReason, setWarnReason]           = useState('');
   const [timeoutDuration, setTimeoutDuration] = useState('3600000');
@@ -1509,12 +1517,14 @@ function App() {
                       </h1>
                     </div>
                     <div className="header-actions">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#1e3a52', fontFamily: 'var(--font-mono)', userSelect: 'none', letterSpacing: '0.3px' }}>
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 6px var(--success)', display: 'inline-block', animation: 'pulse 2s infinite', flexShrink: 0 }} />
-                        {autoRefreshSecs}s
-                      </div>
+                      {!isTablet && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#1e3a52', fontFamily: 'var(--font-mono)', userSelect: 'none', letterSpacing: '0.3px' }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 6px var(--success)', display: 'inline-block', animation: 'pulse 2s infinite', flexShrink: 0 }} />
+                          {autoRefreshSecs}s
+                        </div>
+                      )}
                       <button className="btn btn-secondary" onClick={() => { fetchTelemetry(); setInventoryLoaded(false); setPetsLoaded(false); setMarketLoaded(false); setInventoryList([]); setPetsList([]); setMarketList([]); setAutoRefreshSecs(30); }} disabled={loading}>
-                        <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Refresh
+                        <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />{!isTablet && ' Refresh'}
                       </button>
                     </div>
                   </header>
@@ -1760,7 +1770,7 @@ function App() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                               {/* stats ticker bar */}
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1px', background: 'var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: '1px', background: 'var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border)' }}>
                                 {[
                                   { label: 'Total XP', value: totalXp.toLocaleString(), Icon: Zap, color: '#8b5cf6' },
                                   { label: 'Coins Circulation', value: totalCoins.toLocaleString(), Icon: Coins, color: '#00c853' },
@@ -3875,7 +3885,7 @@ function App() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                               {/* Stats row */}
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '16px' }}>
                                 {[
                                   { label: 'Employed Members', value: jobsList.length },
                                   { label: 'Unemployed Members', value: Math.max(0, members.length - jobsList.length) },
@@ -4648,7 +4658,7 @@ function App() {
                       </div>
 
                       {/* ── Profile Stats ── */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', padding: '14px 0', borderBottom: '1px solid var(--border)', marginBottom: '20px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px', padding: '14px 0', borderBottom: '1px solid var(--border)', marginBottom: '20px' }}>
                         {[
                           { label: 'Level', icon: <Trophy size={14} />, value: (selectedMember.level ?? 1).toLocaleString(), color: 'var(--primary)' },
                           { label: 'XP', icon: <Zap size={14} />, value: (selectedMember.xp ?? 0).toLocaleString(), color: 'var(--info)' },

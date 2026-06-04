@@ -307,3 +307,8 @@
   .upd-hero { padding: 48px 16px 32px; }
   .upd-main { padding: 0 16px 60px; }
 }
+
+@media (max-width: 360px) {
+  .upd-hero { padding: 40px 12px 24px; }
+  .upd-main { padding: 0 10px 48px; }
+}

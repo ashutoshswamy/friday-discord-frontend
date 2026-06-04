@@ -599,3 +599,17 @@
   .cmd-nav { padding: 0 16px; }
   .cmd-nav-count { display: none; }
 }
+
+@media (max-width: 400px) {
+  .cmd-hero-title { font-size: 22px; }
+  .cmd-body { padding: 0 10px 60px; }
+  .cmd-card { padding: 14px 12px; }
+}
+
+/* iOS form zoom prevention */
+@media (max-width: 768px) {
+  .cmd-root input,
+  .cmd-root select {
+    font-size: 16px;
+  }
+}

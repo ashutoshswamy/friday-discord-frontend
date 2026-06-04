@@ -3418,4 +3418,18 @@
 
 @media (max-width: 360px) {
   .lp-footer-cols { grid-template-columns: 1fr 1fr; }
+  .lp-hero-title { font-size: clamp(28px, 8vw, 36px); }
+  .lp-section { padding: 48px 0; }
+  .lp-section-inner { padding: 0 14px; }
+  .lp-features-grid { gap: 8px; }
+  .lp-feature-card { padding: 16px 12px; }
+}
+
+/* ── Ensure iOS form inputs don't zoom ── */
+@media (max-width: 768px) {
+  .lp-root input,
+  .lp-root select,
+  .lp-root textarea {
+    font-size: 16px;
+  }
 }
