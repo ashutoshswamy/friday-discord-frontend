@@ -4005,63 +4005,59 @@ function App() {
                                   jobsAssignTierFilter === 'all' || j.tier === Number(jobsAssignTierFilter)
                                 );
                                 return (
-                                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }} onClick={() => setJobsAssignModal(null)}>
-                                    <div className="glass-panel" style={{ padding: '0', width: '520px', maxWidth: '96vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+                                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }} onClick={() => setJobsAssignModal(null)}>
+                                    <div className="glass-panel" style={{ padding: '0', width: '600px', maxWidth: '96vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }} onClick={e => e.stopPropagation()}>
 
-                                      {/* Modal header with user stats */}
-                                      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                                      {/* Header */}
+                                      <div style={{ padding: '18px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', flexShrink: 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                           <img
-                                            src={jobsAssignModal.avatar || `https://cdn.discordapp.com/embed/avatars/0.png`}
+                                            src={jobsAssignModal.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
                                             alt={jobsAssignModal.username}
-                                            style={{ width: '48px', height: '48px', borderRadius: '10px', flexShrink: 0, border: '2px solid var(--border)' }}
+                                            style={{ width: '44px', height: '44px', borderRadius: '10px', flexShrink: 0, border: '2px solid rgba(255,255,255,0.1)' }}
                                             onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'}
                                           />
                                           <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                              <span style={{ fontWeight: 800, fontSize: '16px' }}>{jobsAssignModal.username}</span>
-                                              {currentJob && (
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[currentJob.tier]}22`, color: TIER_COLORS[currentJob.tier], fontWeight: 700, flexShrink: 0 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                              <span style={{ fontWeight: 800, fontSize: '15px' }}>{jobsAssignModal.username}</span>
+                                              {currentJob ? (
+                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[currentJob.tier]}30`, border: `1px solid ${TIER_COLORS[currentJob.tier]}60`, color: TIER_COLORS[currentJob.tier], fontWeight: 700, flexShrink: 0 }}>
                                                   {currentJob.emoji} {currentJob.name}
                                                 </span>
-                                              )}
-                                              {!currentJob && (
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(148,163,184,0.12)', color: '#94a3b8', fontWeight: 600 }}>Unemployed</span>
-                                              )}
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '16px' }}>
-                                              {modalMember && (
-                                                <>
-                                                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                                    <span style={{ color: '#a78bfa', fontWeight: 700 }}>Lv {modalMember.level}</span>
-                                                  </div>
-                                                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                                    🪙 <span style={{ color: '#fbbf24', fontWeight: 700 }}>{(modalMember.coins || 0).toLocaleString()}</span>
-                                                  </div>
-                                                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                                    ⚡ <span style={{ color: '#60a5fa', fontWeight: 700 }}>{(modalMember.xp || 0).toLocaleString()} XP</span>
-                                                  </div>
-                                                </>
+                                              ) : (
+                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(148,163,184,0.15)', border: '1px solid rgba(148,163,184,0.25)', color: '#94a3b8', fontWeight: 600 }}>Unemployed</span>
                                               )}
                                             </div>
+                                            {modalMember && (
+                                              <div style={{ display: 'flex', gap: '14px' }}>
+                                                <span style={{ fontSize: '12px', color: '#a78bfa', fontWeight: 700 }}>Lv {modalMember.level}</span>
+                                                <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 600 }}>🪙 {(modalMember.coins || 0).toLocaleString()}</span>
+                                                <span style={{ fontSize: '12px', color: '#60a5fa', fontWeight: 600 }}>⚡ {(modalMember.xp || 0).toLocaleString()} XP</span>
+                                              </div>
+                                            )}
                                           </div>
-                                          <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', flexShrink: 0 }} onClick={() => setJobsAssignModal(null)}><X size={16} /></button>
+                                          <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '6px', borderRadius: '6px', flexShrink: 0 }} onClick={() => setJobsAssignModal(null)}><X size={16} /></button>
                                         </div>
                                       </div>
 
-                                      {/* Tier filter tabs */}
-                                      <div style={{ padding: '12px 24px', borderBottom: '1px solid var(--border)', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                        {[['all', 'All', '#94a3b8'], ['1', 'Starter', TIER_COLORS[1]], ['2', 'Skilled', TIER_COLORS[2]], ['3', 'Professional', TIER_COLORS[3]], ['4', 'Elite', TIER_COLORS[4]]].map(([val, label, color]) => (
+                                      {/* Tier filter */}
+                                      <div style={{ padding: '10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0, background: 'rgba(0,0,0,0.15)' }}>
+                                        {[['all', 'All Jobs', '#94a3b8'], ['1', 'Starter', TIER_COLORS[1]], ['2', 'Skilled', TIER_COLORS[2]], ['3', 'Professional', TIER_COLORS[3]], ['4', 'Elite', TIER_COLORS[4]]].map(([val, label, color]) => (
                                           <button
                                             key={val}
                                             onClick={() => setJobsAssignTierFilter(val)}
-                                            style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: `1px solid ${jobsAssignTierFilter === val ? color : 'var(--border)'}`, background: jobsAssignTierFilter === val ? `${color}22` : 'transparent', color: jobsAssignTierFilter === val ? color : 'var(--text-muted)', transition: 'all 0.15s' }}
+                                            style={{
+                                              padding: '5px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+                                              border: `1px solid ${jobsAssignTierFilter === val ? color : 'rgba(255,255,255,0.12)'}`,
+                                              background: jobsAssignTierFilter === val ? `${color}28` : 'rgba(255,255,255,0.04)',
+                                              color: jobsAssignTierFilter === val ? color : 'rgba(255,255,255,0.45)',
+                                            }}
                                           >{label}</button>
                                         ))}
                                       </div>
 
-                                      {/* Job cards grid */}
-                                      <div style={{ padding: '16px 24px', overflowY: 'auto', flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '8px' }}>
+                                      {/* Job list */}
+                                      <div style={{ overflowY: 'auto', flex: 1, padding: '12px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                                         {filteredJobs.map(([key, job]) => {
                                           const isSelected = jobsAssignKey === key;
                                           const tc = TIER_COLORS[job.tier];
@@ -4069,54 +4065,71 @@ function App() {
                                             <div
                                               key={key}
                                               onClick={() => setJobsAssignKey(key)}
-                                              style={{ padding: '12px 14px', borderRadius: '10px', border: `1px solid ${isSelected ? tc : `${tc}33`}`, background: isSelected ? `${tc}18` : 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.15s', position: 'relative', overflow: 'hidden' }}
-                                              onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.border = `1px solid ${tc}66`; e.currentTarget.style.background = `${tc}0d`; } }}
-                                              onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.border = `1px solid ${tc}33`; e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; } }}
+                                              style={{
+                                                padding: '11px 14px 11px 16px',
+                                                borderRadius: '10px',
+                                                border: `1px solid ${isSelected ? tc : 'rgba(255,255,255,0.1)'}`,
+                                                background: isSelected ? `${tc}20` : 'rgba(255,255,255,0.04)',
+                                                cursor: 'pointer',
+                                                transition: 'border-color 0.15s, background 0.15s',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                boxShadow: isSelected ? `0 0 0 1px ${tc}40 inset` : 'none',
+                                              }}
+                                              onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = `${tc}70`; e.currentTarget.style.background = `${tc}12`; } }}
+                                              onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; } }}
                                             >
-                                              <div style={{ position: 'absolute', top: 0, left: 0, width: '3px', height: '100%', background: tc, opacity: isSelected ? 1 : 0.4 }} />
-                                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                                <span style={{ fontSize: '20px', lineHeight: 1 }}>{job.emoji}</span>
+                                              <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: tc, borderRadius: '10px 0 0 10px', opacity: isSelected ? 1 : 0.55 }} />
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                                                <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{job.emoji}</span>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                                  <div style={{ fontWeight: 700, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{job.name}</div>
-                                                  <div style={{ fontSize: '10px', color: tc, fontWeight: 600 }}>{TIER_LABELS[job.tier]}</div>
-                                                </div>
-                                                {isSelected && (
-                                                  <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: tc, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                                  <div style={{ fontWeight: 700, fontSize: '13px', color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '2px' }}>{job.name}</div>
+                                                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 600 }}>🪙{job.minPay}–{job.maxPay}</span>
+                                                    {job.xpBonus > 0 && <span style={{ fontSize: '10px', color: '#a78bfa', fontWeight: 600 }}>+{job.xpBonus}xp</span>}
                                                   </div>
+                                                </div>
+                                                {isSelected ? (
+                                                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: tc, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 0 8px ${tc}80` }}>
+                                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                                  </div>
+                                                ) : (
+                                                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
                                                 )}
-                                              </div>
-                                              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                                <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 600 }}>🪙 {job.minPay}–{job.maxPay}</span>
-                                                {job.xpBonus > 0 && <span style={{ fontSize: '10px', color: '#8B5CF6', fontWeight: 600 }}>+{job.xpBonus} XP</span>}
-                                                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Lv {job.levelRequired}+</span>
                                               </div>
                                             </div>
                                           );
                                         })}
                                       </div>
 
-                                      {/* Selected job preview + actions */}
-                                      <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+                                      {/* Preview + actions */}
+                                      <div style={{ padding: '14px 22px', borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)', flexShrink: 0 }}>
                                         {selectedJob ? (
-                                          <div style={{ marginBottom: '14px', padding: '12px 14px', borderRadius: '10px', background: `${TIER_COLORS[selectedJob.tier]}10`, border: `1px solid ${TIER_COLORS[selectedJob.tier]}33` }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                          <div style={{ marginBottom: '12px', padding: '12px 14px', borderRadius: '10px', background: `${TIER_COLORS[selectedJob.tier]}15`, border: `1px solid ${TIER_COLORS[selectedJob.tier]}50` }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
                                               <span style={{ fontSize: '18px' }}>{selectedJob.emoji}</span>
                                               <span style={{ fontWeight: 700, fontSize: '14px' }}>{selectedJob.name}</span>
-                                              <span style={{ fontSize: '10px', padding: '1px 7px', borderRadius: '999px', background: `${TIER_COLORS[selectedJob.tier]}22`, color: TIER_COLORS[selectedJob.tier], fontWeight: 700 }}>{TIER_LABELS[selectedJob.tier]}</span>
+                                              <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[selectedJob.tier]}30`, border: `1px solid ${TIER_COLORS[selectedJob.tier]}50`, color: TIER_COLORS[selectedJob.tier], fontWeight: 700 }}>{TIER_LABELS[selectedJob.tier]}</span>
                                             </div>
-                                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px' }}>{selectedJob.description}</div>
-                                            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                                            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginBottom: '8px', lineHeight: 1.4 }}>{selectedJob.description}</div>
+                                            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                                               <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>🪙 {selectedJob.minPay}–{selectedJob.maxPay}/shift</span>
-                                              {selectedJob.xpBonus > 0 && <span style={{ fontSize: '11px', color: '#8B5CF6', fontWeight: 600 }}>+{selectedJob.xpBonus} XP/shift</span>}
-                                              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Requires Lv {selectedJob.levelRequired}+</span>
+                                              {selectedJob.xpBonus > 0 && <span style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 600 }}>+{selectedJob.xpBonus} XP/shift</span>}
+                                              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Requires Lv {selectedJob.levelRequired}+</span>
                                             </div>
                                           </div>
                                         ) : (
-                                          <div style={{ marginBottom: '14px', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center', padding: '8px' }}>Select a job above to preview details</div>
+                                          <div style={{ marginBottom: '12px', fontSize: '12px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '10px', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                                            Select a job above to preview details
+                                          </div>
                                         )}
                                         <div style={{ display: 'flex', gap: '10px' }}>
-                                          <button className="btn btn-primary" style={{ flex: 1 }} disabled={!jobsAssignKey} onClick={async () => { await adminSetJob(jobsAssignModal.id, jobsAssignKey); setJobsAssignModal(null); setJobsAssignTierFilter('all'); }}>
+                                          <button
+                                            className="btn btn-primary"
+                                            style={{ flex: 1, opacity: jobsAssignKey ? 1 : 0.45 }}
+                                            disabled={!jobsAssignKey}
+                                            onClick={async () => { await adminSetJob(jobsAssignModal.id, jobsAssignKey); setJobsAssignModal(null); setJobsAssignTierFilter('all'); }}
+                                          >
                                             <Briefcase size={14} /> Assign Job
                                           </button>
                                           <button className="btn btn-secondary" onClick={() => { setJobsAssignModal(null); setJobsAssignTierFilter('all'); }}>Cancel</button>
