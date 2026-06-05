@@ -388,8 +388,13 @@
 
 .cmd-card:hover {
   border-color: color-mix(in srgb, var(--cat-color) 35%, transparent);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.cmd-card:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
 }
 
 .cmd-card-accent-line {
@@ -612,4 +617,204 @@
   .cmd-root select {
     font-size: 16px;
   }
+}
+
+/* ── Command Modal ── */
+.cmd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: cmd-overlay-in 0.15s ease;
+}
+
+@keyframes cmd-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cmd-modal {
+  background: rgba(7, 12, 26, 0.96);
+  border: 1px solid color-mix(in srgb, var(--modal-color) 22%, rgba(59,157,255,0.14));
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: cmd-modal-in 0.18s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+@keyframes cmd-modal-in {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Titlebar */
+.cmd-modal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(59, 157, 255, 0.09);
+  background: rgba(59, 157, 255, 0.03);
+  flex-shrink: 0;
+}
+
+.cmd-modal-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.cmd-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cmd-dot-r { background: #ff5f57; cursor: pointer; }
+.cmd-dot-y { background: #febc2e; }
+.cmd-dot-g { background: #28c840; }
+
+.cmd-modal-titlebar-label {
+  font-family: var(--cmd-mono);
+  font-size: 10.5px;
+  color: var(--cmd-sub);
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.cmd-modal-close {
+  background: none;
+  border: none;
+  color: var(--cmd-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.cmd-modal-close:hover { color: var(--cmd-text); }
+
+/* Body */
+.cmd-modal-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+}
+
+/* Panel block */
+.cmd-modal-panel {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(59, 157, 255, 0.08);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.cmd-modal-panel-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.cmd-modal-cmd-name {
+  font-family: var(--cmd-mono);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.cmd-modal-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cmd-modal-desc {
+  font-size: 13px;
+  color: var(--cmd-sub);
+  line-height: 1.68;
+}
+
+.cmd-modal-section-label {
+  font-family: var(--cmd-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--cmd-muted);
+  margin-bottom: 8px;
+}
+
+.cmd-modal-usage-block {
+  display: block;
+  font-family: var(--cmd-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cmd-text);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 10px 14px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.6;
+}
+
+.cmd-modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cmd-modal-option-row {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 9px 11px;
+}
+
+.cmd-modal-option-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.cmd-modal-option-name {
+  font-family: var(--cmd-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cmd-text);
+}
+
+.cmd-modal-option-desc {
+  font-size: 12px;
+  color: var(--cmd-sub);
+  line-height: 1.5;
+}
+
+@media (max-width: 580px) {
+  .cmd-modal { max-height: 90vh; }
+  .cmd-modal-overlay { padding: 12px; }
+  .cmd-modal-cmd-name { font-size: 14px; }
 }

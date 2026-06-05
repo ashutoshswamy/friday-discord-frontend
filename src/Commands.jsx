@@ -1353,11 +1353,18 @@ const TYPE_COLORS = {
 export default function Commands() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
+  const [selectedCmd, setSelectedCmd] = useState(null);
 
   useEffect(() => {
     document.title = 'Commands — Friday Bot';
     return () => { document.title = 'Friday Bot — Smart Discord Community Management'; };
   }, []);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setSelectedCmd(null); };
+    if (selectedCmd) window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedCmd]);
 
   const filtered = useMemo(() => {
     let list = COMMANDS;
@@ -1385,6 +1392,69 @@ export default function Commands() {
       <div className="cmd-bg-grid" />
       <div className="cmd-bg-glow-1" />
       <div className="cmd-bg-glow-2" />
+
+      {/* Modal */}
+      {selectedCmd && (
+        <div className="cmd-modal-overlay" onClick={() => setSelectedCmd(null)}>
+          <div className="cmd-modal" style={{ '--modal-color': CAT_COLORS[selectedCmd.category] }} onClick={e => e.stopPropagation()}>
+            {/* Titlebar */}
+            <div className="cmd-modal-titlebar">
+              <div className="cmd-modal-dots">
+                <span className="cmd-dot cmd-dot-r" onClick={() => setSelectedCmd(null)} title="Close" />
+                <span className="cmd-dot cmd-dot-y" />
+                <span className="cmd-dot cmd-dot-g" />
+              </div>
+              <span className="cmd-modal-titlebar-label">Friday Dashboard — /{selectedCmd.name}</span>
+              <button className="cmd-modal-close" onClick={() => setSelectedCmd(null)}><X size={13} /></button>
+            </div>
+
+            {/* Body */}
+            <div className="cmd-modal-body">
+              {/* Command info panel */}
+              <div className="cmd-modal-panel">
+                <div className="cmd-modal-panel-title">
+                  <code className="cmd-modal-cmd-name" style={{ color: CAT_COLORS[selectedCmd.category] }}>/{selectedCmd.name}</code>
+                  <div className="cmd-modal-badges">
+                    {selectedCmd.admin && <span className="cmd-badge cmd-badge-admin">ADMIN</span>}
+                    {selectedCmd.dashboard && <span className="cmd-badge cmd-badge-dashboard">DASHBOARD</span>}
+                    <span className="cmd-badge cmd-badge-cat" style={{ background: CAT_COLORS[selectedCmd.category] + '1a', color: CAT_COLORS[selectedCmd.category], borderColor: CAT_COLORS[selectedCmd.category] + '33' }}>
+                      {selectedCmd.category}
+                    </span>
+                  </div>
+                </div>
+                <p className="cmd-modal-desc">{selectedCmd.desc}</p>
+              </div>
+
+              {/* Usage panel */}
+              <div className="cmd-modal-panel">
+                <div className="cmd-modal-section-label">USAGE</div>
+                <code className="cmd-modal-usage-block">{selectedCmd.usage}</code>
+              </div>
+
+              {/* Options panel */}
+              {selectedCmd.options.length > 0 && (
+                <div className="cmd-modal-panel">
+                  <div className="cmd-modal-section-label">OPTIONS</div>
+                  <div className="cmd-modal-options">
+                    {selectedCmd.options.map(opt => (
+                      <div key={opt.name} className="cmd-modal-option-row">
+                        <div className="cmd-modal-option-meta">
+                          <code className="cmd-modal-option-name">{opt.name}</code>
+                          <span className="cmd-option-type" style={{ color: TYPE_COLORS[opt.type] || '#888', borderColor: (TYPE_COLORS[opt.type] || '#888') + '33', background: (TYPE_COLORS[opt.type] || '#888') + '12' }}>
+                            {opt.type}
+                          </span>
+                          {!opt.required && <span className="cmd-option-optional">optional</span>}
+                        </div>
+                        <p className="cmd-modal-option-desc">{opt.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Nav */}
       <header className="cmd-nav">
@@ -1476,7 +1546,8 @@ export default function Commands() {
                 <div
                   key={cmd.name}
                   className="cmd-card"
-                  style={{ '--cat-color': CAT_COLORS[cmd.category] }}
+                  style={{ '--cat-color': CAT_COLORS[cmd.category], cursor: 'pointer' }}
+                  onClick={() => setSelectedCmd(cmd)}
                 >
                   <div className="cmd-card-accent-line" />
 
