@@ -175,6 +175,10 @@ function App() {
   // Auto-refresh state
   const [autoRefreshSecs, setAutoRefreshSecs] = useState(30);
 
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
   const REDIRECT_URI = window.location.origin + '/';
 
   // ── Detect OAuth code on mount (lands on /)
@@ -350,6 +354,24 @@ function App() {
   const showNotification = (type, message) => {
     if (type === 'success') { setSuccessMsg(message); setTimeout(() => setSuccessMsg(null), 4000); }
     else { setErrorMsg(message); setTimeout(() => setErrorMsg(null), 4000); }
+  };
+
+  // ── Reset server
+  const resetServer = async () => {
+    setResetLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/reset`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Reset failed');
+      setShowResetModal(false);
+      setResetConfirmText('');
+      showNotification('success', 'Server data has been reset.');
+      fetchTelemetry();
+    } catch (err) { showNotification('error', err.message); }
+    finally { setResetLoading(false); }
   };
 
   // ── Config actions
@@ -1610,6 +1632,22 @@ function App() {
                                     {telemetry.logs.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No incidents recorded.</td></tr>}
                                   </tbody>
                                 </table>
+                              </div>
+                            </div>
+
+                            {/* Danger Zone */}
+                            <div className="glass-panel" style={{ padding: '22px 24px', border: '1px solid rgba(255,23,68,0.25)', background: 'rgba(255,23,68,0.03)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                    <AlertTriangle size={14} color="var(--danger)" />
+                                    <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--danger)', textTransform: 'uppercase', letterSpacing: '1px' }}>Danger Zone</span>
+                                  </div>
+                                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Permanently delete all bot data for this server — members, economy, warnings, shop, settings, and more.</div>
+                                </div>
+                                <button className="btn btn-danger" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '7px' }} onClick={() => { setShowResetModal(true); setResetConfirmText(''); }}>
+                                  <Trash2 size={14} /> Reset Server Data
+                                </button>
                               </div>
                             </div>
 
@@ -4630,6 +4668,53 @@ function App() {
                           <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Changes</button>
                         </div>
                       </form>
+                    </div>
+                  </div>
+                )}
+
+                {showResetModal && (
+                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setShowResetModal(false)}>
+                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(255,23,68,0.35)', borderRadius: '14px', padding: '28px', width: '440px', maxWidth: '94vw' }} onClick={e => e.stopPropagation()}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,23,68,0.12)', border: '1px solid rgba(255,23,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <AlertTriangle size={17} style={{ color: 'var(--danger)' }} />
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '15px' }}>Reset Server Data</div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{telemetry?.guild?.name || activeGuildId}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ background: 'rgba(255,23,68,0.06)', border: '1px solid rgba(255,23,68,0.2)', borderRadius: '8px', padding: '12px 14px', marginBottom: '20px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                        <strong style={{ color: 'var(--danger)' }}>This action is irreversible.</strong> All bot data for this server will be permanently deleted — including member profiles, economy balances, warnings, shop items, XP, settings, and all other records.
+                      </div>
+
+                      <div style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
+                          Type <strong style={{ color: 'var(--danger)', fontFamily: 'monospace' }}>RESET</strong> to confirm
+                        </label>
+                        <input
+                          className="form-input"
+                          type="text"
+                          placeholder="RESET"
+                          value={resetConfirmText}
+                          onChange={e => setResetConfirmText(e.target.value)}
+                          style={{ width: '100%', borderColor: resetConfirmText === 'RESET' ? 'rgba(255,23,68,0.5)' : undefined }}
+                          autoFocus
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowResetModal(false)}>Cancel</button>
+                        <button
+                          className="btn btn-danger"
+                          style={{ flex: 1, opacity: resetConfirmText === 'RESET' ? 1 : 0.4 }}
+                          disabled={resetConfirmText !== 'RESET' || resetLoading}
+                          onClick={resetServer}
+                        >
+                          {resetLoading ? 'Resetting…' : 'Reset All Data'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
