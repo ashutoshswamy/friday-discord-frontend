@@ -3503,47 +3503,64 @@ function App() {
                                       ? `${inventoryBulkSelected.length} users`
                                       : (selectedUserMember?.username || inventorySelectedUser);
                                     return (
-                                      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setInventoryGrantModal(false)}>
-                                        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '14px', padding: '28px', width: '400px', maxWidth: '94vw' }} onClick={e => e.stopPropagation()}>
-                                          {/* Header */}
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                              <Plus size={15} style={{ color: '#4ade80' }} />
+                                      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setInventoryGrantModal(false)}>
+                                        <div style={{ background: 'rgba(7,12,26,0.97)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)', width: '440px', maxWidth: '94vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
+
+                                          {/* macOS titlebar */}
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: '1px solid rgba(34,197,94,0.1)', background: 'rgba(34,197,94,0.03)', flexShrink: 0 }}>
+                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff5f57', display: 'inline-block', cursor: 'pointer', flexShrink: 0 }} onClick={() => { setInventoryGrantModal(false); setInventoryBulkSelected([]); setInventoryBulkMode(false); }} />
+                                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#febc2e', display: 'inline-block', flexShrink: 0 }} />
+                                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28c840', display: 'inline-block', flexShrink: 0 }} />
                                             </div>
-                                            <div>
-                                              <div style={{ fontWeight: 700, fontSize: '15px' }}>Grant Item</div>
-                                              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                                {isBulk ? (
-                                                  <span>Granting to <strong style={{ color: '#4ade80' }}>{inventoryBulkSelected.length} selected users</strong></span>
-                                                ) : (
-                                                  <span>Granting to <strong style={{ color: 'var(--text-primary)' }}>{targetLabel}</strong></span>
-                                                )}
-                                              </div>
-                                            </div>
+                                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'rgba(136,146,164,0.8)', flex: 1, textAlign: 'center', letterSpacing: '0.2px' }}>Friday Dashboard — Inventory · Grant Item</span>
+                                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(74,85,104,1)', padding: '2px', display: 'flex', alignItems: 'center' }} onClick={() => { setInventoryGrantModal(false); setInventoryBulkSelected([]); setInventoryBulkMode(false); }}><X size={13} /></button>
                                           </div>
 
-                                          {/* Bulk user previews */}
-                                          {isBulk && (
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '12px 0', padding: '10px 12px', background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '8px' }}>
-                                              {inventoryBulkSelected.slice(0, 8).map(uid => {
-                                                const bm = members.find(x => x.id === uid);
-                                                return (
-                                                  <div key={uid} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', fontSize: '11px', fontWeight: 600 }}>
-                                                    {bm ? <img src={bm.avatar} style={{ width: '14px', height: '14px', borderRadius: '50%' }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} /> : null}
-                                                    {bm ? bm.username : uid}
-                                                  </div>
-                                                );
-                                              })}
-                                              {inventoryBulkSelected.length > 8 && <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '2px 6px' }}>+{inventoryBulkSelected.length - 8} more</span>}
+                                          {/* Body */}
+                                          <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
+
+                                          {/* Target panel */}
+                                          <div style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '8px', padding: '13px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: isBulk ? '12px' : '0' }}>
+                                              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <Plus size={15} style={{ color: '#4ade80' }} />
+                                              </div>
+                                              <div>
+                                                <div style={{ fontWeight: 700, fontSize: '14px' }}>Grant Item</div>
+                                                <div style={{ fontSize: '11.5px', color: 'rgba(136,146,164,0.8)' }}>
+                                                  {isBulk ? (
+                                                    <span>To <strong style={{ color: '#4ade80' }}>{inventoryBulkSelected.length} selected users</strong></span>
+                                                  ) : (
+                                                    <span>To <strong style={{ color: '#e8edf5' }}>{targetLabel}</strong></span>
+                                                  )}
+                                                </div>
+                                              </div>
                                             </div>
-                                          )}
 
-                                          <div style={{ height: '1px', background: 'var(--border)', margin: '16px 0' }} />
+                                            {/* Bulk user previews */}
+                                            {isBulk && (
+                                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '10px 12px', background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '6px' }}>
+                                                {inventoryBulkSelected.slice(0, 8).map(uid => {
+                                                  const bm = members.find(x => x.id === uid);
+                                                  return (
+                                                    <div key={uid} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', fontSize: '11px', fontWeight: 600 }}>
+                                                      {bm ? <img src={bm.avatar} style={{ width: '14px', height: '14px', borderRadius: '50%' }} onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'} /> : null}
+                                                      {bm ? bm.username : uid}
+                                                    </div>
+                                                  );
+                                                })}
+                                                {inventoryBulkSelected.length > 8 && <span style={{ fontSize: '11px', color: 'rgba(136,146,164,0.8)', padding: '2px 6px' }}>+{inventoryBulkSelected.length - 8} more</span>}
+                                              </div>
+                                            )}
+                                          </div>
 
-                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                          {/* Form panel */}
+                                          <div style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(59,157,255,0.08)', borderRadius: '8px', padding: '13px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(74,85,104,1)', marginBottom: '2px' }}>ITEM DETAILS</div>
                                             {/* Item name with autocomplete */}
                                             <div>
-                                              <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Item Name</label>
+                                              <label style={{ fontSize: '11px', color: 'rgba(136,146,164,0.8)', fontWeight: 600, display: 'block', marginBottom: '5px', fontFamily: 'var(--font-mono)', letterSpacing: '0.5px' }}>ITEM NAME</label>
                                               <input
                                                 className="form-input"
                                                 type="text"
@@ -3561,7 +3578,7 @@ function App() {
 
                                             {/* Item type */}
                                             <div>
-                                              <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Item Type</label>
+                                              <label style={{ fontSize: '11px', color: 'rgba(136,146,164,0.8)', fontWeight: 600, display: 'block', marginBottom: '5px', fontFamily: 'var(--font-mono)', letterSpacing: '0.5px' }}>ITEM TYPE</label>
                                               <select className="form-select" value={inventoryGrantForm.itemType} onChange={e => setInventoryGrantForm(f => ({ ...f, itemType: e.target.value }))} style={{ width: '100%' }}>
                                                 {itemTypeDefs.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                                               </select>
@@ -3569,12 +3586,12 @@ function App() {
 
                                             {/* Quantity */}
                                             <div>
-                                              <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Quantity</label>
+                                              <label style={{ fontSize: '11px', color: 'rgba(136,146,164,0.8)', fontWeight: 600, display: 'block', marginBottom: '5px', fontFamily: 'var(--font-mono)', letterSpacing: '0.5px' }}>QUANTITY</label>
                                               <input className="form-input" type="number" min="1" max="100" value={inventoryGrantForm.count} onChange={e => setInventoryGrantForm(f => ({ ...f, count: e.target.value }))} style={{ width: '100%' }} />
                                             </div>
                                           </div>
 
-                                          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                          <div style={{ display: 'flex', gap: '10px' }}>
                                             <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setInventoryGrantModal(false); setInventoryBulkSelected([]); setInventoryBulkMode(false); }}>Cancel</button>
                                             <button
                                               className="btn btn-primary"
@@ -3594,6 +3611,8 @@ function App() {
                                               {isBulk ? `Grant to ${inventoryBulkSelected.length} Users` : 'Grant'}
                                             </button>
                                           </div>
+
+                                          </div>{/* /body */}
                                         </div>
                                       </div>
                                     );
@@ -4053,43 +4072,53 @@ function App() {
                                   jobsAssignTierFilter === 'all' || j.tier === Number(jobsAssignTierFilter)
                                 );
                                 return (
-                                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }} onClick={() => setJobsAssignModal(null)}>
-                                    <div className="glass-panel" style={{ padding: '0', width: '600px', maxWidth: '96vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }} onClick={e => e.stopPropagation()}>
+                                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }} onClick={() => setJobsAssignModal(null)}>
+                                    <div style={{ background: 'rgba(7,12,26,0.97)', border: '1px solid rgba(59,157,255,0.16)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 60px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04)', width: '600px', maxWidth: '96vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column', position: 'relative' }} onClick={e => e.stopPropagation()}>
 
-                                      {/* Header */}
-                                      <div style={{ padding: '18px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', flexShrink: 0 }}>
+                                      {/* macOS titlebar */}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: '1px solid rgba(59,157,255,0.09)', background: 'rgba(59,157,255,0.03)', flexShrink: 0 }}>
+                                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff5f57', display: 'inline-block', cursor: 'pointer', flexShrink: 0 }} onClick={() => { setJobsAssignModal(null); setJobsAssignTierFilter('1'); }} />
+                                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#febc2e', display: 'inline-block', flexShrink: 0 }} />
+                                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28c840', display: 'inline-block', flexShrink: 0 }} />
+                                        </div>
+                                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'rgba(136,146,164,0.8)', flex: 1, textAlign: 'center', letterSpacing: '0.2px' }}>Friday Dashboard — Job Assignment</span>
+                                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(74,85,104,1)', padding: '2px', display: 'flex', alignItems: 'center' }} onClick={() => { setJobsAssignModal(null); setJobsAssignTierFilter('1'); }}><X size={13} /></button>
+                                      </div>
+
+                                      {/* Member info panel */}
+                                      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(59,157,255,0.08)', background: 'rgba(0,0,0,0.2)', flexShrink: 0 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                           <img
                                             src={jobsAssignModal.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
                                             alt={jobsAssignModal.username}
-                                            style={{ width: '44px', height: '44px', borderRadius: '10px', flexShrink: 0, border: '2px solid rgba(255,255,255,0.1)' }}
+                                            style={{ width: '40px', height: '40px', borderRadius: '8px', flexShrink: 0, border: '1px solid rgba(59,157,255,0.2)' }}
                                             onError={e => e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png'}
                                           />
                                           <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                              <span style={{ fontWeight: 800, fontSize: '15px' }}>{jobsAssignModal.username}</span>
+                                              <span style={{ fontWeight: 800, fontSize: '14px' }}>{jobsAssignModal.username}</span>
                                               {currentJob ? (
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[currentJob.tier]}30`, border: `1px solid ${TIER_COLORS[currentJob.tier]}60`, color: TIER_COLORS[currentJob.tier], fontWeight: 700, flexShrink: 0 }}>
+                                                <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: `${TIER_COLORS[currentJob.tier]}22`, border: `1px solid ${TIER_COLORS[currentJob.tier]}55`, color: TIER_COLORS[currentJob.tier], fontWeight: 700, flexShrink: 0 }}>
                                                   {currentJob.emoji} {currentJob.name}
                                                 </span>
                                               ) : (
-                                                <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(148,163,184,0.15)', border: '1px solid rgba(148,163,184,0.25)', color: '#94a3b8', fontWeight: 600 }}>Unemployed</span>
+                                                <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(148,163,184,0.1)', border: '1px solid rgba(148,163,184,0.2)', color: '#94a3b8', fontWeight: 600 }}>Unemployed</span>
                                               )}
                                             </div>
                                             {modalMember && (
                                               <div style={{ display: 'flex', gap: '14px' }}>
-                                                <span style={{ fontSize: '12px', color: '#a78bfa', fontWeight: 700 }}>Lv {modalMember.level}</span>
-                                                <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 600 }}>🪙 {(modalMember.coins || 0).toLocaleString()}</span>
-                                                <span style={{ fontSize: '12px', color: '#60a5fa', fontWeight: 600 }}>⚡ {(modalMember.xp || 0).toLocaleString()} XP</span>
+                                                <span style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700 }}>Lv {modalMember.level}</span>
+                                                <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 600 }}>🪙 {(modalMember.coins || 0).toLocaleString()}</span>
+                                                <span style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 600 }}>⚡ {(modalMember.xp || 0).toLocaleString()} XP</span>
                                               </div>
                                             )}
                                           </div>
-                                          <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '6px', borderRadius: '6px', flexShrink: 0 }} onClick={() => setJobsAssignModal(null)}><X size={16} /></button>
                                         </div>
                                       </div>
 
                                       {/* Tier filter */}
-                                      <div style={{ padding: '10px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0, background: 'rgba(0,0,0,0.15)' }}>
+                                      <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(59,157,255,0.08)', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0, background: 'rgba(0,0,0,0.18)' }}>
                                         {[['1', 'Starter', TIER_COLORS[1]], ['2', 'Skilled', TIER_COLORS[2]], ['3', 'Professional', TIER_COLORS[3]], ['4', 'Elite', TIER_COLORS[4]]].map(([val, label, color]) => (
                                           <button
                                             key={val}
@@ -4105,7 +4134,7 @@ function App() {
                                       </div>
 
                                       {/* Job list */}
-                                      <div style={{ overflowY: 'auto', flex: 1, padding: '12px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                      <div style={{ overflowY: 'auto', flex: 1, padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                                         {filteredJobs.map(([key, job]) => {
                                           const isSelected = jobsAssignKey === key;
                                           const tc = TIER_COLORS[job.tier];
@@ -4151,7 +4180,7 @@ function App() {
                                       </div>
 
                                       {/* Preview + actions */}
-                                      <div style={{ padding: '14px 22px', borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)', flexShrink: 0 }}>
+                                      <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(59,157,255,0.09)', background: 'rgba(0,0,0,0.28)', flexShrink: 0 }}>
                                         {selectedJob ? (
                                           <div style={{ marginBottom: '12px', padding: '12px 14px', borderRadius: '10px', background: `${TIER_COLORS[selectedJob.tier]}15`, border: `1px solid ${TIER_COLORS[selectedJob.tier]}50` }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
