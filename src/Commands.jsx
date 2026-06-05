@@ -717,10 +717,11 @@ const COMMANDS = [
   {
     name: 'coinflip',
     category: 'economy',
-    desc: 'Flip a coin. Optionally guess heads or tails to see if you win.',
-    usage: '/coinflip [guess?]',
+    desc: 'Flip a coin and optionally bet coins on the outcome. Guess heads or tails — win double your bet or lose it all.',
+    usage: '/coinflip [guess?] [bet?]',
     options: [
       { name: 'guess', type: 'String', required: false, desc: 'Your guess: heads or tails' },
+      { name: 'bet', type: 'Integer', required: false, desc: 'Coins to wager on the flip' },
     ],
     admin: false,
     dashboard: false,
@@ -728,10 +729,11 @@ const COMMANDS = [
   {
     name: 'rps',
     category: 'economy',
-    desc: 'Play Rock, Paper, Scissors against Friday.',
-    usage: '/rps [choice]',
+    desc: 'Play Rock, Paper, Scissors against Friday. Optionally bet coins — win double on a win, lose your bet on a loss.',
+    usage: '/rps [choice] [bet?]',
     options: [
       { name: 'choice', type: 'String', required: true, desc: 'Your move: rock, paper, or scissors' },
+      { name: 'bet', type: 'Integer', required: false, desc: 'Coins to wager on the match' },
     ],
     admin: false,
     dashboard: false,
