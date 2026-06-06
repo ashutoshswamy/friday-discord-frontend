@@ -284,7 +284,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           <div className="lp-dash-body">
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Active Giveaways<span className="lp-gw-refresh-btn"><Star size={11}/></span></div>
-              {[{prize:'Discord Nitro Classic',winners:1,ends:'Dec 25, 2025, 8:00 PM'},{prize:'$50 Steam Gift Card',winners:2,ends:'Dec 28, 2025, 5:00 PM'}].map(({prize,winners,ends})=>(<div key={prize} className="lp-gw-item"><div className="lp-gw-item-top"><div><div className="lp-gw-item-prize"><Gift size={13} color="#ff9100" style={{flexShrink:0}}/> {prize}</div><div className="lp-gw-item-meta">{winners} winner{winners!==1?'s':''} · ends {ends}</div></div></div><div className="lp-gw-item-btns"><button className="lp-gw-btn lp-gw-btn-end">End Now</button><button className="lp-gw-btn">Reroll</button></div></div>))}
+              {[{prize:'Discord Nitro Classic',winners:1,ends:'Dec 25, 2025, 8:00 PM'},{prize:'$50 Steam Gift Card',winners:2,ends:'Dec 28, 2025, 5:00 PM'}].map(({prize,winners,ends})=>(<div key={prize} className="lp-gw-item"><div className="lp-gw-item-top"><div><div className="lp-gw-item-prize"><Gift size={13} color="#ff9100" style={{flexShrink:0}}/> {prize}</div><div className="lp-gw-item-meta">{winners.toLocaleString()} winner{winners!==1?'s':''} · ends {ends}</div></div></div><div className="lp-gw-item-btns"><button className="lp-gw-btn lp-gw-btn-end">End Now</button><button className="lp-gw-btn">Reroll</button></div></div>))}
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title"><Gift size={13} style={{display:'inline',marginRight:'7px',color:'#ff9100'}}/>Launch Giveaway</div>
@@ -357,7 +357,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title">Mod Stats — This Week</div>
-              <div className="lp-modstats-row">{[{label:'Warns',value:14,color:'#f59e0b'},{label:'Timeouts',value:6,color:'#3b9dff'},{label:'Kicks',value:2,color:'#ff9100'},{label:'Bans',value:1,color:'#f43f5e'}].map(({label,value,color})=>(<div key={label} className="lp-modstat-cell"><div className="lp-modstat-value" style={{color}}>{value}</div><div className="lp-modstat-label">{label}</div></div>))}</div>
+              <div className="lp-modstats-row">{[{label:'Warns',value:14,color:'#f59e0b'},{label:'Timeouts',value:6,color:'#3b9dff'},{label:'Kicks',value:2,color:'#ff9100'},{label:'Bans',value:1,color:'#f43f5e'}].map(({label,value,color})=>(<div key={label} className="lp-modstat-cell"><div className="lp-modstat-value" style={{color}}>{value.toLocaleString()}</div><div className="lp-modstat-label">{label}</div></div>))}</div>
             </div>
           </div>
         </div>
@@ -368,11 +368,11 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           <div className="lp-dash-body">
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Voice Leaderboard<span style={{fontSize:'9px',color:'#a78bfa',background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>THIS WEEK</span></div>
-              <div className="lp-vc-list">{[{rank:1,name:'nova_knight',mins:840,bar:100},{rank:2,name:'crystal_void',mins:612,bar:73},{rank:3,name:'blazex99',mins:490,bar:58},{rank:4,name:'lunaris',mins:310,bar:37},{rank:5,name:'axion_drift',mins:205,bar:24}].map(({rank,name,mins,bar})=>(<div key={name} className="lp-vc-row"><span className="lp-vc-rank">#{rank}</span><div className="lp-vc-avatar">{name[0].toUpperCase()}</div><div className="lp-vc-info"><div className="lp-vc-name">{name}</div><div className="lp-vc-bar-track"><div className="lp-vc-bar-fill" style={{width:`${bar}%`}}/></div></div><span className="lp-vc-mins">{mins}m</span></div>))}</div>
+              <div className="lp-vc-list">{[{rank:1,name:'nova_knight',mins:840,bar:100},{rank:2,name:'crystal_void',mins:612,bar:73},{rank:3,name:'blazex99',mins:490,bar:58},{rank:4,name:'lunaris',mins:310,bar:37},{rank:5,name:'axion_drift',mins:205,bar:24}].map(({rank,name,mins,bar})=>(<div key={name} className="lp-vc-row"><span className="lp-vc-rank">#{rank}</span><div className="lp-vc-avatar">{name[0].toUpperCase()}</div><div className="lp-vc-info"><div className="lp-vc-name">{name}</div><div className="lp-vc-bar-track"><div className="lp-vc-bar-fill" style={{width:`${bar}%`}}/></div></div><span className="lp-vc-mins">{mins.toLocaleString()}m</span></div>))}</div>
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title">Active Temp Channels</div>
-              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members} members</span>{locked&&<Lock size={11} color="#a78bfa"/>}</div>))}</div>
+              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members.toLocaleString()} members</span>{locked&&<Lock size={11} color="#a78bfa"/>}</div>))}</div>
             </div>
           </div>
         </div>
