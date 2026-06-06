@@ -4044,7 +4044,7 @@ function App() {
                                                 ) : '—'}
                                               </td>
                                               <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#10B981' }}>
-                                                job ? <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{job.minPay}–{job.maxPay}</span> : <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />50–150</span>
+                                                {job ? <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{job.minPay}–{job.maxPay}</span> : <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />50–150</span>}
                                               </td>
                                               <td style={{ fontSize: '12px', color: '#8B5CF6' }}>
                                                 {job && job.xpBonus > 0 ? `+${job.xpBonus} XP` : '—'}
