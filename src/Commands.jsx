@@ -1,10 +1,29 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard, Shield, Coins, Zap, Gift,
+  LayoutDashboard, Shield, Zap, Gift,
   LifeBuoy, UserPlus, Bell, Terminal, Mic,
   Wrench, FileText, Star, Layers, X
 } from 'lucide-react';
+
+const Coins = ({ size = 16, className = '', style = {} }) => (
+  <img 
+    src="/fridaycoin.png" 
+    alt="🪙" 
+    className={className} 
+    style={{ 
+      width: `${size}px`, 
+      height: `${size}px`, 
+      objectFit: 'contain', 
+      verticalAlign: 'middle', 
+      display: 'inline-block', 
+      position: 'relative', 
+      top: '-0.5px', 
+      ...style 
+    }} 
+  />
+);
+
 import './Commands.css';
 
 const CATEGORIES = [

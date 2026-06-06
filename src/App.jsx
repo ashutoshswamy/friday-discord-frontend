@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import {
-  Shield, Users, Coins, LogOut, ChevronDown,
+  Shield, Users, LogOut, ChevronDown,
   AlertTriangle, Search, Plus, Trash2, VolumeX, UserMinus, Ban,
   Award, ShoppingBag, Server, FileText, LayoutDashboard, RefreshCw, X, ChevronRight, Link,
   Gift, LifeBuoy, UserPlus, Terminal, Bell, Mic, Trophy, Zap,
@@ -10,6 +10,25 @@ import {
   Wrench, Activity, Hash, Headphones, FolderOpen, Cpu, TrendingUp,
   Home, BookOpen, Menu, Landmark, Briefcase, BarChart2
 } from 'lucide-react';
+
+const Coins = ({ size = 16, className = '', style = {} }) => (
+  <img 
+    src="/fridaycoin.png" 
+    alt="🪙" 
+    className={className} 
+    style={{ 
+      width: `${size}px`, 
+      height: `${size}px`, 
+      objectFit: 'contain', 
+      verticalAlign: 'middle', 
+      display: 'inline-block', 
+      position: 'relative', 
+      top: '-0.5px', 
+      ...style 
+    }} 
+  />
+);
+
 import Landing from './Landing';
 import Commands from './Commands';
 import Updates from './Updates';
@@ -3970,7 +3989,7 @@ function App() {
                                                 </div>
                                                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>{job.description}</div>
                                                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                                  <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>🪙 {job.minPay}–{job.maxPay}/shift</span>
+                                                  <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{job.minPay}–{job.maxPay}/shift</span>
                                                   {job.xpBonus > 0 && <span style={{ fontSize: '11px', color: '#8B5CF6', fontWeight: 600 }}>+{job.xpBonus} XP/shift</span>}
                                                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lv {job.levelRequired}+</span>
                                                   {count > 0 && <span style={{ fontSize: '11px', color: TIER_COLORS[tier], fontWeight: 600 }}>{count} employed</span>}
@@ -4025,7 +4044,7 @@ function App() {
                                                 ) : '—'}
                                               </td>
                                               <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#10B981' }}>
-                                                {job ? `🪙 ${job.minPay}–${job.maxPay}` : '🪙 50–150'}
+                                                job ? <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{job.minPay}–{job.maxPay}</span> : <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />50–150</span>
                                               </td>
                                               <td style={{ fontSize: '12px', color: '#8B5CF6' }}>
                                                 {job && job.xpBonus > 0 ? `+${job.xpBonus} XP` : '—'}
@@ -4101,7 +4120,7 @@ function App() {
                                             {modalMember && (
                                               <div style={{ display: 'flex', gap: '14px' }}>
                                                 <span style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700 }}>Lv {modalMember.level}</span>
-                                                <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 600 }}>🪙 {(modalMember.coins || 0).toLocaleString()}</span>
+                                                <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{(modalMember.coins || 0).toLocaleString()}</span>
                                                 <span style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 600 }}>⚡ {(modalMember.xp || 0).toLocaleString()} XP</span>
                                               </div>
                                             )}
@@ -4154,7 +4173,7 @@ function App() {
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                   <div style={{ fontWeight: 700, fontSize: '13px', color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '2px' }}>{job.name}</div>
                                                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                                                    <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 600 }}>🪙{job.minPay}–{job.maxPay}</span>
+                                                    <span style={{ fontSize: '10px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px' }}><Coins size={12} />{job.minPay}–{job.maxPay}</span>
                                                     {job.xpBonus > 0 && <span style={{ fontSize: '10px', color: '#a78bfa', fontWeight: 600 }}>+{job.xpBonus}xp</span>}
                                                   </div>
                                                 </div>
@@ -4182,7 +4201,7 @@ function App() {
                                             </div>
                                             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginBottom: '8px', lineHeight: 1.4 }}>{selectedJob.description}</div>
                                             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                                              <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>🪙 {selectedJob.minPay}–{selectedJob.maxPay}/shift</span>
+                                              <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><Coins size={13} />{selectedJob.minPay}–{selectedJob.maxPay}/shift</span>
                                               {selectedJob.xpBonus > 0 && <span style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 600 }}>+{selectedJob.xpBonus} XP/shift</span>}
                                               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Requires Lv {selectedJob.levelRequired}+</span>
                                             </div>

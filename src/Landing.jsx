@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
-  Shield, Zap, Coins, Gift, LifeBuoy, UserPlus,
+  Shield, Zap, Gift, LifeBuoy, UserPlus,
   ChevronRight, ArrowRight, Star, Check,
   Menu, X, Link, Bell, Terminal, Mic, BrainCircuit,
   Wrench, FileText, TrendingUp,
   Crown, Palette, Gamepad2, Monitor, Music, Megaphone, Lock, PartyPopper
 } from 'lucide-react';
+
+const Coins = ({ size = 16, className = '', style = {} }) => (
+  <img 
+    src="/fridaycoin.png" 
+    alt="🪙" 
+    className={className} 
+    style={{ 
+      width: `${size}px`, 
+      height: `${size}px`, 
+      objectFit: 'contain', 
+      verticalAlign: 'middle', 
+      display: 'inline-block', 
+      position: 'relative', 
+      top: '-0.5px', 
+      ...style 
+    }} 
+  />
+);
+
 import './Landing.css';
 import Footer from './Footer';
 

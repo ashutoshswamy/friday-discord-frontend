@@ -3,8 +3,27 @@ import { Link as RouterLink } from 'react-router-dom';
 import {
   Activity, Server, Users, Zap, Terminal, RefreshCw,
   CheckCircle2, XCircle, Clock, Hash, ArrowLeft, Shield,
-  Coins, Bell, LifeBuoy, TrendingUp, Wifi,
+  Bell, LifeBuoy, TrendingUp, Wifi,
 } from 'lucide-react';
+
+const Coins = ({ size = 16, className = '', style = {} }) => (
+  <img 
+    src="/fridaycoin.png" 
+    alt="🪙" 
+    className={className} 
+    style={{ 
+      width: `${size}px`, 
+      height: `${size}px`, 
+      objectFit: 'contain', 
+      verticalAlign: 'middle', 
+      display: 'inline-block', 
+      position: 'relative', 
+      top: '-0.5px', 
+      ...style 
+    }} 
+  />
+);
+
 import Footer from './Footer';
 import './Status.css';
 
