@@ -2866,11 +2866,7 @@ function App() {
                                             <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)' }}>Username</div>
                                             <span style={{ fontSize: '10px', fontWeight: 700, color: wa1, fontFamily: 'var(--font-display)' }}>WELCOME</span>
                                           </div>
-                                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', marginBottom: '10px' }}>Welcome to Server! · Member #42</div>
-                                          {/* Accent bar */}
-                                          <div style={{ height: '6px', borderRadius: '3px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                                            <div style={{ width: '15%', height: '100%', background: `linear-gradient(90deg,${wa1},${wa2})`, borderRadius: '3px' }} />
-                                          </div>
+                                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}>Welcome to Server! · Member #42</div>
                                         </div>
                                       </div>
                                       {!welcomeCardEnabled && (
@@ -4698,48 +4694,76 @@ function App() {
                 )}
 
                 {showResetModal && (
-                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setShowResetModal(false)}>
-                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(255,23,68,0.35)', borderRadius: '14px', padding: '28px', width: '440px', maxWidth: '94vw' }} onClick={e => e.stopPropagation()}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,23,68,0.12)', border: '1px solid rgba(255,23,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <AlertTriangle size={17} style={{ color: 'var(--danger)' }} />
+                  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => { setShowResetModal(false); setResetConfirmText(''); }}>
+                    <div style={{ background: 'rgba(7,12,26,0.97)', border: '1px solid rgba(255,23,68,0.16)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)', width: '440px', maxWidth: '94vw', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
+
+                      {/* macOS titlebar */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: '1px solid rgba(255,23,68,0.09)', background: 'rgba(255,23,68,0.03)', flexShrink: 0 }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff5f57', display: 'inline-block', cursor: 'pointer', flexShrink: 0 }} onClick={() => { setShowResetModal(false); setResetConfirmText(''); }} />
+                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#febc2e', display: 'inline-block', flexShrink: 0 }} />
+                          <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#28c840', display: 'inline-block', flexShrink: 0 }} />
                         </div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '15px' }}>Reset Server Data</div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{telemetry?.guild?.name || activeGuildId}</div>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: 'rgba(136,146,164,0.8)', flex: 1, textAlign: 'center', letterSpacing: '0.2px' }}>Friday Dashboard — Reset Server Data</span>
+                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(74,85,104,1)', padding: '2px', display: 'flex', alignItems: 'center' }} onClick={() => { setShowResetModal(false); setResetConfirmText(''); }}><X size={13} /></button>
+                      </div>
+
+                      {/* Body */}
+                      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+                        {/* Target panel */}
+                        <div style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,23,68,0.12)', borderRadius: '8px', padding: '13px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,23,68,0.12)', border: '1px solid rgba(255,23,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <AlertTriangle size={15} style={{ color: '#ff1744' }} />
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '14px' }}>Reset Server Data</div>
+                              <div style={{ fontSize: '11.5px', color: 'rgba(136,146,164,0.8)' }}>
+                                <span>Server: <strong style={{ color: '#e8edf5' }}>{telemetry?.guild?.name || activeGuildId}</strong></span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
 
-                      <div style={{ background: 'rgba(255,23,68,0.06)', border: '1px solid rgba(255,23,68,0.2)', borderRadius: '8px', padding: '12px 14px', marginBottom: '20px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                        <strong style={{ color: 'var(--danger)' }}>This action is irreversible.</strong> All bot data for this server will be permanently deleted — including member profiles, economy balances, warnings, shop items, XP, settings, and all other records.
-                      </div>
+                        {/* Warning panel */}
+                        <div style={{ background: 'rgba(255,23,68,0.06)', border: '1px solid rgba(255,23,68,0.18)', borderRadius: '8px', padding: '13px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,23,68,0.7)', marginBottom: '2px' }}>WARNING — IRREVERSIBLE ACTION</div>
+                          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.6' }}>
+                            All bot data for this server will be <strong style={{ color: '#ff1744' }}>permanently deleted</strong> — including member profiles, economy balances, warnings, shop items, XP, settings, and all other records.
+                          </div>
+                        </div>
 
-                      <div style={{ marginBottom: '20px' }}>
-                        <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
-                          Type <strong style={{ color: 'var(--danger)', fontFamily: 'monospace' }}>RESET</strong> to confirm
-                        </label>
-                        <input
-                          className="form-input"
-                          type="text"
-                          placeholder="RESET"
-                          value={resetConfirmText}
-                          onChange={e => setResetConfirmText(e.target.value)}
-                          style={{ width: '100%', borderColor: resetConfirmText === 'RESET' ? 'rgba(255,23,68,0.5)' : undefined }}
-                          autoFocus
-                        />
-                      </div>
+                        {/* Confirm input panel */}
+                        <div style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(59,157,255,0.08)', borderRadius: '8px', padding: '13px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(74,85,104,1)' }}>CONFIRM ACTION</div>
+                          <label style={{ fontSize: '11px', color: 'rgba(136,146,164,0.8)', fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '0.5px' }}>
+                            TYPE <strong style={{ color: '#ff1744' }}>RESET</strong> TO CONFIRM
+                          </label>
+                          <input
+                            className="form-input"
+                            type="text"
+                            placeholder="RESET"
+                            value={resetConfirmText}
+                            onChange={e => setResetConfirmText(e.target.value)}
+                            style={{ width: '100%', borderColor: resetConfirmText === 'RESET' ? 'rgba(255,23,68,0.5)' : undefined }}
+                            autoFocus
+                          />
+                        </div>
 
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowResetModal(false)}>Cancel</button>
-                        <button
-                          className="btn btn-danger"
-                          style={{ flex: 1, opacity: resetConfirmText === 'RESET' ? 1 : 0.4 }}
-                          disabled={resetConfirmText !== 'RESET' || resetLoading}
-                          onClick={resetServer}
-                        >
-                          {resetLoading ? 'Resetting…' : 'Reset All Data'}
-                        </button>
-                      </div>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowResetModal(false); setResetConfirmText(''); }}>Cancel</button>
+                          <button
+                            className="btn btn-danger"
+                            style={{ flex: 1, opacity: resetConfirmText === 'RESET' ? 1 : 0.4 }}
+                            disabled={resetConfirmText !== 'RESET' || resetLoading}
+                            onClick={resetServer}
+                          >
+                            {resetLoading ? 'Resetting…' : 'Reset All Data'}
+                          </button>
+                        </div>
+
+                      </div>{/* /body */}
                     </div>
                   </div>
                 )}
