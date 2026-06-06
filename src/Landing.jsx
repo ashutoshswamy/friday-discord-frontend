@@ -10,6 +10,7 @@ import {
 import './Landing.css';
 import Footer from './Footer';
 
+
 const makeInviteUrl = (clientId) =>
   `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`;
 
@@ -326,11 +327,11 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Alerts</span></div>
           <div className="lp-dash-body">
             <div className="lp-dash-chart-panel">
-              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><span style={{color:'#ff0000',fontSize:'13px'}}>▶</span> YouTube Alerts</div>
+              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><img src="/youtube_logo.png" alt="YouTube" style={{width:15,height:15,objectFit:'contain'}}/> YouTube Alerts</div>
               <div className="lp-alerts-list">{[{name:'Linus Tech Tips',channel:'#tech-alerts',status:'live'},{name:'Fireship',channel:'#dev-alerts',status:'live'},{name:'MKBHD',channel:'#tech-alerts',status:'idle'}].map(({name,channel,status})=>(<div key={name} className="lp-alert-row"><div className="lp-alert-dot" style={{background:status==='live'?'#00c853':'#555'}}/><div className="lp-alert-info"><div className="lp-alert-name">{name}</div><div className="lp-alert-channel">{channel}</div></div><span className="lp-alert-badge" style={{color:status==='live'?'#00c853':'#555',borderColor:status==='live'?'rgba(0,200,83,0.25)':'rgba(85,85,85,0.25)',background:status==='live'?'rgba(0,200,83,0.08)':'rgba(85,85,85,0.08)'}}>{status==='live'?'NEW VIDEO':'WATCHING'}</span></div>))}</div>
             </div>
             <div className="lp-dash-chart-panel">
-              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><span style={{color:'#9147ff',fontSize:'13px'}}>◆</span> Twitch Alerts</div>
+              <div className="lp-dash-chart-title" style={{display:'flex',alignItems:'center',gap:'7px'}}><img src="/twitch_logo.webp" alt="Twitch" style={{width:15,height:15,objectFit:'contain'}}/> Twitch Alerts</div>
               <div className="lp-alerts-list">{[{name:'shroud',channel:'#gaming-alerts',status:'live'},{name:'pokimane',channel:'#gaming-alerts',status:'idle'},{name:'HasanAbi',channel:'#stream-alerts',status:'live'}].map(({name,channel,status})=>(<div key={name} className="lp-alert-row"><div className="lp-alert-dot" style={{background:status==='live'?'#9147ff':'#555'}}/><div className="lp-alert-info"><div className="lp-alert-name">{name}</div><div className="lp-alert-channel">{channel}</div></div><span className="lp-alert-badge" style={{color:status==='live'?'#9147ff':'#555',borderColor:status==='live'?'rgba(145,71,255,0.25)':'rgba(85,85,85,0.25)',background:status==='live'?'rgba(145,71,255,0.08)':'rgba(85,85,85,0.08)'}}>{status==='live'?'LIVE NOW':'OFFLINE'}</span></div>))}</div>
             </div>
           </div>
