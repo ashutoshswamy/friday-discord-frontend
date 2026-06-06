@@ -4,7 +4,8 @@ import {
   Shield, Zap, Coins, Gift, LifeBuoy, UserPlus,
   ChevronRight, ArrowRight, Star, Check,
   Menu, X, Link, Bell, Terminal, Mic, BrainCircuit,
-  Wrench, FileText, TrendingUp
+  Wrench, FileText, TrendingUp,
+  Crown, Palette, Gamepad2, Monitor, Music, Megaphone, Lock, PartyPopper
 } from 'lucide-react';
 import './Landing.css';
 import Footer from './Footer';
@@ -272,7 +273,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Server Shop<button className="lp-shop-add-btn"><Coins size={11}/> Add Item</button></div>
-              <div className="lp-shop-items">{[{name:'VIP Role',price:5000,icon:'👑',desc:'Exclusive VIP member role'},{name:'Custom Colour',price:2500,icon:'🎨',desc:'Pick your own role colour'},{name:'XP Booster',price:1000,icon:'⚡',desc:'+50 XP on use · consumable'},{name:'Coin Multiplier',price:3000,icon:'💰',desc:'2× /work pay for 24h'}].map(({name,price,icon,desc})=>(<div key={name} className="lp-shop-item-row"><div className="lp-shop-item-icon">{icon}</div><div className="lp-shop-item-info"><div className="lp-shop-item-name">{name}</div><div className="lp-shop-item-desc">{desc}</div></div><div className="lp-shop-item-price"><Coins size={10} color="#f59e0b"/> {price.toLocaleString()}</div></div>))}</div>
+              <div className="lp-shop-items">{[{name:'VIP Role',price:5000,icon:<Crown size={16}/>,desc:'Exclusive VIP member role'},{name:'Custom Colour',price:2500,icon:<Palette size={16}/>,desc:'Pick your own role colour'},{name:'XP Booster',price:1000,icon:<Zap size={16}/>,desc:'+50 XP on use · consumable'},{name:'Coin Multiplier',price:3000,icon:<Coins size={16}/>,desc:'2× /work pay for 24h'}].map(({name,price,icon,desc})=>(<div key={name} className="lp-shop-item-row"><div className="lp-shop-item-icon">{icon}</div><div className="lp-shop-item-info"><div className="lp-shop-item-name">{name}</div><div className="lp-shop-item-desc">{desc}</div></div><div className="lp-shop-item-price"><Coins size={10} color="#f59e0b"/> {price.toLocaleString()}</div></div>))}</div>
             </div>
           </div>
         </div>
@@ -310,12 +311,12 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           <div className="lp-dash-body">
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title">Welcome Message</div>
-              <div className="lp-ob-welcome-preview">Welcome to <strong>Nexus Gaming</strong>, <span style={{color:'#38bdf8'}}>@nova_knight</span>! 🎉 You're member <strong>#312</strong>. Head to <span style={{color:'#38bdf8'}}>#get-roles</span> to get started.</div>
+              <div className="lp-ob-welcome-preview">Welcome to <strong>Nexus Gaming</strong>, <span style={{color:'#38bdf8'}}>@nova_knight</span>! <PartyPopper size={14} style={{display:'inline',verticalAlign:'middle'}}/> You're member <strong>#312</strong>. Head to <span style={{color:'#38bdf8'}}>#get-roles</span> to get started.</div>
               <div className="lp-ob-placeholders">{['{user}','{username}','{server}','{memberCount}'].map(p=>(<span key={p} className="lp-ob-placeholder">{p}</span>))}</div>
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Reaction Roles<span style={{fontSize:'9px',color:'#38bdf8',background:'rgba(56,189,248,0.1)',border:'1px solid rgba(56,189,248,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>5 ROLES</span></div>
-              <div className="lp-ob-roles">{[{emoji:'🎮',label:'Gamer',color:'#8b5cf6'},{emoji:'🎨',label:'Artist',color:'#ec4899'},{emoji:'💻',label:'Dev',color:'#3b9dff'},{emoji:'🎵',label:'Music',color:'#10b981'},{emoji:'📢',label:'Announcements',color:'#f59e0b'}].map(({emoji,label,color})=>(<div key={label} className="lp-ob-role-chip" style={{borderColor:color+'33',color}}><span>{emoji}</span><span>{label}</span></div>))}</div>
+              <div className="lp-ob-roles">{[{icon:<Gamepad2 size={13}/>,label:'Gamer',color:'#8b5cf6'},{icon:<Palette size={13}/>,label:'Artist',color:'#ec4899'},{icon:<Monitor size={13}/>,label:'Dev',color:'#3b9dff'},{icon:<Music size={13}/>,label:'Music',color:'#10b981'},{icon:<Megaphone size={13}/>,label:'Announcements',color:'#f59e0b'}].map(({icon,label,color})=>(<div key={label} className="lp-ob-role-chip" style={{borderColor:color+'33',color}}><span>{icon}</span><span>{label}</span></div>))}</div>
             </div>
           </div>
         </div>
@@ -371,7 +372,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             </div>
             <div className="lp-dash-chart-panel">
               <div className="lp-dash-chart-title">Active Temp Channels</div>
-              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members} members</span>{locked&&<span className="lp-vc-lock">🔒</span>}</div>))}</div>
+              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members} members</span>{locked&&<Lock size={11} color="#a78bfa"/>}</div>))}</div>
             </div>
           </div>
         </div>

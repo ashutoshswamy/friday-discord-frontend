@@ -100,9 +100,9 @@ export default function Status() {
   const statCards = [
     { icon: <Server  size={20} />, label: 'Servers',   value: formatNumber(stats.guildCount),   accent: '#3b9dff' },
     { icon: <Users   size={20} />, label: 'Members',   value: formatNumber(stats.memberCount),  accent: '#8b5cf6' },
-    { icon: <Hash    size={20} />, label: 'Commands',  value: stats.commandCount != null ? String(stats.commandCount) : '—', accent: '#00c853' },
+    { icon: <Hash    size={20} />, label: 'Commands',  value: stats.commandCount != null ? stats.commandCount.toLocaleString() : '—', accent: '#00c853' },
     { icon: <Clock   size={20} />, label: 'Uptime',    value: formatUptime(stats.uptimeMs),     accent: '#ff9100' },
-    { icon: <Zap     size={20} />, label: 'Latency',   value: latencyMs >= 0 ? `${latencyMs}ms` : '—', accent: latencyColor },
+    { icon: <Zap     size={20} />, label: 'Latency',   value: latencyMs >= 0 ? `${latencyMs.toLocaleString()}ms` : '—', accent: latencyColor },
   ];
 
   const allOk  = SERVICES.every(s => s.check(online, stats, data));
@@ -181,7 +181,7 @@ export default function Status() {
           {online && latencyMs >= 0 && (
             <div className="st-banner-ping">
               <span className="st-banner-ping-label">WS Ping</span>
-              <span className="st-banner-ping-val" style={{ color: latencyColor }}>{latencyMs}ms</span>
+              <span className="st-banner-ping-val" style={{ color: latencyColor }}>{latencyMs.toLocaleString()}ms</span>
               <LatencyBar ms={latencyMs} />
             </div>
           )}

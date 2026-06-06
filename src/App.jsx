@@ -1565,11 +1565,11 @@ function App() {
                             <div className="stats-row" style={{ marginBottom: 0 }}>
                               <div className="stat-card glass-panel">
                                 <div className="stat-icon-wrapper stat-icon-primary"><Users size={22} /></div>
-                                <div className="stat-info"><h3>Total Members</h3><div className="stat-value">{telemetry.stats.memberCount}</div></div>
+                                <div className="stat-info"><h3>Total Members</h3><div className="stat-value">{telemetry.stats.memberCount?.toLocaleString()}</div></div>
                               </div>
                               <div className="stat-card glass-panel">
                                 <div className="stat-icon-wrapper stat-icon-warning"><AlertTriangle size={22} /></div>
-                                <div className="stat-info"><h3>Active Warnings</h3><div className="stat-value">{telemetry.stats.warningsCount}</div></div>
+                                <div className="stat-info"><h3>Active Warnings</h3><div className="stat-value">{telemetry.stats.warningsCount?.toLocaleString()}</div></div>
                               </div>
                               <div className="stat-card glass-panel">
                                 <div className="stat-icon-wrapper stat-icon-success"><Coins size={22} /></div>
@@ -1577,7 +1577,7 @@ function App() {
                               </div>
                               <div className="stat-card glass-panel">
                                 <div className="stat-icon-wrapper stat-icon-info"><Award size={22} /></div>
-                                <div className="stat-info"><h3>Average Level</h3><div className="stat-value">Lvl {telemetry.stats.avgLevel}</div></div>
+                                <div className="stat-info"><h3>Average Level</h3><div className="stat-value">Lvl {telemetry.stats.avgLevel?.toLocaleString()}</div></div>
                               </div>
                             </div>
 
