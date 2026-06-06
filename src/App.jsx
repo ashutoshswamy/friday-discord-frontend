@@ -3249,9 +3249,7 @@ function App() {
                             {/* YouTube */}
                             <div className="glass-panel" style={{ padding: '24px' }}>
                               <div className="chart-title" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: '#FF0000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <span style={{ fontSize: '9px', color: 'white', fontWeight: 900 }}>▶</span>
-                                </div>
+                                <img src="/youtube_logo.png" alt="YouTube" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                 YouTube Alerts
                               </div>
                               <form onSubmit={e => addAlert(e, 'youtube')}>
@@ -3273,9 +3271,7 @@ function App() {
                             {/* Twitch */}
                             <div className="glass-panel" style={{ padding: '24px' }}>
                               <div className="chart-title" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: '#9146FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Mic size={10} color="white" />
-                                </div>
+                                <img src="/twitch_logo.webp" alt="Twitch" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                 Twitch Alerts
                               </div>
                               <form onSubmit={e => addAlert(e, 'twitch')}>
@@ -3314,7 +3310,7 @@ function App() {
                                         const key = `${a.platform}_${identifier}`;
                                         return (
                                           <tr key={key}>
-                                            <td><span style={{ padding: '3px 8px', borderRadius: '3px', fontSize: '11px', fontWeight: 700, background: a.platform === 'youtube' ? 'rgba(255,0,0,0.12)' : 'rgba(145,70,255,0.12)', color: a.platform === 'youtube' ? '#ff4444' : '#9146FF' }}>{a.platform === 'youtube' ? 'YouTube' : 'Twitch'}</span></td>
+                                            <td><span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '3px 8px', borderRadius: '3px', fontSize: '11px', fontWeight: 700, background: a.platform === 'youtube' ? 'rgba(255,0,0,0.12)' : 'rgba(145,70,255,0.12)', color: a.platform === 'youtube' ? '#ff4444' : '#9146FF' }}><img src={a.platform === 'youtube' ? '/youtube_logo.png' : '/twitch_logo.webp'} alt={a.platform} style={{ width: '13px', height: '13px', objectFit: 'contain' }} />{a.platform === 'youtube' ? 'YouTube' : 'Twitch'}</span></td>
                                             <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}>{identifier}</td>
                                             <td>{ch ? `# ${ch.name}` : a.channelId}</td>
                                             <td><button className="logout-btn" onClick={() => removeAlert(a.platform, identifier)}><Trash2 size={15} /></button></td>
