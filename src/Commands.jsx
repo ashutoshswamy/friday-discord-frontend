@@ -233,7 +233,7 @@ const COMMANDS = [
   {
     name: 'balance',
     category: 'economy',
-    desc: 'Displays your current coin wallet and bank vault balance, or another member\'s.',
+    desc: 'Displays your full financial breakdown — wallet, bank vault, stock portfolio, and inventory asset value. Net worth includes all four sources.',
     usage: '/balance [user?]',
     options: [
       { name: 'user', type: 'User', required: false, desc: 'Member to check (defaults to you)' },
