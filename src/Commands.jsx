@@ -787,10 +787,10 @@ const COMMANDS = [
   {
     name: 'scramble',
     category: 'economy',
-    desc: 'Start a word scramble game in the channel. First to unscramble wins.',
+    desc: 'Start a word scramble in the channel — first to unscramble wins coins and XP. Reward scales with word length (word.length × 35 coins base) plus a speed bonus for answering in under 15s or 30s.',
     usage: '/scramble [answer?]',
     options: [
-      { name: 'answer', type: 'String', required: false, desc: 'Your answer to the current scramble' },
+      { name: 'answer', type: 'String', required: false, desc: 'Your guess for the active scramble in this channel' },
     ],
     admin: false,
     dashboard: false,
