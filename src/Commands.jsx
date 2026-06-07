@@ -354,6 +354,15 @@ const COMMANDS = [
     dashboard: false,
   },
   {
+    name: 'mine',
+    category: 'economy',
+    desc: 'Descend into the mine shaft and excavate rare ores. Requires a Pickaxe from the shop. 9 ore tiers from Coal up to legendary Mythril Core. 60-second cooldown.',
+    usage: '/mine',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+  {
     name: 'search',
     category: 'economy',
     desc: 'Search 3 random locations for coins or items. 60-second cooldown.',
@@ -576,6 +585,17 @@ const COMMANDS = [
     dashboard: false,
   },
   {
+    name: 'trade',
+    category: 'economy',
+    desc: 'Opens an interactive bilateral trade session with another member. Both parties can add coins and up to 5 items each to their offer. Trade executes atomically only when both confirm.',
+    usage: '/trade [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'The member to initiate a trade with' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
     name: 'pet view',
     category: 'economy',
     desc: 'View your pet\'s current stats, hunger, energy, and battle attributes.',
@@ -624,6 +644,40 @@ const COMMANDS = [
     desc: 'Play high-stakes blackjack against Friday (dealer). Hit or Stand to beat 21.',
     usage: '/blackjack [bet]',
     options: [
+      { name: 'bet', type: 'Integer', required: true, desc: 'Coins to wager' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'highlow',
+    category: 'economy',
+    desc: 'Draw a card and guess if the next is higher or lower. Chain correct guesses to climb multipliers: 1.4× → 1.8× → 2.4× → 3.2× → 4.5×. Cash out anytime.',
+    usage: '/highlow [bet]',
+    options: [
+      { name: 'bet', type: 'Integer', required: true, desc: 'Coins to wager' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'dice',
+    category: 'economy',
+    desc: 'Roll two dice against Friday. Highest total wins 2× your bet. Tie returns your bet.',
+    usage: '/dice [bet]',
+    options: [
+      { name: 'bet', type: 'Integer', required: true, desc: 'Coins to wager' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'horse',
+    category: 'economy',
+    desc: 'Bet on one of 5 horses in a narrated race. Favourite pays 1.8×, Dark Horse pays 6×. Higher odds = lower win chance.',
+    usage: '/horse [horse] [bet]',
+    options: [
+      { name: 'horse', type: 'Integer', required: true, desc: '1 Thunderbolt · 2 Silver Arrow · 3 Dark Phantom · 4 Lucky Charm · 5 Iron Hoof' },
       { name: 'bet', type: 'Integer', required: true, desc: 'Coins to wager' },
     ],
     admin: false,
