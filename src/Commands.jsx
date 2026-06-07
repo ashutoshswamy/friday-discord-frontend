@@ -253,7 +253,7 @@ const COMMANDS = [
   {
     name: 'weekly',
     category: 'economy',
-    desc: 'Claims your weekly reward of 1,500 server coins. Resets every 7 days.',
+    desc: 'Claims a random weekly reward of 1,000–3,500 server coins. Resets every 7 days.',
     usage: '/weekly',
     options: [],
     admin: false,
@@ -262,7 +262,7 @@ const COMMANDS = [
   {
     name: 'monthly',
     category: 'economy',
-    desc: 'Claims your monthly reward of 7,500 server coins. Resets every 30 days.',
+    desc: 'Claims a random monthly reward of 5,000–15,000 server coins. Resets every 30 days.',
     usage: '/monthly',
     options: [],
     admin: false,
@@ -329,7 +329,7 @@ const COMMANDS = [
   {
     name: 'hunt',
     category: 'economy',
-    desc: 'Hunt in the woods with your Hunting Rifle for coins and loot. 60-second cooldown.',
+    desc: 'Hunt in the woods with your Hunting Rifle. 9 drops from common Rabbit up to legendary Dragon Scale. 60-second cooldown.',
     usage: '/hunt',
     options: [],
     admin: false,
@@ -338,7 +338,7 @@ const COMMANDS = [
   {
     name: 'fish',
     category: 'economy',
-    desc: 'Fish in the lake with your Fishing Pole for coins and loot. 45-second cooldown.',
+    desc: 'Fish in the lake with your Fishing Pole. 12 drops from Clam up to legendary Ancient Pearl and Mythical Whale. 45-second cooldown.',
     usage: '/fish',
     options: [],
     admin: false,
@@ -347,7 +347,7 @@ const COMMANDS = [
   {
     name: 'dig',
     category: 'economy',
-    desc: 'Dig for buried treasure with your Shovel for coins and loot. 45-second cooldown.',
+    desc: 'Dig for buried treasure with your Shovel. 9 drops from Common Worm up to legendary Diamond and Buried Gold Chest. 45-second cooldown.',
     usage: '/dig',
     options: [],
     admin: false,
@@ -479,6 +479,15 @@ const COMMANDS = [
     dashboard: true,
   },
   {
+    name: 'shop catalog',
+    category: 'economy',
+    desc: 'Browse all built-in items (tools, consumables, collectibles, gems) with suggested prices for admins to add to the server shop.',
+    usage: '/shop catalog',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+  {
     name: 'buy',
     category: 'economy',
     desc: 'Purchases an item from the server shop using your coins.',
@@ -492,7 +501,7 @@ const COMMANDS = [
   {
     name: 'sell',
     category: 'economy',
-    desc: 'Sell grinding loot items (from hunt/fish/dig) for coins.',
+    desc: 'Sell 30+ grinding loot items (fish, animals, fossils, gems, pelts) back to the merchant for fixed coin prices.',
     usage: '/sell [item] [amount?]',
     options: [
       { name: 'item', type: 'String', required: true, desc: 'Item name to sell' },
@@ -504,10 +513,10 @@ const COMMANDS = [
   {
     name: 'use',
     category: 'economy',
-    desc: 'Uses a consumable item from your inventory, applying its effect.',
-    usage: '/use [item]',
+    desc: 'Activates a consumable from inventory: Pizza (150 XP), XP Potion (300 XP), Energy Drink (300 coins), Work Gloves (500 coins), Coin Bomb (800–4,000 coins), Lootbox, Mystery Crate (gem drops).',
+    usage: '/use [item?]',
     options: [
-      { name: 'item', type: 'String', required: true, desc: 'Item name to use' },
+      { name: 'item', type: 'String', required: false, desc: 'Item name to use (leave blank for picker)' },
     ],
     admin: false,
     dashboard: false,
