@@ -40,6 +40,9 @@ const CATEGORIES = [
   { id: 'utility',    label: 'Utility',       Icon: Wrench         },
   { id: 'auditing',   label: 'Auditing',      Icon: FileText       },
   { id: 'core',       label: 'Core',          Icon: Star           },
+  { id: 'social',     label: 'Social',        Icon: Star           },
+  { id: 'clan',       label: 'Clans',         Icon: Shield         },
+  { id: 'fun',        label: 'Fun',           Icon: Zap            },
 ];
 
 const COMMANDS = [
@@ -635,6 +638,57 @@ const COMMANDS = [
     options: [
       { name: 'attribute', type: 'Choice', required: true, desc: 'attack · defense' },
     ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'pet rename',
+    category: 'economy',
+    desc: 'Give your pet a new name (max 15 characters).',
+    usage: '/pet rename [name]',
+    options: [
+      { name: 'name', type: 'String', required: true, desc: 'New name for your pet' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'pet release',
+    category: 'economy',
+    desc: 'Permanently releases your pet. Requires confirmation — irreversible action.',
+    usage: '/pet release',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'pet battle',
+    category: 'economy',
+    desc: 'Challenge another member\'s pet to a battle simulation based on attack, defense, and level. Winner earns bonus Pet XP.',
+    usage: '/pet battle [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to battle' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'crime',
+    category: 'economy',
+    desc: 'Attempt a crime for quick cash. Three types: pickpocket (62% / 30m CD), carjack (42% / 1h CD), fraud (28% / 2h CD). Failure deducts a fine.',
+    usage: '/crime [type]',
+    options: [
+      { name: 'type', type: 'Choice', required: true, desc: 'pickpocket · carjack · fraud' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'cooldowns',
+    category: 'economy',
+    desc: 'View a full dashboard of all your active cooldowns — daily, weekly, monthly, work, and in-memory game cooldowns (slots, dice, trivia, etc.).',
+    usage: '/cooldowns',
+    options: [],
     admin: false,
     dashboard: false,
   },
@@ -1307,7 +1361,224 @@ const COMMANDS = [
     dashboard: false,
   },
 
+  // ── SOCIAL ──
+  {
+    name: 'profile',
+    category: 'social',
+    desc: 'View a member\'s full profile card: bio, level, net worth, job, pet, clan, marriage status, and rep count.',
+    usage: '/profile [user?]',
+    options: [
+      { name: 'user', type: 'User', required: false, desc: 'Member to view (defaults to you)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'bio',
+    category: 'social',
+    desc: 'Set your personal tagline or bio (max 150 chars). Use with no argument to view your current bio.',
+    usage: '/bio [text?]',
+    options: [
+      { name: 'text', type: 'String', required: false, desc: 'Your new bio (omit to view current)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'rep',
+    category: 'social',
+    desc: 'Give a +1 reputation point to another member. Limited to once every 24 hours.',
+    usage: '/rep [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to give rep to' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'marry propose',
+    category: 'social',
+    desc: 'Send a marriage proposal with Accept/Decline buttons. The target has 60 seconds to respond.',
+    usage: '/marry propose [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to propose to' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'marry divorce',
+    category: 'social',
+    desc: 'Dissolve your current in-server marriage.',
+    usage: '/marry divorce',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'trivia',
+    category: 'social',
+    desc: 'Answer a timed multiple-choice trivia question for coins and XP. Difficulty scales rewards: Easy 100c/30xp, Medium 200c/60xp, Hard 350c/100xp.',
+    usage: '/trivia [category?]',
+    options: [
+      { name: 'category', type: 'Choice', required: false, desc: 'general · science · history · gaming · movies' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+
+  // ── CLAN ──
+  {
+    name: 'clan create',
+    category: 'clan',
+    desc: 'Found a new clan for 5,000 coins. Clan name must be 2–20 characters.',
+    usage: '/clan create [name]',
+    options: [
+      { name: 'name', type: 'String', required: true, desc: 'Clan name (2–20 chars)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan invite',
+    category: 'clan',
+    desc: 'Invite a member to your clan (owner only). The invite expires in 2 minutes.',
+    usage: '/clan invite [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to invite' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan join',
+    category: 'clan',
+    desc: 'Accept a pending invite and join a clan by name.',
+    usage: '/clan join [name]',
+    options: [
+      { name: 'name', type: 'String', required: true, desc: 'Clan name to join' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan leave',
+    category: 'clan',
+    desc: 'Leave your current clan. Owners cannot leave — disband or transfer first.',
+    usage: '/clan leave',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan kick',
+    category: 'clan',
+    desc: 'Remove a member from your clan (owner only).',
+    usage: '/clan kick [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to kick' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan info',
+    category: 'clan',
+    desc: 'View a clan\'s roster, treasury, level, and stats. Leave name blank to view your own clan.',
+    usage: '/clan info [name?]',
+    options: [
+      { name: 'name', type: 'String', required: false, desc: 'Clan name (blank = your clan)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan deposit',
+    category: 'clan',
+    desc: 'Contribute coins from your wallet to your clan\'s treasury.',
+    usage: '/clan deposit [amount]',
+    options: [
+      { name: 'amount', type: 'Integer', required: true, desc: 'Coins to deposit (min 1)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'clan leaderboard',
+    category: 'clan',
+    desc: 'View the top 10 clans on this server ranked by treasury wealth.',
+    usage: '/clan leaderboard',
+    options: [],
+    admin: false,
+    dashboard: false,
+  },
+
+  // ── FUN ──
+  {
+    name: 'mock',
+    category: 'fun',
+    desc: 'Converts your text to SpongeBob alternating-case mocking format (max 500 chars).',
+    usage: '/mock [text]',
+    options: [
+      { name: 'text', type: 'String', required: true, desc: 'Text to mock-ify' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'reverse',
+    category: 'fun',
+    desc: 'Reverses your input text character by character (max 500 chars).',
+    usage: '/reverse [text]',
+    options: [
+      { name: 'text', type: 'String', required: true, desc: 'Text to reverse' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+  {
+    name: 'ascii',
+    category: 'fun',
+    desc: 'Renders your text as giant 5-line tall block art letters in a code block (max 10 chars; supports A–Z, 0–9).',
+    usage: '/ascii [text]',
+    options: [
+      { name: 'text', type: 'String', required: true, desc: 'Text to render as ASCII art (max 10 chars)' },
+    ],
+    admin: false,
+    dashboard: false,
+  },
+
   // ── AUDITING ──
+  {
+    name: 'analytics overview',
+    category: 'auditing',
+    desc: 'Admin: Shows total members with profiles, total coins in circulation, total XP, average level, and the top 5 wealthiest members.',
+    usage: '/analytics overview',
+    options: [],
+    admin: true,
+    dashboard: false,
+  },
+  {
+    name: 'analytics topspenders',
+    category: 'auditing',
+    desc: 'Admin: Displays the top 10 wealthiest members ranked by combined wallet + bank balance with per-player breakdown.',
+    usage: '/analytics topspenders',
+    options: [],
+    admin: true,
+    dashboard: false,
+  },
+  {
+    name: 'analytics activity',
+    category: 'auditing',
+    desc: 'Admin: Inspect a specific member\'s economy summary — coins, XP, level, job, pet, clan, rep, and cooldown readiness.',
+    usage: '/analytics activity [@user]',
+    options: [
+      { name: 'user', type: 'User', required: true, desc: 'Member to inspect' },
+    ],
+    admin: true,
+    dashboard: false,
+  },
+
   {
     name: 'logs message',
     category: 'auditing',
@@ -1426,6 +1697,9 @@ const CAT_COLORS = {
   utility:    '#3b9dff',
   auditing:   '#f43f5e',
   core:       '#6366f1',
+  social:     '#ff69b4',
+  clan:       '#8b5cf6',
+  fun:        '#f97316',
 };
 
 const TYPE_COLORS = {
