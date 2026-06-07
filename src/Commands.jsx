@@ -1317,17 +1317,6 @@ const COMMANDS = [
     dashboard: false,
   },
   {
-    name: 'friday protocol',
-    category: 'core',
-    desc: 'Executes a specialized system automation protocol slate. Currently supports: cleanslate (Admin only).',
-    usage: '/friday protocol [name]',
-    options: [
-      { name: 'name', type: 'String', required: true, desc: 'Protocol keyword (e.g. cleanslate)' },
-    ],
-    admin: true,
-    dashboard: false,
-  },
-  {
     name: 'friday ask',
     category: 'core',
     desc: 'Sends a direct AI query to Friday\'s Gemini-powered conversational core. Responds in Friday\'s system persona.',
