@@ -515,7 +515,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
 
             <div className="lp-hero-stats">
               <div className="lp-stat">
-                <span className="lp-stat-num">77+</span>
+                <span className="lp-stat-num">100+</span>
                 <span className="lp-stat-label">Slash Commands</span>
               </div>
               <div className="lp-stat-divider" />
@@ -608,7 +608,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
               </div>
               <h2 className="lp-section-title">Friday Thinks.<br />Friday Creates.</h2>
               <p className="lp-section-desc" style={{ marginBottom: 0 }}>
-                Four built-in AI commands powered by Gemini — zero config, available to every member from day one.
+                Three built-in AI commands powered by Gemini — zero config, available to every member from day one.
               </p>
             </div>
 
