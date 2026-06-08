@@ -36,16 +36,21 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import Status from './Status';
 
+if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
+  throw new Error('VITE_API_BASE is not configured for this deployment.');
+}
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 
 function App() {
   const navigate = useNavigate();
 
-  const [token, setToken]           = useState(localStorage.getItem('friday_jwt') || null);
-  const [user, setUser]             = useState(JSON.parse(localStorage.getItem('friday_user') || 'null'));
+  const [token, setToken]           = useState(null);
+  const [user, setUser]             = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('friday_user')); } catch { return null; }
+  });
   const [guilds, setGuilds]         = useState([]);
-  const [activeGuildId, setActiveGuildId] = useState(localStorage.getItem('friday_active_guild') || null);
+  const [activeGuildId, setActiveGuildId] = useState(sessionStorage.getItem('friday_active_guild') || null);
   const [activeTab, setActiveTab]   = useState('overview');
   const [telemetry, setTelemetry]   = useState(null);
   const [members, setMembers]       = useState([]);
@@ -194,6 +199,13 @@ function App() {
   // Auto-refresh state
   const [autoRefreshSecs, setAutoRefreshSecs] = useState(30);
 
+  const [actionLoading, setActionLoading] = useState(false);
+  const runAction = async (fn) => {
+    if (actionLoading) return;
+    setActionLoading(true);
+    try { await fn(); } finally { setActionLoading(false); }
+  };
+
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetConfirmText, setResetConfirmText] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
@@ -202,8 +214,10 @@ function App() {
 
   // ── Detect OAuth code on mount (lands on /)
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code');
-    if (code) handleOAuthCallback(code);
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    if (code) handleOAuthCallback(code, state);
   }, []);
 
   // ── When token is present: fetch guilds (no forced redirect — user can browse freely)
@@ -267,11 +281,20 @@ function App() {
 
   // ── Auth
   const initiateOAuth = () => {
-    const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('oauth_state', state);
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds&state=${state}`;
     window.location.href = url;
   };
 
-  const handleOAuthCallback = async (code) => {
+  const handleOAuthCallback = async (code, returnedState) => {
+    const savedState = sessionStorage.getItem('oauth_state');
+    sessionStorage.removeItem('oauth_state');
+    if (!savedState || returnedState !== savedState) {
+      setAuthError('Invalid state parameter. Possible CSRF attack.');
+      window.history.replaceState({}, document.title, '/');
+      return;
+    }
     setGlobalLoading(true);
     setAuthError(null);
     try {
@@ -286,8 +309,7 @@ function App() {
         setGlobalLoading(false);
         window.history.replaceState({}, document.title, '/');
       } else {
-        localStorage.setItem('friday_jwt', data.token);
-        localStorage.setItem('friday_user', JSON.stringify(data.user));
+        sessionStorage.setItem('friday_user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         window.history.replaceState({}, document.title, '/');
@@ -301,6 +323,9 @@ function App() {
   };
 
   const handleLogout = () => {
+    sessionStorage.removeItem('friday_user');
+    sessionStorage.removeItem('friday_active_guild');
+    // clear any legacy localStorage keys from older sessions
     localStorage.removeItem('friday_jwt');
     localStorage.removeItem('friday_user');
     localStorage.removeItem('friday_active_guild');
@@ -358,7 +383,7 @@ function App() {
   };
 
   const selectGuild = (id) => {
-    localStorage.setItem('friday_active_guild', id);
+    sessionStorage.setItem('friday_active_guild', id);
     setActiveGuildId(id);
     setTelemetry(null);
     setMembers([]);
@@ -2256,7 +2281,7 @@ function App() {
                                       </select>
                                     </div>
                                   </div>
-                                  <button className="btn btn-danger" style={{ width: '100%' }} disabled={!purgeChannelId} onClick={executePurge}><Trash2 size={14} /> Purge</button>
+                                  <button className="btn btn-danger" style={{ width: '100%' }} disabled={!purgeChannelId || actionLoading} onClick={() => runAction(executePurge)}><Trash2 size={14} /> Purge</button>
                                 </div>
                               </div>
                             </div>
@@ -4851,12 +4876,12 @@ function App() {
                             {memberWarnings.length > 0 && <span style={{ background: 'var(--warning)', color: '#060912', fontSize: '10px', fontWeight: 800, borderRadius: '10px', padding: '1px 7px' }}>{memberWarnings.length}</span>}
                           </h4>
                           {memberWarnings.length > 0 && (
-                            <button style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }} onClick={executeClearWarnings}>Clear All</button>
+                            <button style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }} disabled={actionLoading} onClick={() => runAction(executeClearWarnings)}>Clear All</button>
                           )}
                         </div>
                         <div style={{ display: 'flex', gap: '8px', marginBottom: memberWarnings.length > 0 ? '10px' : '0' }}>
-                          <input className="form-input" type="text" placeholder="Reason for warning..." value={warnReason} onChange={(e) => setWarnReason(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && executeWarn()} />
-                          <button className="btn btn-primary" style={{ background: 'var(--warning)', color: '#060912', whiteSpace: 'nowrap' }} onClick={executeWarn}>Issue Warn</button>
+                          <input className="form-input" type="text" placeholder="Reason for warning..." value={warnReason} onChange={(e) => setWarnReason(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && runAction(executeWarn)} />
+                          <button className="btn btn-primary" style={{ background: 'var(--warning)', color: '#060912', whiteSpace: 'nowrap' }} disabled={actionLoading} onClick={() => runAction(executeWarn)}>Issue Warn</button>
                         </div>
                         {memberWarnings.length > 0 && (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', maxHeight: '110px', overflowY: 'auto', background: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '6px' }}>
@@ -4885,8 +4910,8 @@ function App() {
                           <input className="form-input" type="text" placeholder="Reason (optional)..." value={timeoutReason} onChange={(e) => setTimeoutReason(e.target.value)} />
                         </div>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <button className="btn btn-danger" style={{ flex: 1 }} onClick={executeTimeout}><VolumeX size={14} /> Apply Timeout</button>
-                          <button className="btn btn-secondary" style={{ borderColor: 'rgba(139,92,246,0.3)', color: '#a78bfa' }} onClick={executeUntimeout}>Remove Timeout</button>
+                          <button className="btn btn-danger" style={{ flex: 1 }} disabled={actionLoading} onClick={() => runAction(executeTimeout)}><VolumeX size={14} /> Apply Timeout</button>
+                          <button className="btn btn-secondary" style={{ borderColor: 'rgba(139,92,246,0.3)', color: '#a78bfa' }} disabled={actionLoading} onClick={() => runAction(executeUntimeout)}>Remove Timeout</button>
                         </div>
                       </div>
 
@@ -4895,7 +4920,7 @@ function App() {
                         <h4 style={{ marginBottom: '12px', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}><UserMinus size={15} /> Kick</h4>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <input className="form-input" type="text" placeholder="Reason (optional)..." value={kickReason} onChange={(e) => setKickReason(e.target.value)} />
-                          <button className="btn btn-secondary" style={{ borderColor: 'rgba(255,23,68,0.25)', color: '#f87171', whiteSpace: 'nowrap' }} onClick={executeKick}><UserMinus size={14} /> Kick Member</button>
+                          <button className="btn btn-secondary" style={{ borderColor: 'rgba(255,23,68,0.25)', color: '#f87171', whiteSpace: 'nowrap' }} disabled={actionLoading} onClick={() => runAction(executeKick)}><UserMinus size={14} /> Kick Member</button>
                         </div>
                       </div>
 
@@ -4912,7 +4937,7 @@ function App() {
                           </select>
                           <input className="form-input" type="text" placeholder="Reason (optional)..." value={banReason} onChange={(e) => setBanReason(e.target.value)} />
                         </div>
-                        <button className="btn btn-danger" style={{ width: '100%' }} onClick={executeBan}><Ban size={14} /> Ban Member</button>
+                        <button className="btn btn-danger" style={{ width: '100%' }} disabled={actionLoading} onClick={() => runAction(executeBan)}><Ban size={14} /> Ban Member</button>
                       </div>
 
                       {/* ── Economy ── */}
@@ -4925,7 +4950,7 @@ function App() {
                             <option value="SET">Set to</option>
                           </select>
                           <input className="form-input" type="number" min="0" placeholder="Amount..." value={coinChangeAmount} onChange={(e) => setCoinChangeAmount(e.target.value)} />
-                          <button className="btn btn-primary" style={{ background: 'var(--success)', color: '#060912', whiteSpace: 'nowrap' }} onClick={executeCoinAdjustment}>Apply</button>
+                          <button className="btn btn-primary" style={{ background: 'var(--success)', color: '#060912', whiteSpace: 'nowrap' }} disabled={actionLoading} onClick={() => runAction(executeCoinAdjustment)}>Apply</button>
                         </div>
                       </div>
 
@@ -4939,7 +4964,7 @@ function App() {
                             <option value="SET">Set to</option>
                           </select>
                           <input className="form-input" type="number" min="0" placeholder="XP amount..." value={xpChangeAmount} onChange={(e) => setXpChangeAmount(e.target.value)} />
-                          <button className="btn btn-primary" style={{ background: 'var(--info)', color: 'white', whiteSpace: 'nowrap' }} onClick={executeXpAdjustment}>Apply</button>
+                          <button className="btn btn-primary" style={{ background: 'var(--info)', color: 'white', whiteSpace: 'nowrap' }} disabled={actionLoading} onClick={() => runAction(executeXpAdjustment)}>Apply</button>
                         </div>
                       </div>
 
@@ -4966,7 +4991,7 @@ function App() {
                             value={userXpMultiplier}
                             onChange={(e) => setUserXpMultiplier(e.target.value)}
                           />
-                          <button className="btn btn-primary" style={{ background: 'var(--primary)', color: '#060912', whiteSpace: 'nowrap' }} onClick={executeUserMultiplierUpdate}>Set</button>
+                          <button className="btn btn-primary" style={{ background: 'var(--primary)', color: '#060912', whiteSpace: 'nowrap' }} disabled={actionLoading} onClick={() => runAction(executeUserMultiplierUpdate)}>Set</button>
                         </div>
                       </div>
 

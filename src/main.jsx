@@ -5,6 +5,7 @@ import { inject } from '@vercel/analytics'
 import { injectSpeedInsights } from '@vercel/speed-insights'
 import './index.css'
 import App from './App.jsx'
+import ErrorBoundary from './ErrorBoundary.jsx'
 
 inject()
 injectSpeedInsights()
@@ -17,9 +18,11 @@ function ScrollToTop() {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <ScrollToTop />
-      <App />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ScrollToTop />
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>,
 )

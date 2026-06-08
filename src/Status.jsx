@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   Activity, Server, Users, Zap, Terminal, RefreshCw,
@@ -27,6 +27,9 @@ const Coins = ({ size = 16, className = '', style = {} }) => (
 import Footer from './Footer';
 import './Status.css';
 
+if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
+  throw new Error('VITE_API_BASE is not configured for this deployment.');
+}
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 
@@ -83,23 +86,33 @@ export default function Status() {
   const [lastFetched, setLastFetched] = useState(null);
   const [countdown, setCountdown]     = useState(30);
 
+  const abortRef = useRef(null);
+
   const doFetch = useCallback(async () => {
+    if (abortRef.current) abortRef.current.abort();
+    const ac = new AbortController();
+    abortRef.current = ac;
     setLoading(true);
     try {
-      const res  = await fetch(`${API_BASE}/status`);
+      const res  = await fetch(`${API_BASE}/status`, { signal: ac.signal });
       const json = await res.json();
       setData(json);
       setLastFetched(new Date());
       setCountdown(30);
-    } catch {
-      setData({ online: false, error: 'Cannot reach API' });
-      setCountdown(30);
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        setData({ online: false, error: 'Cannot reach API' });
+        setCountdown(30);
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { doFetch(); }, [doFetch]);
+  useEffect(() => {
+    doFetch();
+    return () => { if (abortRef.current) abortRef.current.abort(); };
+  }, [doFetch]);
   useEffect(() => {
     const id = setInterval(doFetch, 30_000);
     return () => clearInterval(id);

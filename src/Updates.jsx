@@ -53,25 +53,30 @@ function RepoSection({ repoKey }) {
   const [hasMore,  setHasMore]  = useState(true);
   const PER_PAGE = 15;
 
-  const fetchCommits = async (p = 1, append = false) => {
+  const fetchCommits = async (p = 1, append = false, signal = undefined) => {
     setLoading(true);
     setError(null);
     try {
       const res  = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${PER_PAGE}&page=${p}`
+        `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${PER_PAGE}&page=${p}`,
+        { signal }
       );
       if (!res.ok) throw new Error(`GitHub API ${res.status}`);
       const data = await res.json();
       setCommits(prev => append ? [...prev, ...data] : data);
       setHasMore(data.length === PER_PAGE);
     } catch (e) {
-      setError(e.message);
+      if (e.name !== 'AbortError') setError(e.message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchCommits(1); }, []);
+  useEffect(() => {
+    const ac = new AbortController();
+    fetchCommits(1, false, ac.signal);
+    return () => ac.abort();
+  }, []);
 
   const loadMore = () => {
     const next = page + 1;
