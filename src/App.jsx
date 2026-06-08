@@ -31,6 +31,7 @@ const Coins = ({ size = 16, className = '', style = {} }) => (
 
 import Landing from './Landing';
 import Commands from './Commands';
+import Guide from './Guide';
 import Updates from './Updates';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
@@ -5017,6 +5018,7 @@ function App() {
 
       {/* Commands reference */}
       <Route path="/commands" element={<Commands />} />
+      <Route path="/guide" element={<Guide />} />
       <Route path="/updates" element={<Updates />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
