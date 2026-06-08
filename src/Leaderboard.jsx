@@ -1,91 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Trophy, Star, Coins as CoinsIcon, ChevronRight, Search, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Trophy, Star, ArrowLeft, RefreshCw, Search, ChevronRight } from 'lucide-react';
+import './Leaderboard.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
-const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
-
 const DISCORD_CDN = 'https://cdn.discordapp.com';
 
-function guildIconUrl(guildId, icon) {
+function guildIconUrl(id, icon) {
   if (!icon) return null;
-  return `${DISCORD_CDN}/icons/${guildId}/${icon}.webp?size=64`;
+  return `${DISCORD_CDN}/icons/${id}/${icon}.webp?size=64`;
 }
 
-function GuildAvatar({ id, icon, name, size = 40 }) {
+function xpForNextLevel(level) {
+  return Math.floor(100 * Math.pow(level, 1.5));
+}
+
+function GuildIcon({ id, icon, name, className, fallbackClass }) {
   const src = guildIconUrl(id, icon);
   const initials = (name || '?').replace(/[^a-zA-Z0-9]/g, '').slice(0, 2).toUpperCase() || '?';
   if (src) {
     return (
-      <img
-        src={src}
-        alt={name}
-        width={size}
-        height={size}
-        style={{ borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
-        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-      />
+      <>
+        <img
+          src={src}
+          alt={name}
+          className={className}
+          onError={e => {
+            e.target.style.display = 'none';
+            e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+          }}
+        />
+        <div className={fallbackClass} style={{ display: 'none' }}>{initials}</div>
+      </>
     );
   }
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: 10, background: 'var(--surface2, #1e1f2e)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.35, fontWeight: 700, color: 'var(--primary, #7c3aed)', flexShrink: 0,
-    }}>{initials}</div>
-  );
+  return <div className={fallbackClass}>{initials}</div>;
 }
 
-function UserAvatar({ avatar, username, size = 36 }) {
-  const initials = (username || '?').slice(0, 1).toUpperCase();
+function UserAvatar({ avatar, username, className, fallbackClass }) {
+  const initial = (username || '?').slice(0, 1).toUpperCase();
   if (avatar) {
     return (
-      <img
-        src={avatar}
-        alt={username}
-        width={size}
-        height={size}
-        style={{ borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
-        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-      />
+      <>
+        <img
+          src={avatar}
+          alt={username}
+          className={className}
+          onError={e => {
+            e.target.style.display = 'none';
+            e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
+          }}
+        />
+        <div className={fallbackClass} style={{ display: 'none' }}>{initial}</div>
+      </>
     );
   }
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: 8, background: 'var(--surface2, #1e1f2e)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.4, fontWeight: 700, color: 'var(--primary, #7c3aed)', flexShrink: 0,
-    }}>{initials}</div>
-  );
+  return <div className={fallbackClass}>{initial}</div>;
 }
 
-const MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
-
-function RankBadge({ rank }) {
-  const color = rank <= 3 ? MEDAL_COLORS[rank - 1] : 'rgba(255,255,255,0.25)';
-  return (
-    <div style={{
-      width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: rank <= 3 ? `${color}18` : 'rgba(255,255,255,0.04)',
-      border: `1px solid ${rank <= 3 ? `${color}50` : 'rgba(255,255,255,0.08)'}`,
-      fontSize: 13, fontWeight: 700, color: rank <= 3 ? color : 'rgba(255,255,255,0.4)',
-    }}>
-      #{rank}
-    </div>
-  );
-}
+const RANK_CLASS = ['', 'gold', 'silver', 'bronze'];
 
 export default function Leaderboard({ token, user, onLogin }) {
-  const navigate = useNavigate();
-  const [servers, setServers] = useState([]);
+  const [servers, setServers]           = useState([]);
   const [serversLoading, setServersLoading] = useState(false);
-  const [selectedGuild, setSelectedGuild] = useState(null);
-  const [lbData, setLbData] = useState(null);
-  const [lbLoading, setLbLoading] = useState(false);
-  const [lbError, setLbError] = useState(null);
-  const [tab, setTab] = useState('xp');
-  const [search, setSearch] = useState('');
+  const [selectedGuild, setSelectedGuild]   = useState(null);
+  const [lbData, setLbData]             = useState(null);
+  const [lbLoading, setLbLoading]       = useState(false);
+  const [lbError, setLbError]           = useState(null);
+  const [tab, setTab]                   = useState('xp');
+  const [search, setSearch]             = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -94,10 +77,7 @@ export default function Leaderboard({ token, user, onLogin }) {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.json())
-      .then(data => {
-        setServers(Array.isArray(data) ? data : []);
-        setServersLoading(false);
-      })
+      .then(data => { setServers(Array.isArray(data) ? data : []); setServersLoading(false); })
       .catch(() => setServersLoading(false));
   }, [token]);
 
@@ -132,93 +112,72 @@ export default function Leaderboard({ token, user, onLogin }) {
     g.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const s = {
-    page: {
-      minHeight: '100vh',
-      background: 'var(--bg, #0f0c1a)',
-      color: '#fff',
-      fontFamily: 'system-ui, sans-serif',
-    },
-    nav: {
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)',
-      background: 'rgba(15,12,26,0.95)', backdropFilter: 'blur(12px)',
-      position: 'sticky', top: 0, zIndex: 100,
-    },
-    navBrand: {
-      display: 'flex', alignItems: 'center', gap: 10,
-      fontSize: 18, fontWeight: 800, letterSpacing: '0.05em',
-      color: '#fff', textDecoration: 'none',
-    },
-    container: { maxWidth: 740, margin: '0 auto', padding: '40px 20px' },
-  };
+  const discordIcon = (
+    <svg width="16" height="12" viewBox="0 0 24 18" fill="currentColor" aria-hidden="true">
+      <path d="M20.317 1.492a19.825 19.825 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.294 18.294 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 1.492a.07.07 0 0 0-.032.027C.533 6.093-.32 10.555.099 14.961a.08.08 0 0 0 .031.055 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 12.278c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+    </svg>
+  );
 
   return (
-    <div style={s.page}>
-      <nav style={s.nav}>
-        <Link to="/" style={s.navBrand}>
-          <img src="/logo.png" alt="Friday" style={{ width: 28, height: 28, borderRadius: 6 }} />
-          FRIDAY
-        </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {user && (
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
-              {user.username}
-            </span>
-          )}
-          {!user && (
-            <button
-              onClick={handleLogin}
-              style={{
-                background: '#5865F2', color: '#fff', border: 'none', borderRadius: 8,
-                padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              }}
-            >
-              Login with Discord
+    <div className="lb-root">
+      {/* Nav */}
+      <nav className="lb-nav">
+        <div className="lb-nav-inner">
+          <Link to="/" className="lb-nav-brand">
+            <img src="/logo.png" alt="Friday" className="lb-nav-logo" />
+            <span className="lb-nav-name">FRIDAY</span>
+          </Link>
+
+          {user ? (
+            <div className="lb-nav-user">
+              {user.avatar ? (
+                <img
+                  src={`${DISCORD_CDN}/avatars/${user.id}/${user.avatar}.webp?size=32`}
+                  alt={user.username}
+                  className="lb-nav-avatar"
+                  onError={e => { e.target.style.display = 'none'; }}
+                />
+              ) : null}
+              <span className="lb-nav-username">{user.username}</span>
+            </div>
+          ) : (
+            <button className="lb-nav-login-btn" onClick={handleLogin}>
+              {discordIcon}
+              Login
             </button>
           )}
         </div>
       </nav>
 
-      <div style={s.container}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)',
-            borderRadius: 20, padding: '6px 16px', fontSize: 12, fontWeight: 600,
-            color: '#a78bfa', letterSpacing: '0.08em', marginBottom: 16,
-          }}>
-            <Trophy size={12} />
-            LEADERBOARD
+      {/* Main */}
+      <main className="lb-main">
+        {/* Hero */}
+        <div className="lb-hero">
+          <div className="lb-hero-pill">
+            <Trophy size={11} />
+            Leaderboard
           </div>
-          <h1 style={{ fontSize: 36, fontWeight: 800, margin: '0 0 10px', lineHeight: 1.15 }}>
-            Server Rankings
+          <h1 className="lb-hero-title">
+            Server <span>Rankings</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 15, margin: 0 }}>
-            View XP and Economy leaderboards for your servers
+          <p className="lb-hero-sub">
+            View XP and Economy leaderboards for your Discord servers
           </p>
         </div>
 
         {/* Not logged in */}
         {!token && (
-          <div style={{
-            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 16, padding: 48, textAlign: 'center',
-          }}>
-            <Trophy size={48} style={{ color: '#7c3aed', opacity: 0.6, marginBottom: 16 }} />
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px' }}>Login to view leaderboards</h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, margin: '0 0 24px' }}>
-              Connect your Discord account to see rankings for your servers.
+          <div className="glass-panel lb-login-card">
+            <div className="lb-login-icon">
+              <Trophy size={30} />
+            </div>
+            <h2 className="lb-login-title">Login to view leaderboards</h2>
+            <p className="lb-login-desc">
+              Connect your Discord account to see rankings for servers you're in.
             </p>
-            <button
-              onClick={handleLogin}
-              style={{
-                background: '#5865F2', color: '#fff', border: 'none', borderRadius: 10,
-                padding: '12px 28px', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-              }}
-            >
-              Login with Discord
+            <button className="lb-discord-btn" onClick={handleLogin}>
+              {discordIcon}
+              Continue with Discord
             </button>
           </div>
         )}
@@ -226,70 +185,48 @@ export default function Leaderboard({ token, user, onLogin }) {
         {/* Server picker */}
         {token && !selectedGuild && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <div style={{
-                flex: 1, display: 'flex', alignItems: 'center', gap: 10,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 10, padding: '10px 14px',
-              }}>
-                <Search size={15} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
+            <div className="lb-picker-header">
+              <div className="lb-search-wrap">
+                <Search size={14} className="lb-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search servers..."
+                  className="lb-search-input"
+                  placeholder="Search your servers..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  style={{
-                    background: 'none', border: 'none', outline: 'none', width: '100%',
-                    color: '#fff', fontSize: 14,
-                  }}
                 />
               </div>
             </div>
 
             {serversLoading ? (
-              <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>
-                Loading servers...
+              <div className="lb-state">
+                <div className="lb-spinner" />
+                Loading your servers...
               </div>
             ) : filteredServers.length === 0 ? (
-              <div style={{
-                textAlign: 'center', padding: 60,
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 16, color: 'rgba(255,255,255,0.35)',
-              }}>
-                {search ? 'No servers match your search.' : 'No mutual servers found. Make sure Friday is in your server.'}
+              <div className="glass-panel lb-empty">
+                {search
+                  ? 'No servers match your search.'
+                  : 'No mutual servers found. Make sure Friday is added to your server.'}
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="lb-server-list">
                 {filteredServers.map(guild => (
-                  <button
-                    key={guild.id}
-                    onClick={() => selectGuild(guild)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 14,
-                      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
-                      borderRadius: 12, padding: '14px 16px', cursor: 'pointer',
-                      textAlign: 'left', transition: 'all 0.15s', color: '#fff',
-                      width: '100%',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = 'rgba(124,58,237,0.1)';
-                      e.currentTarget.style.borderColor = 'rgba(124,58,237,0.3)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                    }}
-                  >
-                    <GuildAvatar id={guild.id} icon={guild.icon} name={guild.name} size={44} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {guild.name}
-                      </div>
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                  <button key={guild.id} className="lb-server-btn" onClick={() => selectGuild(guild)}>
+                    <GuildIcon
+                      id={guild.id}
+                      icon={guild.icon}
+                      name={guild.name}
+                      className="lb-server-icon"
+                      fallbackClass="lb-server-icon-fallback"
+                    />
+                    <div className="lb-server-info">
+                      <div className="lb-server-name">{guild.name}</div>
+                      <div className="lb-server-meta">
                         {guild.memberCount?.toLocaleString()} members
                       </div>
                     </div>
-                    <ChevronRight size={16} style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                    <ChevronRight size={15} className="lb-server-chevron" />
                   </button>
                 ))}
               </div>
@@ -300,170 +237,135 @@ export default function Leaderboard({ token, user, onLogin }) {
         {/* Leaderboard view */}
         {token && selectedGuild && (
           <div>
-            {/* Back + guild header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-              <button
-                onClick={() => { setSelectedGuild(null); setLbData(null); }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.6)',
-                  fontSize: 13, cursor: 'pointer', flexShrink: 0,
-                }}
-              >
-                <ArrowLeft size={13} /> Back
+            {/* View header */}
+            <div className="lb-view-header">
+              <button className="lb-back-btn" onClick={() => { setSelectedGuild(null); setLbData(null); }}>
+                <ArrowLeft size={13} />
+                Back
               </button>
-              <GuildAvatar id={selectedGuild.id} icon={selectedGuild.icon} name={selectedGuild.name} size={36} />
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {selectedGuild.name}
-                </div>
+              <GuildIcon
+                id={selectedGuild.id}
+                icon={selectedGuild.icon}
+                name={selectedGuild.name}
+                className="lb-guild-icon"
+                fallbackClass="lb-guild-icon-fallback"
+              />
+              <div className="lb-guild-info">
+                <div className="lb-guild-name">{selectedGuild.name}</div>
                 {lbData && (
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                  <div className="lb-guild-meta">
                     {lbData.guild.memberCount?.toLocaleString()} members
                   </div>
                 )}
               </div>
               <button
+                className="lb-refresh-btn"
                 onClick={() => fetchLeaderboard(selectedGuild.id)}
                 disabled={lbLoading}
-                style={{
-                  marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: 8, padding: '7px 11px', color: 'rgba(255,255,255,0.4)',
-                  fontSize: 12, cursor: 'pointer', flexShrink: 0,
-                }}
               >
-                <RefreshCw size={12} style={{ animation: lbLoading ? 'spin 1s linear infinite' : 'none' }} />
+                <RefreshCw size={12} className={lbLoading ? 'animate-spin' : ''} />
                 Refresh
               </button>
             </div>
 
             {/* Tabs */}
-            <div style={{
-              display: 'flex', gap: 4,
-              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 10, padding: 4, marginBottom: 20,
-            }}>
-              {[
-                { id: 'xp', label: 'XP Ranking', icon: <Star size={13} /> },
-                { id: 'economy', label: 'Economy', icon: <span style={{ fontSize: 13 }}>🪙</span> },
-              ].map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
-                  style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    background: tab === t.id ? 'rgba(124,58,237,0.2)' : 'none',
-                    border: tab === t.id ? '1px solid rgba(124,58,237,0.35)' : '1px solid transparent',
-                    borderRadius: 7, padding: '8px 12px', color: tab === t.id ? '#a78bfa' : 'rgba(255,255,255,0.4)',
-                    fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  {t.icon} {t.label}
-                </button>
-              ))}
+            <div className="lb-tabs">
+              <button
+                className={`lb-tab${tab === 'xp' ? ' active' : ''}`}
+                onClick={() => setTab('xp')}
+              >
+                <Star size={13} />
+                XP Ranking
+              </button>
+              <button
+                className={`lb-tab${tab === 'economy' ? ' active' : ''}`}
+                onClick={() => setTab('economy')}
+              >
+                <img src="/fridaycoin.png" alt="coin" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                Economy
+              </button>
             </div>
 
-            {/* Loading / error */}
+            {/* Loading */}
             {lbLoading && (
-              <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>
+              <div className="lb-state">
+                <div className="lb-spinner" />
                 Loading leaderboard...
               </div>
             )}
+
+            {/* Error */}
             {lbError && !lbLoading && (
-              <div style={{
-                textAlign: 'center', padding: 40,
-                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)',
-                borderRadius: 12, color: '#f87171', fontSize: 14,
-              }}>
-                {lbError}
-              </div>
+              <div className="lb-error-card">{lbError}</div>
             )}
 
-            {/* Leaderboard entries */}
+            {/* Entries */}
             {lbData && !lbLoading && (() => {
               const entries = tab === 'xp' ? (lbData.xp || []) : (lbData.economy || []);
+
               if (!entries.length) {
                 return (
-                  <div style={{
-                    textAlign: 'center', padding: 60,
-                    background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: 16, color: 'rgba(255,255,255,0.3)',
-                  }}>
-                    No data yet. Members need to chat to earn XP!
+                  <div className="glass-panel lb-state">
+                    {tab === 'xp'
+                      ? 'No XP data yet. Members need to chat to start earning XP!'
+                      : 'No economy data yet. Use the economy commands to get started!'}
                   </div>
                 );
               }
 
               return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div className="lb-entries">
                   {entries.map((entry, i) => {
                     const rank = entry.rank || i + 1;
-                    const isTop3 = rank <= 3;
-                    const medalColor = isTop3 ? MEDAL_COLORS[rank - 1] : null;
+                    const rankClass = RANK_CLASS[rank] || '';
+                    const xpPct = tab === 'xp'
+                      ? Math.min(1, (entry.xp || 0) / (xpForNextLevel(entry.level) || 1))
+                      : 0;
 
                     return (
-                      <div
-                        key={entry.userId}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          padding: '12px 16px', borderRadius: 12,
-                          background: isTop3
-                            ? `linear-gradient(135deg, ${medalColor}08, transparent)`
-                            : 'rgba(255,255,255,0.025)',
-                          border: `1px solid ${isTop3 ? `${medalColor}20` : 'rgba(255,255,255,0.06)'}`,
-                          transition: 'all 0.1s',
-                        }}
-                      >
-                        <RankBadge rank={rank} />
-                        <UserAvatar avatar={entry.avatar} username={entry.username} size={36} />
-                        <div
-                          style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', display: 'none' }}
+                      <div key={entry.userId} className={`lb-entry${rankClass ? ` top-${rank}` : ''}`}>
+                        <div className={`lb-rank${rankClass ? ` ${rankClass}` : ''}`}>
+                          #{rank}
+                        </div>
+
+                        <UserAvatar
+                          avatar={entry.avatar}
+                          username={entry.username}
+                          className="lb-avatar"
+                          fallbackClass="lb-avatar-fallback"
                         />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{
-                            fontWeight: isTop3 ? 700 : 500,
-                            fontSize: 14,
-                            color: isTop3 ? '#fff' : 'rgba(255,255,255,0.8)',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                          }}>
+
+                        <div className="lb-user-info">
+                          <div className="lb-username">
                             {entry.nickname || entry.username}
                           </div>
                           {entry.nickname && (
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>
-                              @{entry.username}
-                            </div>
+                            <div className="lb-user-tag">@{entry.username}</div>
                           )}
                         </div>
 
-                        {tab === 'xp' ? (
-                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{
-                              fontSize: 15, fontWeight: 700,
-                              color: isTop3 ? medalColor : 'rgba(255,255,255,0.7)',
-                            }}>
-                              Lv. {entry.level}
-                            </div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>
-                              {(entry.xp || 0).toLocaleString()} XP
-                            </div>
-                          </div>
-                        ) : (
-                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{
-                              fontSize: 15, fontWeight: 700,
-                              color: isTop3 ? medalColor : 'rgba(255,255,255,0.7)',
-                              display: 'flex', alignItems: 'center', gap: 5,
-                            }}>
-                              {(entry.coins || 0).toLocaleString()}
-                              <span style={{ fontSize: 13 }}>🪙</span>
-                            </div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>
-                              coins
-                            </div>
-                          </div>
-                        )}
+                        <div className="lb-stat">
+                          {tab === 'xp' ? (
+                            <>
+                              <div className="lb-stat-main">Lv. {entry.level}</div>
+                              <div className="lb-stat-sub">{(entry.xp || 0).toLocaleString()} XP</div>
+                              <div className="lb-xp-bar-track">
+                                <div
+                                  className="lb-xp-bar-fill"
+                                  style={{ width: `${xpPct * 100}%` }}
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="lb-stat-main" style={{ display: 'flex', alignItems: 'center', gap: 5, justifyContent: 'flex-end' }}>
+                                {(entry.coins || 0).toLocaleString()}
+                                <img src="/fridaycoin.png" alt="coin" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                              </div>
+                              <div className="lb-stat-sub">coins</div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -472,13 +374,14 @@ export default function Leaderboard({ token, user, onLogin }) {
             })()}
           </div>
         )}
-      </div>
+      </main>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        * { box-sizing: border-box; }
-        input::placeholder { color: rgba(255,255,255,0.2); }
-      `}</style>
+      {/* Footer */}
+      <footer className="lb-footer">
+        <p className="lb-footer-text">
+          <Link to="/">Friday</Link> · <Link to="/commands">Commands</Link> · <Link to="/privacy">Privacy</Link>
+        </p>
+      </footer>
     </div>
   );
 }
