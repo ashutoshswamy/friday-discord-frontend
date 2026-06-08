@@ -4,7 +4,7 @@ import {
   Shield, Zap, Gift, LifeBuoy, UserPlus,
   ChevronRight, ArrowRight, Star, Check,
   Menu, X, Link, Bell, Terminal, Mic, BrainCircuit,
-  Wrench, FileText, TrendingUp,
+  Wrench, FileText, TrendingUp, Trophy,
   Crown, Palette, Gamepad2, Monitor, Music, Megaphone, Lock, PartyPopper
 } from 'lucide-react';
 
@@ -175,10 +175,10 @@ const PREVIEW_ITEMS = [
     bullets: ['Spam, caps, link & invite filters', 'Custom word & regex blocklist', 'Channel & role whitelisting', 'Auto-escalation punishment rules'],
   },
   {
-    id: 'leveling', label: 'Leveling', Icon: Zap, color: '#8b5cf6', eyebrow: 'LEVELING',
+    id: 'leaderboard', label: 'Leaderboard', Icon: Trophy, color: '#8b5cf6', eyebrow: 'LEADERBOARD',
     title: 'Track Your Community',
     desc: 'Real-time XP and economy leaderboards show exactly who\'s most active. Set multipliers for XP events, assign milestone role rewards, and watch engagement climb.',
-    bullets: ['XP & economy leaderboards', 'Configurable XP multipliers', 'Level-up role rewards', 'Voice activity tracking'],
+    bullets: ['XP & economy leaderboards', 'Configurable XP multipliers', 'Level-up role rewards', 'Milestone role rewards'],
   },
   {
     id: 'economy', label: 'Economy', Icon: Coins, color: '#00c853', eyebrow: 'ECONOMY',
@@ -223,10 +223,10 @@ const PREVIEW_ITEMS = [
     bullets: ['Deleted & edited message logs', 'Voice channel join/leave history', 'Per-moderator action stats', 'Live telemetry charts on dashboard'],
   },
   {
-    id: 'voice', label: 'Voice', Icon: Mic, color: '#a78bfa', eyebrow: 'VOICE',
-    title: 'Dynamic Voice Channels',
-    desc: 'Members create personal temporary voice channels on demand. Lock, unlock, or claim ownership — channels disappear automatically when everyone leaves. Track voice time on a live weekly leaderboard.',
-    bullets: ['Auto-created temp voice channels', 'Lock, unlock & claim commands', 'Weekly voice time leaderboard', 'Auto-cleanup when channel empties'],
+    id: 'stocks', label: 'Stocks', Icon: TrendingUp, color: '#a78bfa', eyebrow: 'STOCKS',
+    title: 'Live Stock Market',
+    desc: 'A real-time stock market with 5 tradeable assets and up to 5× leveraged positions. Buy, sell, and hold — prices shift every hour. Admins can inspect any member\'s portfolio from the dashboard.',
+    bullets: ['5 live tradeable stocks', 'Up to 5× leveraged positions', 'Hourly price movements', 'Per-member portfolio viewer'],
   },
 ];
 
@@ -272,7 +272,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           </div>
         </div>
       );
-      case 'leveling': return (
+      case 'leaderboard': return (
         <div className="lp-dash-card">
           <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Leaderboard</span></div>
           <div className="lp-dash-body">
@@ -382,17 +382,17 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
           </div>
         </div>
       );
-      case 'voice': return (
+      case 'stocks': return (
         <div className="lp-dash-card">
-          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday — Voice Activity</span></div>
+          <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Stocks & Portfolio</span></div>
           <div className="lp-dash-body">
             <div className="lp-dash-chart-panel">
-              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Voice Leaderboard<span style={{fontSize:'9px',color:'#a78bfa',background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>THIS WEEK</span></div>
-              <div className="lp-vc-list">{[{rank:1,name:'nova_knight',mins:840,bar:100},{rank:2,name:'crystal_void',mins:612,bar:73},{rank:3,name:'blazex99',mins:490,bar:58},{rank:4,name:'lunaris',mins:310,bar:37},{rank:5,name:'axion_drift',mins:205,bar:24}].map(({rank,name,mins,bar})=>(<div key={name} className="lp-vc-row"><span className="lp-vc-rank">#{rank}</span><div className="lp-vc-avatar">{name[0].toUpperCase()}</div><div className="lp-vc-info"><div className="lp-vc-name">{name}</div><div className="lp-vc-bar-track"><div className="lp-vc-bar-fill" style={{width:`${bar}%`}}/></div></div><span className="lp-vc-mins">{mins.toLocaleString()}m</span></div>))}</div>
+              <div className="lp-dash-chart-title" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>Market Overview<span style={{fontSize:'9px',color:'#a78bfa',background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.2)',borderRadius:'4px',padding:'2px 7px',fontWeight:600}}>LIVE</span></div>
+              <div style={{display:'flex',flexDirection:'column',gap:'6px',marginTop:'8px'}}>{[{sym:'TECH',price:1240,change:+4.2,up:true},{sym:'GAME',price:870,change:-1.8,up:false},{sym:'FOOD',price:530,change:+2.1,up:true},{sym:'MEME',price:310,change:+11.4,up:true},{sym:'BANK',price:990,change:-0.6,up:false}].map(({sym,price,change,up})=>(<div key={sym} style={{display:'flex',alignItems:'center',gap:'8px',padding:'5px 8px',borderRadius:'6px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.05)'}}><code style={{fontSize:'10px',fontWeight:700,color:'#a78bfa',minWidth:'36px'}}>{sym}</code><span style={{fontSize:'11px',color:'#e2e8f0',flex:1}}>{price.toLocaleString()} <span style={{fontSize:'9px',color:'#64748b'}}>coins</span></span><span style={{fontSize:'10px',fontWeight:600,color:up?'#00c853':'#f43f5e'}}>{up?'▲':'▼'} {Math.abs(change)}%</span></div>))}</div>
             </div>
             <div className="lp-dash-chart-panel">
-              <div className="lp-dash-chart-title">Active Temp Channels</div>
-              <div className="lp-vc-channels">{[{name:"nova_knight's VC",members:3,locked:true},{name:"Gaming Session",members:5,locked:false},{name:"Study Room",members:2,locked:true}].map(({name,members,locked})=>(<div key={name} className="lp-vc-channel-row"><Mic size={12} color="#a78bfa"/><span className="lp-vc-channel-name">{name}</span><span className="lp-vc-channel-members">{members.toLocaleString()} members</span>{locked&&<Lock size={11} color="#a78bfa"/>}</div>))}</div>
+              <div className="lp-dash-chart-title">nova_knight's Portfolio</div>
+              <div style={{display:'flex',flexDirection:'column',gap:'5px',marginTop:'8px'}}>{[{sym:'TECH',shares:3,value:3720,pnl:+18.2},{sym:'MEME',shares:10,value:3100,pnl:+42.6},{sym:'BANK',shares:2,value:1980,pnl:-3.1}].map(({sym,shares,value,pnl})=>(<div key={sym} style={{display:'flex',alignItems:'center',gap:'8px',padding:'5px 8px',borderRadius:'6px',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.05)'}}><code style={{fontSize:'10px',fontWeight:700,color:'#a78bfa',minWidth:'36px'}}>{sym}</code><span style={{fontSize:'10px',color:'#94a3b8',flex:1}}>{shares} shares · {value.toLocaleString()} coins</span><span style={{fontSize:'10px',fontWeight:600,color:pnl>0?'#00c853':'#f43f5e'}}>{pnl>0?'+':''}{pnl}%</span></div>))}</div>
             </div>
           </div>
         </div>
@@ -418,11 +418,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#how">How it works</a>
             <RouterLink to="/commands">Commands</RouterLink>
             <RouterLink to="/leaderboard">Leaderboard</RouterLink>
-            <RouterLink to="/updates">Updates</RouterLink>
-            <RouterLink to="/status" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00e676', display: 'inline-block', boxShadow: '0 0 6px #00e676' }} />
-              Status
-            </RouterLink>
+            <RouterLink to="/guide">Guide</RouterLink>
           </nav>
 
           <div className="lp-nav-ctas">
@@ -453,8 +449,7 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
             <a href="#how" onClick={() => setMobileMenuOpen(false)}>How it works</a>
             <RouterLink to="/commands" onClick={() => setMobileMenuOpen(false)}>Commands</RouterLink>
             <RouterLink to="/leaderboard" onClick={() => setMobileMenuOpen(false)}>Leaderboard</RouterLink>
-            <RouterLink to="/updates" onClick={() => setMobileMenuOpen(false)}>Updates</RouterLink>
-            <RouterLink to="/status" onClick={() => setMobileMenuOpen(false)}>Status</RouterLink>
+            <RouterLink to="/guide" onClick={() => setMobileMenuOpen(false)}>Guide</RouterLink>
             <a
               href={inviteUrl}
               target="_blank"

@@ -33,6 +33,7 @@ export default function Footer({ onDashboard }) {
               <RouterLink to="/#how">How it works</RouterLink>
               <RouterLink to="/commands">Command List</RouterLink>
               <RouterLink to="/updates">Updates</RouterLink>
+              <RouterLink to="/status">Status</RouterLink>
             </div>
             <div className="lp-footer-col">
               <p className="lp-footer-col-heading">Access</p>
