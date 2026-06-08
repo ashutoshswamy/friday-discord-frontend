@@ -1,16 +1,50 @@
-# React + Vite
+# Friday Bot — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The marketing site and dashboard frontend for **Friday**, a free Discord bot with moderation, leveling, economy, AI, giveaways, and more.
 
-Currently, two official plugins are available:
+**Stack:** React 19 · Vite 8 · React Router v7 · Deployed on Vercel
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Pages
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Route       | Component            | Description                  |
+| ----------- | -------------------- | ---------------------------- |
+| `/`         | `Landing.jsx`        | Marketing landing page       |
+| `/commands` | `Commands.jsx`       | Full slash command reference |
+| `/status`   | `Status.jsx`         | Bot uptime / status page     |
+| `/updates`  | `Updates.jsx`        | Live commit feed from GitHub |
+| `/privacy`  | `PrivacyPolicy.jsx`  | Privacy policy               |
+| `/terms`    | `TermsOfService.jsx` | Terms of service             |
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Features Showcased
+
+- **AutoMod & Moderation** — spam, caps, link, invite filters; custom blocklist with regex; auto-escalation rules
+- **XP Leveling & Voice** — chat + voice XP, multipliers, milestone role rewards, leaderboards
+- **Economy, Jobs & Games** — 24 careers across 4 pay tiers (`/work` pays 50–20,000 coins), hunting/fishing/digging, real-time stock market with 5× leverage, blackjack/roulette/slots
+- **Tickets & Helpdesk** — persistent helpdesk panel, private threads, collaborators, HTML transcripts
+- **Giveaways & Events** — timed giveaways with button entry, multi-winner draw, reroll, RSVP event cards
+- **Smart Onboarding** — custom welcome messages, auto-assign roles, button-based reaction role menus
+- **Alerts & Notifications** — YouTube upload and Twitch live stream alerts routed to any channel
+- **Custom Commands** — plain-text or rich embed responses, managed from dashboard
+- **Auditing & Logs** — deleted/edited messages, voice activity, per-moderator action stats
+- **Utility Tools** — avatar lookup, polls, reminders, weather, Urban Dictionary, embed builder
+- **AI (Gemini Flash)** — `/friday ask`, `/friday rewrite` (5 styles), `/friday summarize`
+
+---
+
+## Deployment
+
+Deployed on **Vercel**. `vercel.json` configures:
+
+- SPA rewrite: all routes → `index.html`
+- Security headers: `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
+
+---
+
+## Related Repositories
+
+- **Bot backend:** [ashutoshswamy/friday-discord-backend](https://github.com/ashutoshswamy/friday-discord-backend)
+- **Frontend (this):** [ashutoshswamy/friday-discord-frontend](https://github.com/ashutoshswamy/friday-discord-frontend)
