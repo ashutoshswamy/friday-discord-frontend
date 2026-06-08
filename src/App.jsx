@@ -36,6 +36,7 @@ import Updates from './Updates';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import Status from './Status';
+import Leaderboard from './Leaderboard';
 
 if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
   throw new Error('VITE_API_BASE is not configured for this deployment.');
@@ -314,7 +315,9 @@ function App() {
         setToken(data.token);
         setUser(data.user);
         window.history.replaceState({}, document.title, '/');
-        navigate('/dashboard');
+        const redirect = sessionStorage.getItem('oauth_redirect') || '/dashboard';
+        sessionStorage.removeItem('oauth_redirect');
+        navigate(redirect);
       }
     } catch {
       setAuthError('Authentication server is unreachable.');
@@ -5023,6 +5026,7 @@ function App() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/status" element={<Status />} />
+      <Route path="/leaderboard" element={<Leaderboard token={token} user={user} onLogin={initiateOAuth} />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
