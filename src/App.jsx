@@ -13,7 +13,7 @@ import {
 
 const Coins = ({ size = 16, className = '', style = {} }) => (
   <img 
-    src="/fridaycoin.png" 
+    src="/emojis/fridaycoin.png"
     alt="🪙" 
     className={className} 
     style={{ 
@@ -28,6 +28,105 @@ const Coins = ({ size = 16, className = '', style = {} }) => (
     }} 
   />
 );
+
+const ITEM_ICONS = {
+  // Tools
+  'Axe':                         '/emojis/tools:equipments/fridayaxe.png',
+  'Fishing Pole':                '/emojis/tools:equipments/fridayfishingpole.png',
+  'Hacker Laptop':               '/emojis/tools:equipments/fridayhackerlaptop.png',
+  'Hunting Rifle':               '/emojis/tools:equipments/fridayhuntingrifle.png',
+  'Pickaxe':                     '/emojis/tools:equipments/fridaypickaxe.png',
+  'Shovel':                      '/emojis/tools:equipments/fridayshovel.png',
+  // Consumables & seeds
+  'Basic Fertilizer':            '/emojis/consumables:seeds/fridaybasicfertilizer.png',
+  'Carrot Seed':                 '/emojis/consumables:seeds/fridaycarrotseed.png',
+  'Coin Bomb':                   '/emojis/consumables:seeds/fridaycoinbomb.png',
+  'Energy Drink':                '/emojis/consumables:seeds/fridayenergydrink.png',
+  'Gamer Energy Drink':          '/emojis/consumables:seeds/fridaygamerenergydrink.png',
+  'Golden Apple Seed':           '/emojis/consumables:seeds/fridaygoldenappleseed.png',
+  'Growth Serum':                '/emojis/consumables:seeds/fridaygrowthserum.png',
+  'Lootbox':                     '/emojis/consumables:seeds/fridaylootbox.png',
+  'Mystery Crate':               '/emojis/consumables:seeds/fridaymysterycrate.png',
+  'Pesticide':                   '/emojis/consumables:seeds/fridaypesticide.png',
+  'Pizza':                       '/emojis/consumables:seeds/fridaypizza.png',
+  'Tomato Seed':                 '/emojis/consumables:seeds/fridaytomatoseed.png',
+  'Wheat Seed':                  '/emojis/consumables:seeds/fridaywheatseed.png',
+  'Work Gloves':                 '/emojis/consumables:seeds/fridayworkgloves.png',
+  'XP Potion':                   '/emojis/consumables:seeds/fridayxppotion.png',
+  'Yield Booster':               '/emojis/consumables:seeds/fridayyieldbooster.png',
+  // Collectibles — hunt
+  'Rabbit':                      '/emojis/resources:collectibles/fridayrabbit.png',
+  'Duck':                        '/emojis/resources:collectibles/fridayduck.png',
+  'Deer':                        '/emojis/resources:collectibles/fridaydeer.png',
+  'Wild Boar':                   '/emojis/resources:collectibles/fridaywildboar.png',
+  'Grizzly Bear':                '/emojis/resources:collectibles/fridaygrizzlybear.png',
+  'Deer Antler':                 '/emojis/resources:collectibles/fridaydeerantler.png',
+  'Wolf Pelt':                   '/emojis/resources:collectibles/fridaywolfpelt.png',
+  'Eagle Feather':               '/emojis/resources:collectibles/fridayeaglefeather.png',
+  'Dragon Scale':                '/emojis/resources:collectibles/fridaydragonscale.png',
+  // Collectibles — fish
+  'Clam':                        '/emojis/resources:collectibles/fridayclam.png',
+  'Common Bass':                 '/emojis/resources:collectibles/fridaycommonbass.png',
+  'Salmon':                      '/emojis/resources:collectibles/fridaysalmon.png',
+  'Goldfish':                    '/emojis/resources:collectibles/fridaygoldfish.png',
+  'Pufferfish':                  '/emojis/resources:collectibles/fridaypufferfish.png',
+  'Lobster':                     '/emojis/resources:collectibles/fridaylobster.png',
+  'Tropical Coral Fish':         '/emojis/resources:collectibles/fridaytropicalcoralfish.png',
+  'Shark Tooth':                 '/emojis/resources:collectibles/fridaysharktooth.png',
+  'Ancient Pearl':               '/emojis/resources:collectibles/fridayancientpearl.png',
+  'Mystical Whale':              '/emojis/resources:collectibles/fridaymysticalwhale.png',
+  'Junk Seaweed':                '/emojis/resources:collectibles/fridayjunkseaweed.png',
+  'Old Boot':                    '/emojis/resources:collectibles/fridayoldboot.png',
+  // Collectibles — dig
+  'Common Worm':                 '/emojis/resources:collectibles/fridaycommonworm.png',
+  'Worm':                        '/emojis/resources:collectibles/fridaycommonworm.png',
+  'Dirt Fossil':                 '/emojis/resources:collectibles/fridaydirtfossil.png',
+  'Old Coin':                    '/emojis/resources:collectibles/fridayoldcoin.png',
+  'Quartz Crystal':              '/emojis/resources:collectibles/fridayquartzcrystal.png',
+  'Ruby Shard':                  '/emojis/resources:collectibles/fridayrubyshard.png',
+  'Silver Ring':                 '/emojis/resources:collectibles/fridaysilverring.png',
+  'Stolen Crypto Key':           '/emojis/resources:collectibles/fridaystolencryptokey.png',
+  'Decrypted Hard Drive':        '/emojis/resources:collectibles/fridaydecryptedharddrive.png',
+  'Ancient Vase':                '/emojis/resources:collectibles/fridayancientvase.png',
+  'Buried Chest':                '/emojis/resources:collectibles/fridayburiedchest.png',
+  'Mainframe Core':              '/emojis/resources:collectibles/fridaymainframecore.png',
+  'Mythril Core':                '/emojis/resources:collectibles/fridaymythrilcore.png',
+  // Collectibles — mine
+  'Coal':                        '/emojis/resources:collectibles/fridaycoal.png',
+  'Iron Ore':                    '/emojis/resources:collectibles/fridayironore.png',
+  'Gold Ore':                    '/emojis/resources:collectibles/fridaygoldore.png',
+  'Diamond Ore':                 '/emojis/resources:collectibles/fridaydiamondore.png',
+  'Common Gem':                  '/emojis/resources:collectibles/fridaycommongem.png',
+  'Rare Gem':                    '/emojis/resources:collectibles/fridayraregem.png',
+  'Crystal Shard':               '/emojis/resources:collectibles/fridaycrystalshard.png',
+  'Ruby':                        '/emojis/resources:collectibles/fridayruby.png',
+  'Emerald':                     '/emojis/resources:collectibles/fridayemerald.png',
+  'Sapphire':                    '/emojis/resources:collectibles/fridaysapphire.png',
+  'Diamond':                     '/emojis/resources:collectibles/fridaydiamond.png',
+  'Legendary Gem':               '/emojis/resources:collectibles/fridaylegendarygem.png',
+  'Cracked Geode':               '/emojis/resources:collectibles/fridaycrackedgeode.png',
+  // Collectibles — chop
+  'Pine Log':                    '/emojis/resources:collectibles/fridaypinelog.png',
+  'Birch Log':                   '/emojis/resources:collectibles/fridaybirchlog.png',
+  'Oak Log':                     '/emojis/resources:collectibles/fridayoaklog.png',
+  'Yew Log':                     '/emojis/resources:collectibles/fridayyewlog.png',
+  'Mahogany Log':                '/emojis/resources:collectibles/fridaymahoganylog.png',
+  'Elderwood Log':               '/emojis/resources:collectibles/fridayelderwoodlog.png',
+  'Golden Sap':                  '/emojis/resources:collectibles/fridaygoldensap.png',
+  // Collectibles — farm harvests
+  'Harvested Wheat':             '/emojis/resources:collectibles/fridayharvestedwheat.png',
+  'Harvested Tomato':            '/emojis/resources:collectibles/fridayharvestedtomato.png',
+  'Harvested Carrot':            '/emojis/resources:collectibles/fridayharvestedcarrot.png',
+  'Harvested Golden Apple':      '/emojis/resources:collectibles/fridayharvestedgoldenapple.png',
+  'Silver Harvested Wheat':      '/emojis/resources:collectibles/fridaysilverharvestedwheat.png',
+  'Silver Harvested Tomato':     '/emojis/resources:collectibles/fridaysilverharvestedtomato.png',
+  'Silver Harvested Carrot':     '/emojis/resources:collectibles/fridaysilverharvestedcarrot.png',
+  'Silver Harvested Golden Apple': '/emojis/resources:collectibles/fridaysilverharvestedgoldenapple.png',
+  'Gold Harvested Wheat':        '/emojis/resources:collectibles/fridaygoldharvestedwheat.png',
+  'Gold Harvested Tomato':       '/emojis/resources:collectibles/fridaygoldharvestedtomato.png',
+  'Gold Harvested Carrot':       '/emojis/resources:collectibles/fridaygoldharvestedcarrot.png',
+  'Gold Harvested Golden Apple': '/emojis/resources:collectibles/fridaygoldharvestedgoldenapple.png',
+};
 
 import Landing from './Landing';
 import Commands from './Commands';
@@ -3203,10 +3302,12 @@ function App() {
                             other: { label: 'Other', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.25)' },
                           };
                           const getItemIcon = (name, size = 18) => {
+                            const src = ITEM_ICONS[name];
+                            if (src) return <img src={src} alt={name} style={{ width: size, height: size, objectFit: 'contain' }} />;
                             const n = name.toLowerCase();
                             if (n.includes('rifle')) return <Target size={size} />;
                             if (n.includes('pole') || n.includes('fish') || n.includes('bass') || n.includes('salmon') || n.includes('goldfish') || n.includes('whale') || n.includes('coral') || n.includes('seaweed') || n.includes('boot')) return <Fish size={size} />;
-                            if (n.includes('bear') || n.includes('deer') || n.includes('wolf') || n.includes('moose') || n.includes('elk')) return <PawPrint size={size} />;
+                            if (n.includes('bear') || n.includes('deer') || n.includes('wolf')) return <PawPrint size={size} />;
                             if (n.includes('worm') || n.includes('fossil') || n.includes('shovel') || n.includes('vase') || n.includes('chest')) return <Pickaxe size={size} />;
                             if (n.includes('lootbox') || n.includes('crate')) return <Gift size={size} />;
                             if (n.includes('pizza')) return <PizzaIcon size={size} />;
@@ -3717,13 +3818,15 @@ function App() {
                                               <td>
                                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
                                                   <span style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
-                                                    {listing.itemName.includes('Fish') || listing.itemName.includes('fish') || listing.itemName.includes('Pole') ? <Fish size={16} /> :
-                                                     listing.itemName.includes('Deer') || listing.itemName.includes('Bear') ? <PawPrint size={16} /> :
-                                                     listing.itemName.includes('Lootbox') ? <Gift size={16} /> :
-                                                     listing.itemName.includes('Rifle') ? <Target size={16} /> :
-                                                     listing.itemName.includes('Shovel') ? <Pickaxe size={16} /> :
-                                                     listing.itemName.includes('Pizza') ? <PizzaIcon size={16} /> :
-                                                     <Package size={16} />}
+                                                    {ITEM_ICONS[listing.itemName]
+                                                      ? <img src={ITEM_ICONS[listing.itemName]} alt={listing.itemName} style={{ width: 16, height: 16, objectFit: 'contain' }} />
+                                                      : listing.itemName.includes('Fish') || listing.itemName.includes('fish') || listing.itemName.includes('Pole') ? <Fish size={16} /> :
+                                                        listing.itemName.includes('Deer') || listing.itemName.includes('Bear') ? <PawPrint size={16} /> :
+                                                        listing.itemName.includes('Lootbox') ? <Gift size={16} /> :
+                                                        listing.itemName.includes('Rifle') ? <Target size={16} /> :
+                                                        listing.itemName.includes('Shovel') ? <Pickaxe size={16} /> :
+                                                        listing.itemName.includes('Pizza') ? <PizzaIcon size={16} /> :
+                                                        <Package size={16} />}
                                                   </span>
                                                   <strong>{listing.itemName}</strong>
                                                 </span>

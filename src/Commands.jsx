@@ -8,7 +8,7 @@ import {
 
 const Coins = ({ size = 16, className = '', style = {} }) => (
   <img 
-    src="/fridaycoin.png" 
+    src="/emojis/fridaycoin.png"
     alt="🪙" 
     className={className} 
     style={{ 
@@ -25,6 +25,39 @@ const Coins = ({ size = 16, className = '', style = {} }) => (
 );
 
 import './Commands.css';
+
+const ITEM_ICONS = {
+  'Axe':                '/emojis/tools:equipments/fridayaxe.png',
+  'Fishing Pole':       '/emojis/tools:equipments/fridayfishingpole.png',
+  'Hacker Laptop':      '/emojis/tools:equipments/fridayhackerlaptop.png',
+  'Hunting Rifle':      '/emojis/tools:equipments/fridayhuntingrifle.png',
+  'Pickaxe':            '/emojis/tools:equipments/fridaypickaxe.png',
+  'Shovel':             '/emojis/tools:equipments/fridayshovel.png',
+  'Basic Fertilizer':   '/emojis/consumables:seeds/fridaybasicfertilizer.png',
+  'Carrot Seed':        '/emojis/consumables:seeds/fridaycarrotseed.png',
+  'Coin Bomb':          '/emojis/consumables:seeds/fridaycoinbomb.png',
+  'Energy Drink':       '/emojis/consumables:seeds/fridayenergydrink.png',
+  'Gamer Energy Drink': '/emojis/consumables:seeds/fridaygamerenergydrink.png',
+  'Golden Apple Seed':  '/emojis/consumables:seeds/fridaygoldenappleseed.png',
+  'Growth Serum':       '/emojis/consumables:seeds/fridaygrowthserum.png',
+  'Lootbox':            '/emojis/consumables:seeds/fridaylootbox.png',
+  'Mystery Crate':      '/emojis/consumables:seeds/fridaymysterycrate.png',
+  'Pesticide':          '/emojis/consumables:seeds/fridaypesticide.png',
+  'Pizza':              '/emojis/consumables:seeds/fridaypizza.png',
+  'Tomato Seed':        '/emojis/consumables:seeds/fridaytomatoseed.png',
+  'Wheat Seed':         '/emojis/consumables:seeds/fridaywheatseed.png',
+  'Work Gloves':        '/emojis/consumables:seeds/fridayworkgloves.png',
+  'XP Potion':          '/emojis/consumables:seeds/fridayxppotion.png',
+  'Yield Booster':      '/emojis/consumables:seeds/fridayyieldbooster.png',
+  'Golden Sap':         '/emojis/resources:collectibles/fridaygoldensap.png',
+  'Worm':               '/emojis/resources:collectibles/fridaycommonworm.png',
+};
+
+const II = ({ name, size = 16 }) => {
+  const src = ITEM_ICONS[name];
+  if (!src) return null;
+  return <img src={src} alt={name} style={{ width: size, height: size, objectFit: 'contain', verticalAlign: 'middle', display: 'inline-block', position: 'relative', top: '-1px', marginRight: 3 }} />;
+};
 
 const CATEGORIES = [
   { id: 'all',        label: 'All Commands',  Icon: Layers         },
@@ -527,7 +560,7 @@ const COMMANDS = [
   {
     name: 'use',
     category: 'economy',
-    desc: 'Activates a consumable from inventory: Pizza (150 XP), XP Potion (300 XP), Energy Drink (300 coins), Work Gloves (500 coins), Coin Bomb (800–4,000 coins), Lootbox, Mystery Crate (gem drops).',
+    desc: <><II name="Pizza" />Pizza (150 XP), <II name="XP Potion" />XP Potion (300 XP), <II name="Energy Drink" />Energy Drink (300 coins), <II name="Work Gloves" />Work Gloves (500 coins), <II name="Coin Bomb" />Coin Bomb (800–4,000 coins), <II name="Lootbox" />Lootbox, <II name="Mystery Crate" />Mystery Crate (gem drops).</>,
     usage: '/use [item?]',
     options: [
       { name: 'item', type: 'String', required: false, desc: 'Item name to use (leave blank for picker)' },
@@ -581,7 +614,7 @@ const COMMANDS = [
   {
     name: 'farm fertilize',
     category: 'economy',
-    desc: 'Apply a fertilizer from your inventory to a crop (Basic Fertilizer = 50% speedup, Growth Serum = Instant ready, Yield Booster = Double quantity yield).',
+    desc: <>Apply a fertilizer from your inventory to a crop: <II name="Basic Fertilizer" />Basic Fertilizer = 50% speedup, <II name="Growth Serum" />Growth Serum = instant ready, <II name="Yield Booster" />Yield Booster = double quantity yield.</>,
     usage: '/farm fertilize [fertilizer] [plot]',
     options: [
       { name: 'fertilizer', type: 'Choice', required: true, desc: 'basic · growth · yield' },
@@ -593,7 +626,7 @@ const COMMANDS = [
   {
     name: 'farm treat',
     category: 'economy',
-    desc: 'Cures a pest infestation on a crop. Requires Pesticide in your inventory.',
+    desc: <>Cures a pest infestation on a crop. Requires <II name="Pesticide" />Pesticide in your inventory.</>,
     usage: '/farm treat [plot]',
     options: [
       { name: 'plot', type: 'Integer', required: true, desc: 'Plot slot number to spray' },
@@ -653,7 +686,7 @@ const COMMANDS = [
   {
     name: 'craft item',
     category: 'economy',
-    desc: 'Forges a tool or item from ingredients in your inventory (Axe, Hacker Laptop, Fishing Pole, Shovel, Lootbox, Energy Drink, Golden Sap, Basic Fertilizer, Growth Serum, Yield Booster, Pesticide).',
+    desc: <>Forges a tool or item from ingredients in your inventory: <II name="Axe" />Axe, <II name="Hacker Laptop" />Hacker Laptop, <II name="Fishing Pole" />Fishing Pole, <II name="Shovel" />Shovel, <II name="Lootbox" />Lootbox, <II name="Energy Drink" />Energy Drink, <II name="Golden Sap" />Golden Sap, <II name="Basic Fertilizer" />Basic Fertilizer, <II name="Growth Serum" />Growth Serum, <II name="Yield Booster" />Yield Booster, <II name="Pesticide" />Pesticide.</>,
     usage: '/craft item [name]',
     options: [
       { name: 'name', type: 'Choice', required: true, desc: 'Axe · Hacker Laptop · Fishing Pole · Shovel · Lootbox · Energy Drink · Golden Sap · Basic Fertilizer · Growth Serum · Yield Booster · Pesticide' },

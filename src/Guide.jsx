@@ -9,8 +9,41 @@ import {
 import './Guide.css';
 
 const Coins = ({ size = 16 }) => (
-  <img src="/fridaycoin.png" alt="coin" style={{ width: size, height: size, objectFit: 'contain', verticalAlign: 'middle', display: 'inline-block', position: 'relative', top: '-1px' }} />
+  <img src="/emojis/fridaycoin.png" alt="coin" style={{ width: size, height: size, objectFit: 'contain', verticalAlign: 'middle', display: 'inline-block', position: 'relative', top: '-1px' }} />
 );
+
+const ITEM_ICONS = {
+  'Axe':                '/emojis/tools:equipments/fridayaxe.png',
+  'Fishing Pole':       '/emojis/tools:equipments/fridayfishingpole.png',
+  'Hacker Laptop':      '/emojis/tools:equipments/fridayhackerlaptop.png',
+  'Hunting Rifle':      '/emojis/tools:equipments/fridayhuntingrifle.png',
+  'Pickaxe':            '/emojis/tools:equipments/fridaypickaxe.png',
+  'Shovel':             '/emojis/tools:equipments/fridayshovel.png',
+  'Basic Fertilizer':   '/emojis/consumables:seeds/fridaybasicfertilizer.png',
+  'Carrot Seed':        '/emojis/consumables:seeds/fridaycarrotseed.png',
+  'Coin Bomb':          '/emojis/consumables:seeds/fridaycoinbomb.png',
+  'Energy Drink':       '/emojis/consumables:seeds/fridayenergydrink.png',
+  'Gamer Energy Drink': '/emojis/consumables:seeds/fridaygamerenergydrink.png',
+  'Golden Apple Seed':  '/emojis/consumables:seeds/fridaygoldenappleseed.png',
+  'Growth Serum':       '/emojis/consumables:seeds/fridaygrowthserum.png',
+  'Lootbox':            '/emojis/consumables:seeds/fridaylootbox.png',
+  'Mystery Crate':      '/emojis/consumables:seeds/fridaymysterycrate.png',
+  'Pesticide':          '/emojis/consumables:seeds/fridaypesticide.png',
+  'Pizza':              '/emojis/consumables:seeds/fridaypizza.png',
+  'Tomato Seed':        '/emojis/consumables:seeds/fridaytomatoseed.png',
+  'Wheat Seed':         '/emojis/consumables:seeds/fridaywheatseed.png',
+  'Work Gloves':        '/emojis/consumables:seeds/fridayworkgloves.png',
+  'XP Potion':          '/emojis/consumables:seeds/fridayxppotion.png',
+  'Yield Booster':      '/emojis/consumables:seeds/fridayyieldbooster.png',
+  'Golden Sap':         '/emojis/resources:collectibles/fridaygoldensap.png',
+  'Worm':               '/emojis/resources:collectibles/fridaycommonworm.png',
+};
+
+const II = ({ name, size = 18 }) => {
+  const src = ITEM_ICONS[name];
+  if (!src) return null;
+  return <img src={src} alt={name} style={{ width: size, height: size, objectFit: 'contain', verticalAlign: 'middle', display: 'inline-block', position: 'relative', top: '-1px', marginRight: 4 }} />;
+};
 
 const SECTIONS = [
   { id: 'getting-started',  label: 'Getting Started',       Icon: BookOpen,    color: '#3b9dff' },
@@ -236,12 +269,12 @@ export default function Guide() {
             <Table
               headers={['Command', 'Tool Required', 'Drop Tiers', 'Cooldown']}
               rows={[
-                [<CmdRef name="hunt" />, 'Hunting Rifle', '9 tiers: Rabbit → Dragon Scale', '60s'],
-                [<CmdRef name="fish" />, 'Fishing Pole', '12 tiers: Clam → Mythical Whale', '45s'],
-                [<CmdRef name="dig" />, 'Shovel', '9 tiers: Worm → Buried Gold Chest', '45s'],
-                [<CmdRef name="mine" />, 'Pickaxe', '9 tiers: Coal → Mythril Core', '60s'],
-                [<CmdRef name="chop" />, 'Axe', '7 tiers: Pine Log → Golden Sap', '45s'],
-                [<CmdRef name="hack" />, 'Hacker Laptop', 'Coins + Data files', '10m'],
+                [<CmdRef name="hunt" />, <><II name="Hunting Rifle" />Hunting Rifle</>, '9 tiers: Rabbit → Dragon Scale', '60s'],
+                [<CmdRef name="fish" />, <><II name="Fishing Pole" />Fishing Pole</>, '12 tiers: Clam → Mythical Whale', '45s'],
+                [<CmdRef name="dig" />, <><II name="Shovel" />Shovel</>, '9 tiers: Worm → Buried Gold Chest', '45s'],
+                [<CmdRef name="mine" />, <><II name="Pickaxe" />Pickaxe</>, '9 tiers: Coal → Mythril Core', '60s'],
+                [<CmdRef name="chop" />, <><II name="Axe" />Axe</>, '7 tiers: Pine Log → Golden Sap', '45s'],
+                [<CmdRef name="hack" />, <><II name="Hacker Laptop" />Hacker Laptop</>, 'Coins + Data files', '10m'],
                 [<CmdRef name="search" />, 'None', 'Coins or items from 3 locations', '60s'],
               ]}
             />
@@ -260,10 +293,10 @@ export default function Guide() {
               Farming gives you passive income through crop plots. Plant seeds, manage pests, and harvest yields to sell or use.
             </p>
             <Step n={1}><strong>View your farm</strong> — <CmdRef name="farm view" /> shows all plots, growth stages, active fertilizers, and pests.</Step>
-            <Step n={2}><strong>Plant</strong> — Use <CmdRef name="farm plant" /> to plant a seed from inventory on an empty plot. Seeds: Wheat, Tomato, Carrot, Golden Apple.</Step>
+            <Step n={2}><strong>Plant</strong> — Use <CmdRef name="farm plant" /> to plant a seed from inventory on an empty plot. Seeds: <II name="Wheat Seed" />Wheat, <II name="Tomato Seed" />Tomato, <II name="Carrot Seed" />Carrot, <II name="Golden Apple Seed" />Golden Apple.</Step>
             <Step n={3}><strong>Water</strong> — <CmdRef name="farm water" /> speeds growth by 25%, but damp soil has a 15% chance to attract pests.</Step>
-            <Step n={4}><strong>Fertilize</strong> — Boost crops: Basic (50% speedup), Growth Serum (instant), Yield Booster (double harvest).</Step>
-            <Step n={5}><strong>Treat pests</strong> — <CmdRef name="farm treat" /> removes infestations using Pesticide. Infested crops can't be harvested.</Step>
+            <Step n={4}><strong>Fertilize</strong> — Boost crops: <II name="Basic Fertilizer" />Basic (50% speedup), <II name="Growth Serum" />Growth Serum (instant), <II name="Yield Booster" />Yield Booster (double harvest).</Step>
+            <Step n={5}><strong>Treat pests</strong> — <CmdRef name="farm treat" /> removes infestations using <II name="Pesticide" />Pesticide. Infested crops can't be harvested.</Step>
             <Step n={6}><strong>Harvest</strong> — <CmdRef name="farm harvest" /> on a ready crop stores yield in inventory. Higher farming level = better quality (Silver/Gold Star).</Step>
             <Step n={7}><strong>Expand</strong> — Buy more plots with <CmdRef name="farm expand" /> (starts at 3, max 8).</Step>
             <Tip>Craft fertilizers and pesticides instead of buying them — it's cheaper at higher craft levels.</Tip>
@@ -283,17 +316,17 @@ export default function Guide() {
             <Table
               headers={['Item', 'Use']}
               rows={[
-                ['Axe', 'Required for /chop'],
-                ['Fishing Pole', 'Required for /fish'],
-                ['Shovel', 'Required for /dig'],
-                ['Hacker Laptop', 'Required for /hack'],
-                ['Lootbox', 'Open for random items'],
-                ['Energy Drink', 'Grants 300 coins instantly'],
-                ['Basic Fertilizer', 'Farm speedup'],
-                ['Growth Serum', 'Instant crop growth'],
-                ['Yield Booster', 'Double crop yield'],
-                ['Pesticide', 'Cures farm pests'],
-                ['Golden Sap', 'High-value sell item'],
+                [<><II name="Axe" />Axe</>, 'Required for /chop'],
+                [<><II name="Fishing Pole" />Fishing Pole</>, 'Required for /fish'],
+                [<><II name="Shovel" />Shovel</>, 'Required for /dig'],
+                [<><II name="Hacker Laptop" />Hacker Laptop</>, 'Required for /hack'],
+                [<><II name="Lootbox" />Lootbox</>, 'Open for random items'],
+                [<><II name="Energy Drink" />Energy Drink</>, 'Grants 300 coins instantly'],
+                [<><II name="Basic Fertilizer" />Basic Fertilizer</>, 'Farm speedup'],
+                [<><II name="Growth Serum" />Growth Serum</>, 'Instant crop growth'],
+                [<><II name="Yield Booster" />Yield Booster</>, 'Double crop yield'],
+                [<><II name="Pesticide" />Pesticide</>, 'Cures farm pests'],
+                [<><II name="Golden Sap" />Golden Sap</>, 'High-value sell item'],
               ]}
             />
           </section>
@@ -355,7 +388,7 @@ export default function Guide() {
               Adopt a pet companion that levels up, battles other pets, and shows on your profile.
             </p>
             <Step n={1}>Adopt with <CmdRef name="pet adopt" /> for 200 coins. Choose Dog, Cat, Hamster, or Lizard, and give it a name.</Step>
-            <Step n={2}>Keep it fed: <CmdRef name="pet feed" /> using coins or a worm item to maintain hunger.</Step>
+            <Step n={2}>Keep it fed: <CmdRef name="pet feed" /> using coins or a <II name="Worm" />worm item to maintain hunger.</Step>
             <Step n={3}>Train attributes with <CmdRef name="pet train" /> (attack or defense) — each session costs 25 energy.</Step>
             <Step n={4}>Battle other pets: <CmdRef name="pet battle" /> challenges a member's pet based on attack, defense, and level. Winners earn bonus pet XP.</Step>
             <p>Rename your pet any time with <CmdRef name="pet rename" />. View stats with <CmdRef name="pet view" />. <CmdRef name="pet release" /> permanently removes your pet — irreversible.</p>
@@ -390,7 +423,7 @@ export default function Guide() {
               Members earn XP passively through chatting and voice activity. XP accumulates into levels, unlocking level-gated jobs and admin-configured role rewards.
             </p>
             <h3 className="guide-sub">Earning XP</h3>
-            <p>XP is awarded automatically for sending messages and spending time in voice channels. Consumables like Pizza (150 XP), XP Potion (300 XP), and trivia wins also award XP.</p>
+            <p>XP is awarded automatically for sending messages and spending time in voice channels. Consumables like <II name="Pizza" />Pizza (150 XP), <II name="XP Potion" />XP Potion (300 XP), and trivia wins also award XP.</p>
             <h3 className="guide-sub">Viewing Progress</h3>
             <p><CmdRef name="rank" /> shows a styled rank card with level, XP bar, and server standing. <CmdRef name="leaderboard xp" /> shows the top 10 members by XP.</p>
             <h3 className="guide-sub">Admin Configuration</h3>
