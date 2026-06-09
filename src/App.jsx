@@ -139,6 +139,9 @@ import Leaderboard from './Leaderboard';
 if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE) {
   throw new Error('VITE_API_BASE is not configured for this deployment.');
 }
+if (import.meta.env.PROD && !import.meta.env.VITE_CLIENT_ID) {
+  throw new Error('VITE_CLIENT_ID is not configured for this deployment.');
+}
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 
