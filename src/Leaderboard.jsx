@@ -11,6 +11,31 @@ function guildIconUrl(id, icon) {
   return `${DISCORD_CDN}/icons/${id}/${icon}.webp?size=64`;
 }
 
+function userAvatarUrl(userId, avatar) {
+  if (avatar) return `${DISCORD_CDN}/avatars/${userId}/${avatar}.webp?size=64`;
+  const index = Number(BigInt(userId) % 6n);
+  return `${DISCORD_CDN}/embed/avatars/${index}.png`;
+}
+
+function UserAvatar({ userId, avatar, displayName, size = 40, fontSize = 16, ringStyle, color }) {
+  const src = userAvatarUrl(userId, avatar);
+  const initial = (displayName || '?').slice(0, 1).toUpperCase();
+  const [failed, setFailed] = React.useState(false);
+
+  return failed ? (
+    <div style={{ width: size, height: size, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize, color: color || 'var(--primary)', background: 'rgba(59,157,255,0.1)', flexShrink: 0, ...ringStyle }}>
+      {initial}
+    </div>
+  ) : (
+    <img
+      src={src}
+      alt={displayName}
+      style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, display: 'block', ...ringStyle }}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 function xpForNextLevel(level) {
   return level * 150 + 100;
 }
@@ -49,17 +74,23 @@ function PodiumCard({ entry, rank, accent }) {
   const needed = xpForNextLevel(entry.level || 0);
   const pct = Math.min(100, Math.floor(((entry.xp || 0) / needed) * 100));
   const displayName = entry.nickname || entry.username;
-  const initial = (displayName || '?').slice(0, 1).toUpperCase();
+  const avatarSize = rank === 0 ? 72 : 58;
 
   return (
     <div style={{ position: 'relative', flex: rank === 0 ? '0 0 38%' : '0 0 29%', padding: '20px 16px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-card)', border: `1px solid ${pc.glow}30`, overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', boxShadow: `0 0 28px ${pc.glow}18, inset 0 1px 0 ${pc.glow}20`, order: rank === 0 ? 0 : rank === 1 ? -1 : 1 }}>
       <div style={{ position: 'absolute', top: '-12px', right: '8px', fontSize: rank === 0 ? '110px' : '88px', fontWeight: 900, fontFamily: 'var(--font-display)', color: `${pc.glow}10`, lineHeight: 1, pointerEvents: 'none', userSelect: 'none' }}>{pc.num}</div>
       <div style={{ position: 'absolute', top: '10px', left: '10px', fontSize: '9px', fontWeight: 800, fontFamily: 'var(--font-display)', letterSpacing: '1.5px', color: pc.badge, background: `${pc.glow}18`, padding: '2px 7px', borderRadius: '20px', border: `1px solid ${pc.glow}40` }}>{pc.label}</div>
       <div style={{ position: 'relative', marginTop: '8px' }}>
-        <div style={{ width: rank === 0 ? '72px' : '58px', height: rank === 0 ? '72px' : '58px', borderRadius: '50%', padding: '2px', background: pc.ring }}>
-          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: `${pc.glow}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: rank === 0 ? '24px' : '20px', color: pc.badge }}>
-            {initial}
-          </div>
+        <div style={{ width: avatarSize, height: avatarSize, borderRadius: '50%', padding: '2px', background: pc.ring, flexShrink: 0 }}>
+          <UserAvatar
+            userId={entry.userId}
+            avatar={entry.avatar}
+            displayName={displayName}
+            size={avatarSize - 4}
+            fontSize={rank === 0 ? 24 : 20}
+            color={pc.badge}
+            ringStyle={{ border: 'none' }}
+          />
         </div>
         <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '20px', height: '20px', borderRadius: '50%', background: pc.ring, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 900, color: '#000', fontFamily: 'var(--font-display)' }}>{pc.num}</div>
       </div>
@@ -87,7 +118,6 @@ function RankRow({ entry, rank, accent }) {
   const needed = xpForNextLevel(entry.level || 0);
   const pct = Math.min(100, Math.floor(((entry.xp || 0) / needed) * 100));
   const displayName = entry.nickname || entry.username;
-  const initial = (displayName || '?').slice(0, 1).toUpperCase();
 
   return (
     <div
@@ -96,7 +126,14 @@ function RankRow({ entry, rank, accent }) {
       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
     >
       <div style={{ width: '26px', fontFamily: 'var(--font-display)', fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textAlign: 'right', flexShrink: 0, letterSpacing: '0.5px' }}>#{rank + 1}</div>
-      <div style={{ width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0, border: '1.5px solid var(--border)', background: 'rgba(59,157,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '12px', color: 'var(--primary)' }}>{initial}</div>
+      <UserAvatar
+        userId={entry.userId}
+        avatar={entry.avatar}
+        displayName={displayName}
+        size={28}
+        fontSize={12}
+        ringStyle={{ border: '1.5px solid var(--border)' }}
+      />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 600, fontSize: '12.5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</div>
         {isXp && (
