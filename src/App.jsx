@@ -148,7 +148,7 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 function App() {
   const navigate = useNavigate();
 
-  const [token, setToken]           = useState(null);
+  const [token, setToken]           = useState(() => sessionStorage.getItem('friday_jwt') || null);
   const [user, setUser]             = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('friday_user')); } catch { return null; }
   });
@@ -407,6 +407,7 @@ function App() {
         window.history.replaceState({}, document.title, '/');
       } else {
         sessionStorage.setItem('friday_user', JSON.stringify(data.user));
+        sessionStorage.setItem('friday_jwt', data.token);
         setToken(data.token);
         setUser(data.user);
         window.history.replaceState({}, document.title, '/');
@@ -423,6 +424,7 @@ function App() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('friday_user');
+    sessionStorage.removeItem('friday_jwt');
     sessionStorage.removeItem('friday_active_guild');
     // clear any legacy localStorage keys from older sessions
     localStorage.removeItem('friday_jwt');
