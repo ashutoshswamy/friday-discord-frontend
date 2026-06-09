@@ -83,11 +83,10 @@ const COMMANDS = [
   {
     name: 'warn',
     category: 'moderation',
-    desc: 'Issues a formal warning to a member and logs the infraction. Triggers punishment escalation rules if threshold is hit.',
-    usage: '/warn [user] [reason]',
+    desc: 'Issues a formal warning to a member and logs the infraction. Reason is entered via a modal popup. Triggers punishment escalation rules if threshold is hit.',
+    usage: '/warn [user]',
     options: [
       { name: 'user', type: 'User', required: true, desc: 'Member to warn' },
-      { name: 'reason', type: 'String', required: true, desc: 'Reason for the warning' },
     ],
     admin: false,
     dashboard: true,
@@ -263,6 +262,19 @@ const COMMANDS = [
     ],
     admin: true,
     dashboard: true,
+  },
+  {
+    name: 'automod optout',
+    category: 'moderation',
+    desc: 'Opt a specific channel out of a single AutoMod filter without fully whitelisting it from all filters.',
+    usage: '/automod optout [action] [filter?] [channel?]',
+    options: [
+      { name: 'action', type: 'Choice', required: true, desc: 'add · remove · list' },
+      { name: 'filter', type: 'Choice', required: false, desc: 'spam · links · caps' },
+      { name: 'channel', type: 'Channel', required: false, desc: 'Channel to opt out of the filter' },
+    ],
+    admin: true,
+    dashboard: false,
   },
 
   // ── ECONOMY ──
@@ -528,7 +540,7 @@ const COMMANDS = [
   {
     name: 'shop catalog',
     category: 'economy',
-    desc: 'Browse all built-in items (tools, consumables, collectibles, gems) with suggested prices for admins to add to the server shop.',
+    desc: 'Browse the complete built-in item encyclopedia across 2 pages — tools, seeds, consumables, collectibles, craftables, and all grind drops with details.',
     usage: '/shop catalog',
     options: [],
     admin: false,
@@ -560,7 +572,7 @@ const COMMANDS = [
   {
     name: 'use',
     category: 'economy',
-    desc: <><II name="Pizza" />Pizza (150 XP), <II name="XP Potion" />XP Potion (300 XP), <II name="Energy Drink" />Energy Drink (300 coins), <II name="Work Gloves" />Work Gloves (500 coins), <II name="Coin Bomb" />Coin Bomb (800–4,000 coins), <II name="Lootbox" />Lootbox, <II name="Mystery Crate" />Mystery Crate (gem drops).</>,
+    desc: <><II name="Pizza" />Pizza (150 XP), <II name="XP Potion" />XP Potion (300 XP), <II name="Energy Drink" />Energy Drink (300 coins), <II name="Gamer Energy Drink" />Gamer Energy Drink (300 coins), <II name="Work Gloves" />Work Gloves (500 coins), <II name="Coin Bomb" />Coin Bomb (800–4,000 coins), <II name="Lootbox" />Lootbox, <II name="Mystery Crate" />Mystery Crate (gem drops).</>,
     usage: '/use [item?]',
     options: [
       { name: 'item', type: 'String', required: false, desc: 'Item name to use (leave blank for picker)' },
@@ -721,7 +733,7 @@ const COMMANDS = [
     desc: 'Purchase an item from the player market by its listing ID.',
     usage: '/market buy [id]',
     options: [
-      { name: 'id', type: 'String', required: true, desc: 'Market listing ID' },
+      { name: 'id', type: 'Integer', required: true, desc: 'Market listing ID' },
     ],
     admin: false,
     dashboard: false,
@@ -732,7 +744,7 @@ const COMMANDS = [
     desc: 'Cancel and remove one of your own market listings.',
     usage: '/market cancel [id]',
     options: [
-      { name: 'id', type: 'String', required: true, desc: 'Your listing ID to cancel' },
+      { name: 'id', type: 'Integer', required: true, desc: 'Your listing ID to cancel' },
     ],
     admin: false,
     dashboard: false,
@@ -900,10 +912,10 @@ const COMMANDS = [
     name: 'roulette',
     category: 'economy',
     desc: 'Spin the roulette wheel. Bet on a number (0–36), red, black, or green.',
-    usage: '/roulette [bet] [space]',
+    usage: '/roulette [bet] [space?]',
     options: [
       { name: 'bet', type: 'Integer', required: true, desc: 'Coins to wager' },
-      { name: 'space', type: 'String', required: true, desc: 'red · black · green · 0–36' },
+      { name: 'space', type: 'String', required: false, desc: 'red · black · green · 0–36 (leave blank for interactive selector)' },
     ],
     admin: false,
     dashboard: false,
@@ -1059,10 +1071,9 @@ const COMMANDS = [
   {
     name: 'coinflip',
     category: 'economy',
-    desc: 'Flip a coin and optionally bet coins on the outcome. Guess heads or tails — win double your bet or lose it all.',
-    usage: '/coinflip [guess?] [bet?]',
+    desc: 'Flip a coin and optionally bet coins on the outcome. Pick Heads or Tails via buttons — win double your bet or lose it all.',
+    usage: '/coinflip [bet?]',
     options: [
-      { name: 'guess', type: 'String', required: false, desc: 'Your guess: heads or tails' },
       { name: 'bet', type: 'Integer', required: false, desc: 'Coins to wager on the flip' },
     ],
     admin: false,
@@ -1071,10 +1082,9 @@ const COMMANDS = [
   {
     name: 'rps',
     category: 'economy',
-    desc: 'Play Rock, Paper, Scissors against Friday. Optionally bet coins — win double on a win, lose your bet on a loss.',
-    usage: '/rps [choice] [bet?]',
+    desc: 'Play Rock, Paper, Scissors against Friday. Pick your move via buttons — optionally bet coins, win double on a win, lose your bet on a loss.',
+    usage: '/rps [bet?]',
     options: [
-      { name: 'choice', type: 'String', required: true, desc: 'Your move: rock, paper, or scissors' },
       { name: 'bet', type: 'Integer', required: false, desc: 'Coins to wager on the match' },
     ],
     admin: false,
@@ -1171,9 +1181,9 @@ const COMMANDS = [
     name: 'giveaway end',
     category: 'giveaways',
     desc: 'Ends an active giveaway early and draws winners immediately.',
-    usage: '/giveaway end [message_id]',
+    usage: '/giveaway end [id]',
     options: [
-      { name: 'message_id', type: 'String', required: true, desc: 'Message ID of the giveaway embed' },
+      { name: 'id', type: 'String', required: true, desc: 'Message ID of the active giveaway' },
     ],
     admin: true,
     dashboard: false,
@@ -1182,9 +1192,9 @@ const COMMANDS = [
     name: 'giveaway reroll',
     category: 'giveaways',
     desc: 'Picks new winners from an already-ended giveaway entry pool.',
-    usage: '/giveaway reroll [message_id]',
+    usage: '/giveaway reroll [id]',
     options: [
-      { name: 'message_id', type: 'String', required: true, desc: 'Message ID of the ended giveaway' },
+      { name: 'id', type: 'String', required: true, desc: 'Message ID of the ended giveaway' },
     ],
     admin: true,
     dashboard: false,
@@ -1482,12 +1492,13 @@ const COMMANDS = [
   {
     name: 'poll create',
     category: 'utility',
-    desc: 'Posts a reaction poll in the current channel with up to 10 options and optional custom emojis.',
-    usage: '/poll create [question] [options] [emojis?]',
+    desc: 'Posts a poll in the current channel with up to 10 options, optional duration, and optional multi-select.',
+    usage: '/poll create [question] [options] [duration?] [multiselect?]',
     options: [
       { name: 'question', type: 'String', required: true, desc: 'The poll question' },
       { name: 'options', type: 'String', required: true, desc: 'Comma-separated options (2–10)' },
-      { name: 'emojis', type: 'String', required: false, desc: 'Comma-separated emojis matching each option (e.g. ✅,❌,🤔)' },
+      { name: 'duration', type: 'Integer', required: false, desc: 'How long the poll runs in hours (1–168, default: 24)' },
+      { name: 'multiselect', type: 'Boolean', required: false, desc: 'Allow users to vote for multiple options (default: false)' },
     ],
     admin: false,
     dashboard: true,
@@ -1565,9 +1576,10 @@ const COMMANDS = [
     name: 'bio',
     category: 'social',
     desc: 'Set your personal tagline or bio (max 150 chars). Use with no argument to view your current bio.',
-    usage: '/bio [text?]',
+    usage: '/bio [text?] [clear?]',
     options: [
       { name: 'text', type: 'String', required: false, desc: 'Your new bio (omit to view current)' },
+      { name: 'clear', type: 'Boolean', required: false, desc: 'Set true to clear your bio' },
     ],
     admin: false,
     dashboard: false,
