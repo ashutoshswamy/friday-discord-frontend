@@ -37,24 +37,8 @@ function GuildIcon({ id, icon, name, className, fallbackClass }) {
   return <div className={fallbackClass}>{initials}</div>;
 }
 
-function UserAvatar({ avatar, username, className, fallbackClass }) {
+function UserAvatar({ username, fallbackClass }) {
   const initial = (username || '?').slice(0, 1).toUpperCase();
-  if (avatar) {
-    return (
-      <>
-        <img
-          src={avatar}
-          alt={username}
-          className={className}
-          onError={e => {
-            e.target.style.display = 'none';
-            e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
-          }}
-        />
-        <div className={fallbackClass} style={{ display: 'none' }}>{initial}</div>
-      </>
-    );
-  }
   return <div className={fallbackClass}>{initial}</div>;
 }
 
@@ -329,9 +313,7 @@ export default function Leaderboard({ token, user, onLogin }) {
                         </div>
 
                         <UserAvatar
-                          avatar={entry.avatar}
                           username={entry.username}
-                          className="lb-avatar"
                           fallbackClass="lb-avatar-fallback"
                         />
 
