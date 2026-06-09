@@ -8,7 +8,7 @@ import {
 
 const Coins = ({ size = 16, className = '', style = {} }) => (
   <img 
-    src="/fridaycoin.png" 
+    src="/emojis/fridaycoin.png"
     alt="🪙" 
     className={className} 
     style={{ 

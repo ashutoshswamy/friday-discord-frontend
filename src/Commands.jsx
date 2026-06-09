@@ -1946,7 +1946,7 @@ export default function Commands() {
       const q = search.toLowerCase();
       list = list.filter(c =>
         c.name.includes(q) ||
-        c.desc.toLowerCase().includes(q) ||
+        (typeof c.desc === 'string' && c.desc.toLowerCase().includes(q)) ||
         c.category.includes(q)
       );
     }
