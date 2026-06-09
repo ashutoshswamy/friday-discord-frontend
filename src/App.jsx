@@ -113,11 +113,6 @@ function App() {
   const [rankCardAccent, setRankCardAccent] = useState('');
   const [rankCardLoaded, setRankCardLoaded] = useState(false);
 
-  // Leaderboard card state
-  const [lbTheme, setLbTheme]   = useState('cyber');
-  const [lbAccent, setLbAccent] = useState('');
-  const [lbCardLoaded, setLbCardLoaded] = useState(false);
-
   // Welcome card state
   const [welcomeCardTheme, setWelcomeCardTheme]     = useState('cyber');
   const [welcomeCardAccent, setWelcomeCardAccent]   = useState('');
@@ -239,7 +234,6 @@ function App() {
     if (activeTab === 'giveaways' && !eventHistoryLoaded) { fetchEventHistory(); }
     if (activeTab === 'alerts' && !alertsLoaded) fetchAlerts();
     if (activeTab === 'milestones' && !rankCardLoaded) fetchRankCard();
-    if (activeTab === 'leaderboard' && !lbCardLoaded) fetchLbCard();
     if (activeTab === 'onboarding' && !welcomeCardLoaded) fetchWelcomeCard();
     if (activeTab === 'inventory' && !inventoryLoaded) fetchInventory();
     if (activeTab === 'pets' && !petsLoaded) fetchPets();
@@ -839,31 +833,6 @@ function App() {
         body: JSON.stringify({ theme: rankCardTheme, accentColor: rankCardAccent || null }),
       });
       if (res.ok) showNotification('success', 'Rank card theme saved!');
-      else throw new Error((await res.json()).error);
-    } catch (err) { showNotification('error', err.message); }
-  };
-
-  // ── Leaderboard Card
-  const fetchLbCard = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/leaderboard-card`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setLbTheme(data.theme || 'cyber');
-        setLbAccent(data.accentColor || '');
-      }
-    } catch { /* silent */ }
-    finally { setLbCardLoaded(true); }
-  };
-
-  const saveLbCard = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/guilds/${activeGuildId}/leaderboard-card`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ theme: lbTheme, accentColor: lbAccent || null }),
-      });
-      if (res.ok) showNotification('success', 'Leaderboard card theme saved!');
       else throw new Error((await res.json()).error);
     } catch (err) { showNotification('error', err.message); }
   };
@@ -1884,153 +1853,6 @@ function App() {
                                 </div>
                               </div>
 
-                              {/* ── Leaderboard Card Customizer ── */}
-                              {(() => {
-                                const LB_THEMES = {
-                                  cyber:    { label: 'Cyber',    bg: 'linear-gradient(135deg,#0F0C20,#06040A)', accent1: '#00F2FE', accent2: '#4FACFE' },
-                                  midnight: { label: 'Midnight', bg: 'linear-gradient(135deg,#060912,#040810)', accent1: '#3b9dff', accent2: '#8b5cf6' },
-                                  forest:   { label: 'Forest',   bg: 'linear-gradient(135deg,#0a1a0f,#050d04)', accent1: '#00c853', accent2: '#69f0ae' },
-                                  sunset:   { label: 'Sunset',   bg: 'linear-gradient(135deg,#1a0a08,#0d0304)', accent1: '#ff4569', accent2: '#ff9100' },
-                                  aurora:   { label: 'Aurora',   bg: 'linear-gradient(135deg,#0a0813,#070510)', accent1: '#8b5cf6', accent2: '#ec4899' },
-                                  neon:     { label: 'Neon',     bg: 'linear-gradient(135deg,#050515,#020208)', accent1: '#39ff14', accent2: '#ff00ff' },
-                                  ocean:    { label: 'Ocean',    bg: 'linear-gradient(135deg,#011020,#010810)', accent1: '#00e5ff', accent2: '#0ea5e9' },
-                                  volcano:  { label: 'Volcano',  bg: 'linear-gradient(135deg,#1a0500,#0d0200)', accent1: '#ff6d00', accent2: '#ffab40' },
-                                  sakura:   { label: 'Sakura',   bg: 'linear-gradient(135deg,#1a0510,#0d0208)', accent1: '#f472b6', accent2: '#fda4af' },
-                                  gold:     { label: 'Gold',     bg: 'linear-gradient(135deg,#1a1200,#0d0900)', accent1: '#fbbf24', accent2: '#f59e0b' },
-                                  void:     { label: 'Void',     bg: 'linear-gradient(135deg,#050005,#020002)', accent1: '#7c3aed', accent2: '#c026d3' },
-                                };
-                                const pt = LB_THEMES[lbTheme] || LB_THEMES.cyber;
-                                const pa1 = lbAccent || pt.accent1;
-                                const pa2 = lbAccent || pt.accent2;
-                                return (
-                                  <div className="glass-panel" style={{ padding: '24px' }}>
-                                    <div className="chart-title" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <Trophy size={15} style={{ color: 'var(--primary)' }} />
-                                      Leaderboard Card Appearance
-                                      <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-muted)', fontWeight: 400 }}>Applied to <code>/leaderboard xp</code> and <code>/leaderboard economy</code></span>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '32px', alignItems: 'start' }}>
-                                      <div>
-                                        {/* Theme presets */}
-                                        <div className="form-group">
-                                          <label>Theme</label>
-                                          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '4px' }}>
-                                            {Object.entries(LB_THEMES).map(([key, th]) => (
-                                              <button
-                                                key={key}
-                                                onClick={() => setLbTheme(key)}
-                                                style={{
-                                                  background: th.bg,
-                                                  border: `2px solid ${lbTheme === key ? th.accent1 : 'rgba(255,255,255,0.08)'}`,
-                                                  borderRadius: '8px',
-                                                  padding: '10px 18px',
-                                                  cursor: 'pointer',
-                                                  display: 'flex',
-                                                  flexDirection: 'column',
-                                                  alignItems: 'center',
-                                                  gap: '6px',
-                                                  transition: 'border-color 0.2s',
-                                                  minWidth: '90px',
-                                                }}
-                                              >
-                                                <div style={{ display: 'flex', gap: '4px' }}>
-                                                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: th.accent1 }} />
-                                                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: th.accent2 }} />
-                                                </div>
-                                                <span style={{ fontSize: '11px', fontWeight: 700, color: lbTheme === key ? th.accent1 : 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-display)', letterSpacing: '0.5px' }}>
-                                                  {th.label}
-                                                </span>
-                                              </button>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Custom accent */}
-                                        <div className="form-group" style={{ marginTop: '20px' }}>
-                                          <label>Custom Accent Color <span style={{ color: 'var(--text-muted)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(overrides theme accent)</span></label>
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
-                                            <input
-                                              type="color"
-                                              value={lbAccent || pt.accent1}
-                                              onChange={e => setLbAccent(e.target.value)}
-                                              style={{ width: '48px', height: '38px', padding: '2px', border: '1px solid var(--border-hover)', borderRadius: '6px', background: 'transparent', cursor: 'pointer' }}
-                                            />
-                                            <input
-                                              className="form-input"
-                                              type="text"
-                                              placeholder={pt.accent1}
-                                              value={lbAccent}
-                                              onChange={e => setLbAccent(e.target.value)}
-                                              style={{ flex: 1, fontFamily: 'var(--font-mono)' }}
-                                            />
-                                            {lbAccent && (
-                                              <button className="btn btn-secondary" onClick={() => setLbAccent('')} style={{ whiteSpace: 'nowrap' }}>
-                                                <X size={13} /> Reset
-                                              </button>
-                                            )}
-                                          </div>
-                                        </div>
-
-                                        <button className="btn btn-primary" onClick={saveLbCard} style={{ marginTop: '8px' }}>
-                                          <Trophy size={15} /> Save Leaderboard Card
-                                        </button>
-                                      </div>
-
-                                      {/* Live preview — leaderboard card */}
-                                      <div>
-                                        <div style={{ fontSize: '10px', fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '1.5px', marginBottom: '10px', textTransform: 'uppercase' }}>Preview</div>
-                                        <div style={{ width: '460px', borderRadius: '12px', background: pt.bg, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, position: 'relative' }}>
-                                          {/* Ambient top-right glow */}
-                                          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '140px', height: '140px', borderRadius: '50%', background: `radial-gradient(circle, ${pa1}18 0%, transparent 70%)`, pointerEvents: 'none' }} />
-                                          {/* Header */}
-                                          <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: `linear-gradient(135deg,${pa1},${pa2})`, flexShrink: 0 }} />
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                              <div style={{ display: 'inline-block', padding: '1px 8px', borderRadius: '999px', background: '#FFD70018', border: '1px solid #FFD70044', marginBottom: '3px' }}>
-                                                <span style={{ fontSize: '8px', fontWeight: 700, color: '#FFD700', letterSpacing: '0.5px', fontFamily: 'var(--font-display)' }}>XP  LEADERBOARD</span>
-                                              </div>
-                                              <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Server Name</div>
-                                            </div>
-                                            <div style={{ padding: '4px 10px', borderRadius: '999px', background: `linear-gradient(90deg,${pa1}22,${pa2}22)`, border: `1.5px solid ${pa1}88`, flexShrink: 0 }}>
-                                              <span style={{ fontSize: '9px', fontWeight: 700, color: pa1, fontFamily: 'var(--font-display)' }}>TOP  3</span>
-                                            </div>
-                                          </div>
-                                          {/* Divider */}
-                                          <div style={{ height: '1px', background: `linear-gradient(90deg, transparent, ${pa1}44, ${pa2}44, transparent)`, marginBottom: '2px' }} />
-                                          {/* Sample rows */}
-                                          {[
-                                            { rank: 1, name: 'TopUser', lvl: 42, xp: '98,400', color: '#FFD700', bot: '#B8860B', pct: 0.82 },
-                                            { rank: 2, name: 'Player2', lvl: 38, xp: '84,100', color: '#E8E8E8', bot: '#A0A0A0', pct: 0.65 },
-                                            { rank: 3, name: 'Member3', lvl: 31, xp: '61,200', color: '#F0A060', bot: '#8B4513', pct: 0.47 },
-                                          ].map((row, i) => (
-                                            <div key={row.rank} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 16px', background: `${row.color}0a` }}>
-                                              <div style={{ width: '28px', height: '18px', borderRadius: '4px', background: `linear-gradient(180deg,${row.color}30,${row.bot}30)`, border: `1px solid ${row.color}88`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <span style={{ fontSize: '9px', fontWeight: 800, color: row.color, fontFamily: 'var(--font-display)' }}>#{row.rank}</span>
-                                              </div>
-                                              <div style={{ width: '24px', height: '24px', borderRadius: '4px', background: `linear-gradient(135deg,${row.color}44,${row.bot}44)`, border: `1px solid ${row.color}55`, flexShrink: 0 }} />
-                                              <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-display)', marginBottom: '3px' }}>{row.name}</div>
-                                                <div style={{ height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', width: '110px' }}>
-                                                  <div style={{ width: `${row.pct * 100}%`, height: '100%', background: `linear-gradient(90deg,${row.color},${row.bot})` }} />
-                                                </div>
-                                              </div>
-                                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                                <div style={{ fontSize: '11px', fontWeight: 700, color: row.color, fontFamily: 'var(--font-display)' }}>Lvl {row.lvl}</div>
-                                                <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)' }}>{row.xp} XP</div>
-                                              </div>
-                                            </div>
-                                          ))}
-                                          {/* Footer */}
-                                          <div style={{ padding: '6px 0', background: 'rgba(255,255,255,0.025)', textAlign: 'center', fontSize: '9px', color: 'rgba(255,255,255,0.18)', fontFamily: 'var(--font-display)' }}>Server Name  ·  Rankings update in real-time</div>
-                                          {/* Bottom accent line */}
-                                          <div style={{ height: '2px', background: `linear-gradient(90deg, transparent 0%, ${pa1}bb 30%, ${pa2}bb 70%, transparent 100%)` }} />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })()}
 
                             </div>
                           );
