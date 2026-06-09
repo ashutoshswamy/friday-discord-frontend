@@ -2689,228 +2689,80 @@
 /* ── Leaderboard Card ── */
 
 /* stats ticker (matches 4-col stats grid) */
-.lp-lb-ticker {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: rgba(59,157,255,0.08);
-  border: 1px solid rgba(59,157,255,0.08);
-  border-radius: 7px;
-  overflow: hidden;
-}
-
-.lp-lb-ticker-cell {
-  background: rgba(0,0,0,0.22);
-  padding: 7px 6px;
+/* leaderboard tab pills */
+.lp-lb-tabs-mock {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
-.lp-lb-ticker-label {
-  font-size: 7.5px;
-  font-weight: 700;
-  color: var(--lp-text-2);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  text-align: center;
-}
-
-.lp-lb-ticker-value {
-  font-size: 12px;
-  font-weight: 900;
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: -0.3px;
-}
-
-/* board panel header */
-.lp-lb-board-header {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 0 8px;
-  border-bottom: 1px solid rgba(59,157,255,0.09);
-}
-
-.lp-lb-board-title {
-  font-size: 11px;
-  font-weight: 800;
-  color: #8b5cf6;
-  letter-spacing: 1.2px;
-  font-family: 'Poppins', sans-serif;
-  flex: 1;
-}
-
-.lp-lb-board-count {
+.lp-lb-tab-mock {
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 10px;
+  font-weight: 600;
   color: var(--lp-text-2);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  cursor: default;
 }
 
-/* podium (matches PodiumCard) */
-.lp-lb-podium {
-  display: flex;
-  gap: 6px;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 4px 0;
+.lp-lb-tab-mock.active {
+  color: #8b5cf6;
+  background: rgba(139,92,246,0.12);
+  border-color: rgba(139,92,246,0.3);
 }
 
-.lp-lb-podium-card {
-  position: relative;
-  flex: 1;
-  padding: 12px 8px 10px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.22);
+/* list rows */
+.lp-lb-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  overflow: hidden;
+  gap: 2px;
 }
 
-.lp-lb-podium-watermark {
-  position: absolute;
-  top: -6px;
-  right: 4px;
-  font-size: 52px;
-  font-weight: 900;
-  font-family: 'Poppins', sans-serif;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-}
-
-.lp-lb-podium-badge {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  font-size: 7px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 1px 5px;
-  border-radius: 20px;
-  border: 1px solid;
-}
-
-.lp-lb-podium-avatar-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  margin-top: 6px;
-  flex-shrink: 0;
-}
-
-.lp-lb-podium-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--lp-text);
-}
-
-.lp-lb-podium-name {
-  font-size: 9.5px;
-  font-weight: 700;
-  color: var(--lp-text);
-  text-align: center;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.lp-lb-podium-level {
-  font-size: 12px;
-  font-weight: 900;
-  font-family: 'Poppins', sans-serif;
-}
-
-.lp-lb-podium-xp {
-  font-size: 8px;
-  color: var(--lp-text-2);
-}
-
-.lp-lb-podium-bar {
-  width: 100%;
-  height: 2px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.lp-lb-podium-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-  border-radius: 1px;
-}
-
-/* rank rows 4+ (matches RankRow) */
-.lp-lb-rows-label {
-  font-size: 8.5px;
-  font-weight: 700;
-  color: var(--lp-text-2);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 6px 0 4px;
-  border-bottom: 1px solid rgba(59,157,255,0.09);
-  font-family: 'Poppins', sans-serif;
-}
-
-.lp-lb-rank-row {
+.lp-lb-list-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 4px;
-  border-radius: 5px;
+  padding: 6px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
   transition: background 0.15s;
 }
 
-.lp-lb-rank-row:hover { background: rgba(255,255,255,0.04); }
+.lp-lb-list-row.top {
+  background: rgba(139,92,246,0.06);
+  border-color: rgba(139,92,246,0.12);
+}
 
-.lp-lb-rank-num {
-  width: 22px;
+.lp-lb-list-rank {
+  width: 24px;
+  font-size: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 1;
+}
+
+.lp-lb-list-row:not(.top) .lp-lb-list-rank {
   font-size: 10px;
   font-weight: 800;
   color: var(--lp-text-2);
-  text-align: right;
-  flex-shrink: 0;
   font-family: 'Poppins', sans-serif;
 }
 
-.lp-lb-rank-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(59,157,255,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--lp-text);
-  flex-shrink: 0;
-}
-
-.lp-lb-rank-info {
+.lp-lb-list-info {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
-.lp-lb-rank-name {
+.lp-lb-list-name {
   font-size: 11px;
   font-weight: 600;
   color: var(--lp-text);
@@ -2919,36 +2771,44 @@
   white-space: nowrap;
 }
 
-.lp-lb-rank-bar-track {
-  width: 70px;
+.lp-lb-list-bar-track {
+  width: 80px;
   height: 2px;
   background: rgba(255,255,255,0.06);
   border-radius: 1px;
   overflow: hidden;
 }
 
-.lp-lb-rank-bar-fill {
+.lp-lb-list-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #8b5cf6, #a78bfa);
   border-radius: 1px;
 }
 
-.lp-lb-rank-stat {
+.lp-lb-list-stat {
   flex-shrink: 0;
   text-align: right;
 }
 
-.lp-lb-rank-level {
+.lp-lb-list-level {
   font-size: 10.5px;
   font-weight: 800;
   color: #8b5cf6;
   font-family: 'Poppins', sans-serif;
 }
 
-.lp-lb-rank-xp {
+.lp-lb-list-xp {
   font-size: 9px;
   color: var(--lp-text-2);
   margin-top: 1px;
+}
+
+.lp-lb-list-footer {
+  font-size: 9px;
+  color: var(--lp-text-2);
+  text-align: center;
+  padding-top: 4px;
+  opacity: 0.6;
 }
 
 /* ── Giveaway Card ── */

@@ -276,11 +276,33 @@ export default function Landing({ onLogin, clientId, isLoggedIn }) {
         <div className="lp-dash-card">
           <div className="lp-dash-titlebar"><div className="lp-automod-dots"><span className="lp-dot lp-dot-r"/><span className="lp-dot lp-dot-y"/><span className="lp-dot lp-dot-g"/></div><span className="lp-dash-titlebar-label">Friday Dashboard — Leaderboard</span></div>
           <div className="lp-dash-body">
-            <div className="lp-lb-ticker">{[{label:'Total XP',value:'284,500',color:'#8b5cf6'},{label:'Coins Circ.',value:'4.2M',color:'#00c853'},{label:'Peak Level',value:'Lv. 42',color:'#f59e0b'},{label:'Active Members',value:'312',color:'#3b9dff'}].map(({label,value,color})=>(<div key={label} className="lp-lb-ticker-cell"><div className="lp-lb-ticker-label">{label}</div><div className="lp-lb-ticker-value" style={{color}}>{value}</div></div>))}</div>
-            <div className="lp-lb-board-header"><Zap size={13} color="#8b5cf6"/><span className="lp-lb-board-title">XP RANKINGS</span><span className="lp-lb-board-count"><UserPlus size={10}/> 312</span></div>
-            <div className="lp-lb-podium">{[{name:'nova_knight',level:42,xp:9400,pct:88,pc:{glow:'#f59e0b',ring:'linear-gradient(135deg,#f59e0b,#fcd34d)',label:'GOLD',num:'1'},order:0},{name:'crystal_void',level:38,xp:7800,pct:72,pc:{glow:'#94a3b8',ring:'linear-gradient(135deg,#94a3b8,#cbd5e1)',label:'SILVER',num:'2'},order:-1},{name:'blazex99',level:35,xp:6600,pct:61,pc:{glow:'#b45309',ring:'linear-gradient(135deg,#b45309,#d97706)',label:'BRONZE',num:'3'},order:1}].map(({name,level,xp,pct,pc,order})=>(<div key={name} className="lp-lb-podium-card" style={{border:`1px solid ${pc.glow}30`,boxShadow:`0 0 20px ${pc.glow}14`,order}}><div className="lp-lb-podium-watermark" style={{color:`${pc.glow}10`}}>{pc.num}</div><div className="lp-lb-podium-badge" style={{color:pc.glow,background:`${pc.glow}18`,border:`1px solid ${pc.glow}40`}}>{pc.label}</div><div className="lp-lb-podium-avatar-wrap" style={{padding:'2px',background:pc.ring}}><div className="lp-lb-podium-avatar">{name[0].toUpperCase()}</div></div><div className="lp-lb-podium-name">{name}</div><div className="lp-lb-podium-level" style={{color:'#8b5cf6'}}>LVL {level}</div><div className="lp-lb-podium-xp">{xp.toLocaleString()} XP</div><div className="lp-lb-podium-bar"><div className="lp-lb-podium-bar-fill" style={{width:`${pct}%`}}/></div></div>))}</div>
-            <div className="lp-lb-rows-label">Ranked 4–6</div>
-            {[{rank:4,name:'lunaris',level:31,xp:5100,pct:47},{rank:5,name:'axion_drift',level:28,xp:4200,pct:38},{rank:6,name:'dusk_angel',level:24,xp:3500,pct:29}].map(({rank,name,level,xp,pct})=>(<div key={rank} className="lp-lb-rank-row"><span className="lp-lb-rank-num">#{rank}</span><div className="lp-lb-rank-avatar">{name[0].toUpperCase()}</div><div className="lp-lb-rank-info"><div className="lp-lb-rank-name">{name}</div><div className="lp-lb-rank-bar-track"><div className="lp-lb-rank-bar-fill" style={{width:`${pct}%`}}/></div></div><div className="lp-lb-rank-stat"><div className="lp-lb-rank-level">LVL {level}</div><div className="lp-lb-rank-xp">{xp.toLocaleString()} xp</div></div></div>))}
+            <div className="lp-lb-tabs-mock">
+              <span className="lp-lb-tab-mock active"><Star size={11}/>XP Ranking</span>
+              <span className="lp-lb-tab-mock">Economy</span>
+            </div>
+            <div className="lp-lb-list">
+              {[
+                {rank:1,medal:'🥇',name:'nova_knight',level:42,xp:9400,pct:88},
+                {rank:2,medal:'🥈',name:'crystal_void',level:38,xp:7800,pct:72},
+                {rank:3,medal:'🥉',name:'blazex99',level:35,xp:6600,pct:61},
+                {rank:4,medal:null,name:'lunaris',level:31,xp:5100,pct:47},
+                {rank:5,medal:null,name:'axion_drift',level:28,xp:4200,pct:38},
+                {rank:6,medal:null,name:'dusk_angel',level:24,xp:3500,pct:29},
+              ].map(({rank,medal,name,level,xp,pct})=>(
+                <div key={rank} className={`lp-lb-list-row${rank<=3?' top':''}`}>
+                  <span className="lp-lb-list-rank">{medal || `#${rank}`}</span>
+                  <div className="lp-lb-list-info">
+                    <div className="lp-lb-list-name">{name}</div>
+                    <div className="lp-lb-list-bar-track"><div className="lp-lb-list-bar-fill" style={{width:`${pct}%`}}/></div>
+                  </div>
+                  <div className="lp-lb-list-stat">
+                    <div className="lp-lb-list-level">Lv. {level}</div>
+                    <div className="lp-lb-list-xp">{xp.toLocaleString()} XP</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lp-lb-list-footer">312 members ranked</div>
           </div>
         </div>
       );
