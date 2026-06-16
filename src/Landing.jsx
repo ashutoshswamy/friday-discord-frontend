@@ -31,7 +31,7 @@ import Footer from './Footer';
 
 
 const makeInviteUrl = (clientId) =>
-  `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands`;
+  `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=5085252284837110&integration_type=0&scope=bot+applications.commands`;
 
 const ORBIT_ICONS = [
   { Icon: Shield,   label: 'AutoMod',    color: '#3b9dff', angle: 0   },

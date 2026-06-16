@@ -1528,7 +1528,7 @@ function App() {
                         </div>
                       ))}
                       {inactiveGuilds.map(g => {
-                        const invite = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&permissions=8&scope=bot%20applications.commands&guild_id=${g.id}&disable_guild_select=true`;
+                        const invite = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&permissions=5085252284837110&integration_type=0&scope=bot+applications.commands&guild_id=${g.id}&disable_guild_select=true`;
                         return (
                           <div key={g.id} className="guild-card glass-panel">
                             {g.icon ? <img className="guild-avatar-large" src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`} alt={g.name} style={{ opacity: 0.5 }} /> : <div className="guild-avatar-large" style={{ opacity: 0.5 }}>{g.name.charAt(0)}</div>}

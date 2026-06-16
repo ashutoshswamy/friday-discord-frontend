@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || '1508180727953359008';
 const makeInviteUrl = (id) =>
-  `https://discord.com/oauth2/authorize?client_id=${id}&permissions=8&scope=bot%20applications.commands`;
+  `https://discord.com/oauth2/authorize?client_id=${id}&permissions=5085252284837110&integration_type=0&scope=bot+applications.commands`;
 
 export default function Footer({ onDashboard }) {
   const inviteUrl = makeInviteUrl(CLIENT_ID);
