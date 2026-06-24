@@ -4258,7 +4258,7 @@ function App() {
                                             <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '2px 7px', color: 'var(--text-secondary)' }}>{stockChartData.market}</span>
                                           </div>
                                           <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: isUp ? '#00e676' : '#ff1744' }}>
-                                            {stockChartData.currency}{closeP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                                            <Coins size={20} style={{ verticalAlign: 'middle', marginRight: '4px' }} />{closeP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                                             <span style={{ fontSize: '14px', marginLeft: '10px' }}>{isUp ? '▲' : '▼'} {quote?.changePercent >= 0 ? '+' : ''}{quote?.changePercent ?? '—'}%</span>
                                           </div>
                                         </div>
@@ -4266,7 +4266,7 @@ function App() {
                                           {[['Open', openP], ['High', maxP], ['Low', minP]].map(([l, v]) => (
                                             <div key={l} style={{ textAlign: 'center' }}>
                                               <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{l}</div>
-                                              <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{stockChartData.currency}{Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</div>
+                                              <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}><Coins size={12} style={{ verticalAlign: 'middle', marginRight: '2px' }} />{Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</div>
                                             </div>
                                           ))}
                                         </div>
@@ -4328,7 +4328,7 @@ function App() {
                                               <td style={{ textAlign: 'left' }}><span style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '13px' }}>{s.symbol}</span></td>
                                               <td style={{ color: 'var(--text-secondary)', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }} title={s.name}>{s.name}</td>
                                               <td style={{ textAlign: 'center' }}><span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', whiteSpace: 'nowrap', display: 'inline-block' }}>{s.market}</span></td>
-                                              <td style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', fontFamily: 'monospace', fontSize: '13px' }}>{s.currency}{s.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
+                                              <td style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', fontFamily: 'monospace', fontSize: '13px' }}><Coins size={13} style={{ verticalAlign: 'middle', marginRight: '3px' }} />{s.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</td>
                                               <td style={{ color: isUp ? '#00e676' : '#ff1744', fontWeight: 600, fontSize: '12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                                                 {isUp ? '▲' : '▼'} {isUp ? '+' : ''}{s.changePercent}%
                                               </td>
@@ -4367,7 +4367,7 @@ function App() {
                                       {['NASDAQ', 'NSE', 'LSE', 'CRYPTO', 'TYO', 'ASX'].map(mkt => (
                                         <optgroup key={mkt} label={mkt}>
                                           {stockCatalog.filter(s => s.market === mkt).map(s => (
-                                            <option key={s.symbol} value={s.symbol}>{s.symbol} — {s.name} ({s.currency}{s.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</option>
+                                            <option key={s.symbol} value={s.symbol}>{s.symbol} — {s.name} ({s.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} coins)</option>
                                           ))}
                                         </optgroup>
                                       ))}
@@ -4390,7 +4390,7 @@ function App() {
                                     const val = (Number(portfolioShares) * s.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     return (
                                       <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '10px 12px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                        Market value of {portfolioShares} × {s.symbol}: <strong style={{ color: 'var(--text-primary)' }}>{s.currency}{val}</strong>
+                                        Market value of {portfolioShares} × {s.symbol}: <strong style={{ color: 'var(--text-primary)' }}><Coins size={13} style={{ verticalAlign: 'middle', marginRight: '2px' }} />{val}</strong>
                                       </div>
                                     );
                                   })()}
